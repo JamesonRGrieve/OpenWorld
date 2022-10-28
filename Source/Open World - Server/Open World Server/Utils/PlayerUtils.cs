@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -176,7 +175,7 @@ namespace OpenWorldServer
         {
             Server.bannedIPs.Clear();
 
-            if (!File.Exists(Server.mainFolderPath + Path.DirectorySeparatorChar + "Banned IPs.data"))
+            if (!File.Exists(PathProvider.MainFolderPath + Path.DirectorySeparatorChar + "Banned IPs.data"))
             {
                 ConsoleUtils.LogToConsole("No Bans File Found, Ignoring");
                 return;
@@ -223,7 +222,7 @@ namespace OpenWorldServer
             if (Server.banWealthThreshold == 0 && Server.warningWealthThreshold == 0) return;
             if (client.isAdmin) return;
 
-            int wealthToCompare = (int) Server.savedClients.Find(fetch => fetch.username == client.username).wealth;
+            int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.username == client.username).wealth;
 
             if (client.wealth - wealthToCompare > Server.banWealthThreshold && Server.banWealthThreshold > 0)
             {
@@ -246,7 +245,7 @@ namespace OpenWorldServer
                 Server.savedClients.Find(fetch => fetch.username == client.username).pawnCount = client.pawnCount;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                ConsoleUtils.LogToConsole("Player [" + client.username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int) client.wealth + "]");
+                ConsoleUtils.LogToConsole("Player [" + client.username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int)client.wealth + "]");
                 Console.ForegroundColor = ConsoleColor.White;
             }
             else
@@ -359,7 +358,7 @@ namespace OpenWorldServer
 
             dataToSend = dataToSend.Replace("GiftedItems│", "");
 
-            foreach(ServerClient sc in Server.savedClients)
+            foreach (ServerClient sc in Server.savedClients)
             {
                 if (sc.homeTileID == tileToSend)
                 {

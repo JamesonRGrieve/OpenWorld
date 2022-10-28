@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using OpenWorldServer.Data;
+using OpenWorldServer.Migrations;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
     public static class Server
     {
+        private static ServerConfig serverConfig;
+
         //Paths
-        public static string mainFolderPath;
         public static string serverSettingsPath;
         public static string worldSettingsPath;
         public static string playersFolderPath;
@@ -65,13 +69,18 @@ namespace OpenWorldServer
         public static int overallTemperature;
         public static int overallPopulation;
 
-        static void Main()
+        public static void Main()
         {
+            MigrationService.CreateAndMigrateAll();
+
             ServerUtils.SetPaths();
             ServerUtils.SetCulture();
 
             ServerUtils.CheckServerVersion();
-            ServerUtils.CheckSettingsFile();
+
+            serverConfig = ServerUtils.LoadServerConfig(serverSettingsPath);
+            AdoptConfigToStaticVars();
+            return;
 
             ModHandler.CheckMods(true);
             FactionHandler.CheckFactions(true);
@@ -81,6 +90,30 @@ namespace OpenWorldServer
             Threading.GenerateThreads(0);
 
             while (true) ListenForCommands();
+        }
+
+        private static void AdoptConfigToStaticVars()
+        {
+            // This needs to be replaced with proper use of the server config in the classes
+            Server.serverName = serverConfig.ServerName;
+            Server.serverDescription = serverConfig.Description;
+            Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
+            Networking.serverPort = serverConfig.Port;
+            Server.maxPlayers = serverConfig.MaxPlayers;
+            Server.allowDevMode = serverConfig.AllowDevMode;
+            Server.usingWhitelist = serverConfig.WhitelistMode;
+            Server.warningWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold;
+            Server.banWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.BanThreshold;
+            Server.usingWealthSystem = serverConfig.AntiCheat.WealthCheckSystem.IsActive;
+            Server.usingIdleTimer = serverConfig.IdleSystem.IsActive;
+            Server.idleTimer = (int)serverConfig.IdleSystem.IdleThresholdInDays;
+            Server.usingRoadSystem = serverConfig.RoadSystem.IsActive;
+            Server.aggressiveRoadMode = serverConfig.RoadSystem.AggressiveRoadMode;
+            Server.forceModlist = serverConfig.ModsSystem.MatchModlist;
+            Server.forceModlistConfigs = serverConfig.ModsSystem.ModlistConfigMatch;
+            Server.usingModVerification = serverConfig.ModsSystem.ForceModVerification;
+            Server.usingChat = serverConfig.ChatSystem.IsActive;
+            Server.usingProfanityFilter = serverConfig.ChatSystem.UseProfanityFilter;
         }
 
         public static void ListenForCommands()

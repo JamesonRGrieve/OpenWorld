@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -8,7 +9,7 @@ namespace OpenWorldServer
     {
         public static void SaveBannedIPs(Dictionary<string, string> IPs)
         {
-            string folderPath = Server.mainFolderPath;
+            string folderPath = PathProvider.MainFolderPath;
             string filepath = folderPath + Path.DirectorySeparatorChar + "Banned IPs.data";
 
             BinaryFormatter formatter = new BinaryFormatter();
@@ -24,7 +25,7 @@ namespace OpenWorldServer
 
         public static BanDataHolder LoadBannedIPs()
         {
-            string path = Server.mainFolderPath + Path.DirectorySeparatorChar + "Banned IPs.data";
+            string path = PathProvider.MainFolderPath + Path.DirectorySeparatorChar + "Banned IPs.data";
 
             BinaryFormatter formatter = new BinaryFormatter();
 

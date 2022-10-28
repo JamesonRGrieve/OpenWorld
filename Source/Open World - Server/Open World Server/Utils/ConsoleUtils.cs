@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace OpenWorldServer
 {
@@ -10,6 +8,13 @@ namespace OpenWorldServer
         public static void UpdateTitle()
         {
             Console.Title = Server.serverName + " " + Server.serverVersion + " / " + Networking.localAddress.ToString() + " / " + Networking.connectedClients.Count + " Of " + Server.maxPlayers + " Connected Players";
+        }
+
+        public static void LogToConsole(string data, ConsoleColor textColor)
+        {
+            Console.ForegroundColor = textColor;
+            ConsoleUtils.LogToConsole(data);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void LogToConsole(string data)
