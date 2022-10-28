@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -9,6 +10,9 @@ namespace OpenWorldServer
         {
             Console.Title = Server.serverName + " " + Server.serverVersion + " / " + Networking.localAddress.ToString() + " / " + Networking.connectedClients.Count + " Of " + Server.maxPlayers + " Connected Players";
         }
+
+        public static void LogTitleToConsole(string title)
+            => ConsoleUtils.LogToConsole($"== {title} ==", ConsoleColor.Blue);
 
         public static void LogToConsole(string data, ConsoleColor textColor)
         {
@@ -43,7 +47,7 @@ namespace OpenWorldServer
 
         public static void WriteToLog(string data, string logMode)
         {
-            string pathToday = Server.logFolderPath + Path.DirectorySeparatorChar + DateTime.Today.Month + "-" + DateTime.Today.Day + "-" + DateTime.Today.Year;
+            string pathToday = Path.Combine(PathProvider.LogsFolderPath, DateTime.Today.ToString("yyyy-MM-dd"));
             if (!Directory.Exists(pathToday)) Directory.CreateDirectory(pathToday);
 
             string logName;

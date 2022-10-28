@@ -48,7 +48,7 @@ namespace OpenWorldServer
                 SendLoadGameData(client);
             }
 
-            ConsoleUtils.LogToConsole("Player [" + client.username + "] " + "[" + 
+            ConsoleUtils.LogToConsole("Player [" + client.username + "] " + "[" +
                 ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() + "] " + "Has Connected");
         }
 
@@ -139,7 +139,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "Planet│";
 
-            float mmGC = Server.globeCoverage;
+            double mmGC = Server.globeCoverage;
             string mmS = Server.seed;
             int mmOR = Server.overallRainfall;
             int mmOT = Server.overallTemperature;

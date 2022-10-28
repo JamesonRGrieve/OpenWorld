@@ -1,45 +1,15 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
 using OpenWorldServer.Data;
-using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
     public static class ServerUtils
     {
-        public static void SetCulture()
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            ConsoleUtils.LogToConsole("Using Culture Info: [" + CultureInfo.CurrentCulture + "]");
 
-            CultureInfo.CurrentCulture = new CultureInfo("en-US", false);
-            CultureInfo.CurrentUICulture = new CultureInfo("en-US", false);
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US", false);
-            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US", false);
-        }
-
-        public static void SetPaths()
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Server Startup:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.LogToConsole("Base Directory At: [" + PathProvider.MainFolderPath + "]");
-
-            Server.logFolderPath = Path.Combine(PathProvider.MainFolderPath, "Logs");
-            Server.serverSettingsPath = Path.Combine(PathProvider.MainFolderPath, "Server Settings.txt");
-            Server.worldSettingsPath = Path.Combine(PathProvider.MainFolderPath, "World Settings.txt");
-            Server.playersFolderPath = Path.Combine(PathProvider.MainFolderPath, "Players");
-            Server.factionsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Factions");
-            Server.enforcedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Enforced Mods");
-            Server.whitelistedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Whitelisted Mods");
-            Server.blacklistedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Blacklisted Mods");
-            Server.whitelistedUsersPath = Path.Combine(PathProvider.MainFolderPath, "Whitelisted Players.txt");
-        }
 
         public static void CheckServerVersion()
         {

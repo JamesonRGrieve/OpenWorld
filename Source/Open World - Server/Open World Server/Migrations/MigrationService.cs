@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 
@@ -10,15 +9,19 @@ namespace OpenWorldServer.Migrations
     {
         private string fileBackupPath = Path.Combine(PathProvider.MainFolderPath, "MigrationBackups");
 
-        public void MigrateAll()
+        public void MigrateAll(ServerConfig serverConfig)
         {
-            this.MigrateConfig();
+            ConsoleUtils.LogTitleToConsole("Checking for Migrations");
+            this.MigrateConfig(serverConfig);
+            this.MigrateWorldSettings(serverConfig);
+
+            serverConfig.Save(PathProvider.ConfigFile);
         }
 
-        public static MigrationService CreateAndMigrateAll()
+        public static MigrationService CreateAndMigrateAll(ServerConfig serverConfig)
         {
             var service = new MigrationService();
-            service.MigrateAll();
+            service.MigrateAll(serverConfig);
             return service;
         }
 
@@ -36,7 +39,7 @@ namespace OpenWorldServer.Migrations
             ConsoleUtils.LogToConsole($"Migrated {data} {state}{reason}", color);
         }
 
-        public void MigrateConfig()
+        public void MigrateConfig(ServerConfig serverConfig)
         {
             var oldPath = Path.Combine(PathProvider.MainFolderPath, "Server Settings.txt");
             if (File.Exists(oldPath))
@@ -45,7 +48,6 @@ namespace OpenWorldServer.Migrations
                 this.EnsureBackupDir();
                 this.LogMigratingData(migrating);
 
-                var newConfig = new ServerConfig();
                 var settings = File.ReadAllLines(oldPath);
 
                 const string namePrefix = "Server Name: ";
@@ -68,101 +70,148 @@ namespace OpenWorldServer.Migrations
                 const string useChatPrefix = "Use Chat: ";
                 const string profanityFilterPrefix = "Use Profanity filter: ";
 
-                foreach (string setting in settings)
+                try
                 {
-                    if (setting.StartsWith(namePrefix))
+                    foreach (string setting in settings)
                     {
-                        newConfig.ServerName = setting.Replace(namePrefix, string.Empty);
+                        if (setting.StartsWith(namePrefix))
+                        {
+                            serverConfig.ServerName = setting.Replace(namePrefix, string.Empty);
+                        }
+                        else if (setting.StartsWith(descriptionPrefix))
+                        {
+                            serverConfig.Description = setting.Replace(descriptionPrefix, string.Empty);
+                        }
+                        else if (setting.StartsWith(localIpPrefix))
+                        {
+                            serverConfig.HostIP = setting.Replace(localIpPrefix, string.Empty);
+                        }
+                        else if (setting.StartsWith(portPrefix))
+                        {
+                            serverConfig.Port = int.Parse(setting.Replace(portPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(maxPlayerPrefix))
+                        {
+                            serverConfig.MaxPlayers = ushort.Parse(setting.Replace(maxPlayerPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(devModePrefix))
+                        {
+                            serverConfig.AllowDevMode = bool.Parse(setting.Replace(devModePrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(whitelistPrefix))
+                        {
+                            serverConfig.WhitelistMode = bool.Parse(setting.Replace(whitelistPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(wealthWarningPrefix))
+                        {
+                            serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold = int.Parse(setting.Replace(wealthWarningPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(wealthBanPrefix))
+                        {
+                            serverConfig.AntiCheat.WealthCheckSystem.BanThreshold = int.Parse(setting.Replace(wealthBanPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(useWealthPrefix))
+                        {
+                            serverConfig.AntiCheat.WealthCheckSystem.IsActive = bool.Parse(setting.Replace(useWealthPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(useIdleSysPrefix))
+                        {
+                            serverConfig.IdleSystem.IsActive = bool.Parse(setting.Replace(useIdleSysPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(idleTresholdPrefix))
+                        {
+                            serverConfig.IdleSystem.IdleThresholdInDays = uint.Parse(setting.Replace(idleTresholdPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(useRoadSysPrefix))
+                        {
+                            serverConfig.RoadSystem.IsActive = bool.Parse(setting.Replace(useRoadSysPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(aggressiveRoadModePrefix))
+                        {
+                            serverConfig.RoadSystem.AggressiveRoadMode = bool.Parse(setting.Replace(aggressiveRoadModePrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(modlistMatchPrefix))
+                        {
+                            serverConfig.ModsSystem.MatchModlist = bool.Parse(setting.Replace(modlistMatchPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(modlistConfigMatchPrefix))
+                        {
+                            serverConfig.ModsSystem.ModlistConfigMatch = bool.Parse(setting.Replace(modlistConfigMatchPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(modVerifyPrefix))
+                        {
+                            serverConfig.ModsSystem.ForceModVerification = bool.Parse(setting.Replace(modVerifyPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(useChatPrefix))
+                        {
+                            serverConfig.ChatSystem.IsActive = bool.Parse(setting.Replace(useChatPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(profanityFilterPrefix))
+                        {
+                            serverConfig.ChatSystem.UseProfanityFilter = bool.Parse(setting.Replace(profanityFilterPrefix, string.Empty));
+                        }
                     }
-                    else if (setting.StartsWith(descriptionPrefix))
-                    {
-                        newConfig.Description = setting.Replace(descriptionPrefix, string.Empty);
-                    }
-                    else if (setting.StartsWith(localIpPrefix))
-                    {
-                        newConfig.HostIP = setting.Replace(localIpPrefix, string.Empty);
-                    }
-                    else if (setting.StartsWith(portPrefix))
-                    {
-                        newConfig.Port = int.Parse(setting.Replace(portPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(maxPlayerPrefix))
-                    {
-                        newConfig.MaxPlayers = ushort.Parse(setting.Replace(maxPlayerPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(devModePrefix))
-                    {
-                        newConfig.AllowDevMode = bool.Parse(setting.Replace(devModePrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(whitelistPrefix))
-                    {
-                        newConfig.WhitelistMode = bool.Parse(setting.Replace(whitelistPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(wealthWarningPrefix))
-                    {
-                        newConfig.AntiCheat.WealthCheckSystem.WarningThreshold = int.Parse(setting.Replace(wealthWarningPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(wealthBanPrefix))
-                    {
-                        newConfig.AntiCheat.WealthCheckSystem.BanThreshold = int.Parse(setting.Replace(wealthBanPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(useWealthPrefix))
-                    {
-                        newConfig.AntiCheat.WealthCheckSystem.IsActive = bool.Parse(setting.Replace(useWealthPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(useIdleSysPrefix))
-                    {
-                        newConfig.IdleSystem.IsActive = bool.Parse(setting.Replace(useIdleSysPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(idleTresholdPrefix))
-                    {
-                        newConfig.IdleSystem.IdleThresholdInDays = uint.Parse(setting.Replace(idleTresholdPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(useRoadSysPrefix))
-                    {
-                        newConfig.RoadSystem.IsActive = bool.Parse(setting.Replace(useRoadSysPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(aggressiveRoadModePrefix))
-                    {
-                        newConfig.RoadSystem.AggressiveRoadMode = bool.Parse(setting.Replace(aggressiveRoadModePrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(modlistMatchPrefix))
-                    {
-                        newConfig.ModsSystem.MatchModlist = bool.Parse(setting.Replace(modlistMatchPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(modlistConfigMatchPrefix))
-                    {
-                        newConfig.ModsSystem.ModlistConfigMatch = bool.Parse(setting.Replace(modlistConfigMatchPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(modVerifyPrefix))
-                    {
-                        newConfig.ModsSystem.ForceModVerification = bool.Parse(setting.Replace(modVerifyPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(useChatPrefix))
-                    {
-                        newConfig.ChatSystem.IsActive = bool.Parse(setting.Replace(useChatPrefix, string.Empty));
-                    }
-                    else if (setting.StartsWith(profanityFilterPrefix))
-                    {
-                        newConfig.ChatSystem.UseProfanityFilter = bool.Parse(setting.Replace(profanityFilterPrefix, string.Empty));
-                    }
-                }
 
-                if (File.Exists(PathProvider.ConfigFile))
+                    File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
+                    this.LogMigratedData(migrating, true);
+                }
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"{Path.GetFileName(PathProvider.ConfigFile)} already exists. Overwrite? Y/n");
-                    var key = Console.ReadKey();
-                    if (key.Key == ConsoleKey.N)
-                    {
-                        this.LogMigratedData(migrating, false, "Aborted");
-                        return;
-                    }
-                    Console.WriteLine();
+                    this.LogMigratedData(migrating, false, ex.Message);
                 }
+            }
+        }
 
-                File.WriteAllText(PathProvider.ConfigFile, JsonSerializer.Serialize(newConfig, new JsonSerializerOptions() { WriteIndented = true }));
-                File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
-                this.LogMigratedData(migrating, true);
+        public void MigrateWorldSettings(ServerConfig serverConfig)
+        {
+            var oldPath = Path.Combine(PathProvider.MainFolderPath, "World Settings.txt");
+            if (File.Exists(oldPath))
+            {
+                const string migrating = "World Settings";
+                this.EnsureBackupDir();
+                this.LogMigratingData(migrating);
+
+                var settings = File.ReadAllLines(oldPath);
+
+                const string globalCoveragePrefix = "Globe Coverage (0.3, 0.5, 1.0): ";
+                const string seedPrefix = "Seed: ";
+                const string rainfallPrefix = "Overall Rainfall (0-6): ";
+                const string tempPrefix = "Overall Temperature (0-6): ";
+                const string populationPrefix = "Overall Population (0-6): ";
+
+                try
+                {
+                    foreach (string setting in settings)
+                    {
+                        if (setting.StartsWith(globalCoveragePrefix))
+                        {
+                            serverConfig.World.GlobeCoverage = double.Parse(setting.Replace(globalCoveragePrefix, string.Empty), System.Globalization.NumberStyles.Number);
+                        }
+                        else if (setting.StartsWith(seedPrefix))
+                        {
+                            serverConfig.World.Seed = setting.Replace(seedPrefix, string.Empty);
+                        }
+                        else if (setting.StartsWith(rainfallPrefix))
+                        {
+                            serverConfig.World.OverallRainfall = byte.Parse(setting.Replace(rainfallPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(tempPrefix))
+                        {
+                            serverConfig.World.OverallTemperature = byte.Parse(setting.Replace(tempPrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(populationPrefix))
+                        {
+                            serverConfig.World.OverallPopulation = byte.Parse(setting.Replace(populationPrefix, string.Empty));
+                        }
+                    }
+
+                    File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
+                    this.LogMigratedData(migrating, true);
+                }
+                catch (Exception ex)
+                {
+                    this.LogMigratedData(migrating, false, ex.Message);
+                }
             }
         }
     }

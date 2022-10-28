@@ -2,25 +2,18 @@
 using System.Collections.Generic;
 using System.Net;
 using OpenWorldServer.Data;
-using OpenWorldServer.Migrations;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
     public static class Server
     {
-        private static ServerConfig serverConfig;
 
         //Paths
-        public static string serverSettingsPath;
-        public static string worldSettingsPath;
-        public static string playersFolderPath;
-        public static string factionsFolderPath;
         public static string enforcedModsFolderPath;
         public static string whitelistedModsFolderPath;
         public static string blacklistedModsFolderPath;
         public static string whitelistedUsersPath;
-        public static string logFolderPath;
 
         //Player Parameters
         public static List<ServerClient> savedClients = new List<ServerClient>();
@@ -63,28 +56,16 @@ namespace OpenWorldServer
         public static List<Faction> savedFactions = new List<Faction>();
 
         //World Parameters
-        public static float globeCoverage;
+        public static double globeCoverage;
         public static string seed;
         public static int overallRainfall;
         public static int overallTemperature;
         public static int overallPopulation;
 
-        public static void Main()
+        public static void Run()
         {
-            MigrationService.CreateAndMigrateAll();
-
-            ServerUtils.SetPaths();
-            ServerUtils.SetCulture();
-
-            ServerUtils.CheckServerVersion();
-
-            serverConfig = ServerUtils.LoadServerConfig(serverSettingsPath);
-            AdoptConfigToStaticVars();
-            return;
-
             ModHandler.CheckMods(true);
             FactionHandler.CheckFactions(true);
-            WorldHandler.CheckWorldFile();
             PlayerUtils.CheckAllAvailablePlayers(false);
 
             Threading.GenerateThreads(0);
@@ -92,9 +73,11 @@ namespace OpenWorldServer
             while (true) ListenForCommands();
         }
 
-        private static void AdoptConfigToStaticVars()
+        private static void AdoptConfigToStaticVars(ServerConfig serverConfig)
         {
             // This needs to be replaced with proper use of the server config in the classes
+
+            // Server Settings.txt
             Server.serverName = serverConfig.ServerName;
             Server.serverDescription = serverConfig.Description;
             Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
@@ -114,6 +97,13 @@ namespace OpenWorldServer
             Server.usingModVerification = serverConfig.ModsSystem.ForceModVerification;
             Server.usingChat = serverConfig.ChatSystem.IsActive;
             Server.usingProfanityFilter = serverConfig.ChatSystem.UseProfanityFilter;
+
+            // World Settings.txt
+            Server.globeCoverage = serverConfig.World.GlobeCoverage;
+            Server.seed = serverConfig.World.Seed;
+            Server.overallRainfall = serverConfig.World.OverallRainfall;
+            Server.overallTemperature = serverConfig.World.OverallTemperature;
+            Server.overallPopulation = serverConfig.World.OverallPopulation;
         }
 
         public static void ListenForCommands()

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -21,15 +20,15 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("Factions Check:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (!Directory.Exists(Server.factionsFolderPath))
+            if (!Directory.Exists(PathProvider.FactionsFolderPath))
             {
-                Directory.CreateDirectory(Server.factionsFolderPath);
+                Directory.CreateDirectory(PathProvider.FactionsFolderPath);
                 ConsoleUtils.LogToConsole("No Factions Folder Found, Generating");
             }
 
             else
             {
-                string[] factionFiles = Directory.GetFiles(Server.factionsFolderPath);
+                string[] factionFiles = Directory.GetFiles(PathProvider.FactionsFolderPath);
 
                 if (factionFiles.Length == 0)
                 {
@@ -64,13 +63,13 @@ namespace OpenWorldServer
 
         public static void SaveFaction(Faction factionToSave)
         {
-            string factionSavePath = Server.factionsFolderPath + Path.DirectorySeparatorChar + factionToSave.name + ".bin";
+            string factionSavePath = PathProvider.FactionsFolderPath + Path.DirectorySeparatorChar + factionToSave.name + ".bin";
 
             if (factionToSave.members.Count() > 1)
             {
                 //Order faction members dictionary to order
             }
-            
+
             Stream s = File.OpenWrite(factionSavePath);
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(s, factionToSave);
@@ -118,7 +117,7 @@ namespace OpenWorldServer
         {
             Server.savedFactions.Remove(factionToDisband);
 
-            string factionSavePath = Server.factionsFolderPath + Path.DirectorySeparatorChar + factionToDisband.name + ".bin";
+            string factionSavePath = PathProvider.FactionsFolderPath + Path.DirectorySeparatorChar + factionToDisband.name + ".bin";
             File.Delete(factionSavePath);
         }
 
@@ -227,7 +226,7 @@ namespace OpenWorldServer
         {
             ServerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
 
-            foreach(ServerClient dummy in dummyfactionMembers)
+            foreach (ServerClient dummy in dummyfactionMembers)
             {
                 ServerClient connected = Networking.connectedClients.Find(fetch => fetch.username == dummy.username);
                 if (connected != null)
@@ -344,7 +343,7 @@ namespace OpenWorldServer
             SaveFaction(faction);
 
             int factionValue = 0;
-            foreach(ServerClient client in Networking.connectedClients)
+            foreach (ServerClient client in Networking.connectedClients)
             {
                 if (client.faction == null) factionValue = 0;
                 if (client.faction != null)

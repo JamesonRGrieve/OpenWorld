@@ -12,7 +12,7 @@ namespace OpenWorldServer
     {
         public static void SavePlayer(ServerClient playerToSave)
         {
-            string folderPath = Server.playersFolderPath;
+            string folderPath = PathProvider.PlayersFolderPath;
             string filePath = folderPath + Path.DirectorySeparatorChar + playerToSave.username + ".data";
 
             try
@@ -141,16 +141,16 @@ namespace OpenWorldServer
             Server.savedClients.Clear();
             Server.savedSettlements.Clear();
 
-            if (!Directory.Exists(Server.playersFolderPath))
+            if (!Directory.Exists(PathProvider.PlayersFolderPath))
             {
-                Directory.CreateDirectory(Server.playersFolderPath);
+                Directory.CreateDirectory(PathProvider.PlayersFolderPath);
                 ConsoleUtils.LogToConsole("No Players Folder Found, Generating");
                 return;
             }
 
             else
             {
-                string[] playerFiles = Directory.GetFiles(Server.playersFolderPath);
+                string[] playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath);
 
                 foreach (string file in playerFiles)
                 {
