@@ -78,6 +78,7 @@ namespace OpenWorldServer
         {
             AdoptConfigToStaticVars(this.serverConfig);
             Server.whitelistedUsernames = this.playerHandler.WhitelistedUser;
+            this.SetupHandlerProxy();
 
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);
@@ -118,6 +119,12 @@ namespace OpenWorldServer
             Server.overallRainfall = serverConfig.World.OverallRainfall;
             Server.overallTemperature = serverConfig.World.OverallTemperature;
             Server.overallPopulation = serverConfig.World.OverallPopulation;
+        }
+
+        public void SetupHandlerProxy()
+        {
+            HandlerProxy.modHandler = this.modHandler;
+            HandlerProxy.playerHandler = this.playerHandler;
         }
 
         public static void ListenForCommands()
