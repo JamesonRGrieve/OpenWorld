@@ -353,15 +353,14 @@ namespace OpenWorldServer
 
         public static bool CompareClientIPWithBans(ServerClient client)
         {
-            foreach (KeyValuePair<string, string> pair in Server.bannedIPs)
+            var banInfo = HandlerProxy.playerHandler.GetBanInfo(client.PlayerData.Username);
+            if (banInfo != null &&
+                (banInfo.IPAddress == ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() || banInfo.Username == client.PlayerData.Username))
             {
-                if (pair.Key == ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() || pair.Value == client.PlayerData.Username)
-                {
-                    Networking.SendData(client, "Disconnect│Banned");
-                    client.disconnectFlag = true;
-                    ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Banned");
-                    return false;
-                }
+                Networking.SendData(client, "Disconnect│Banned");
+                client.disconnectFlag = true;
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Banned");
+                return false;
             }
 
             return true;
