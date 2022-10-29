@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -158,7 +157,7 @@ namespace OpenWorldServer
 
             connectedClients.Remove(client);
 
-            if (kickMode == "Normal") ConsoleUtils.LogToConsole("Player [" + client.username + "] Has Disconnected");
+            if (kickMode == "Normal") ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Disconnected");
             else if (kickMode == "Silent") { }
 
             ServerUtils.SendPlayerListToAll(null);
@@ -190,7 +189,7 @@ namespace OpenWorldServer
                         SendData(client, "Ping");
                     }
 
-                    foreach(ServerClient client in clientsToDisconnect)
+                    foreach (ServerClient client in clientsToDisconnect)
                     {
                         Thread.Sleep(1);
 

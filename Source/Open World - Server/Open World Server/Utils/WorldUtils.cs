@@ -10,13 +10,13 @@ namespace OpenWorldServer
         {
             if (client != null)
             {
-                client.homeTileID = tileID;
+                client.PlayerData.HomeTileId = tileID;
 
-                foreach(ServerClient sc in Server.savedClients)
+                foreach (ServerClient sc in Server.savedClients)
                 {
-                    if (sc.username == client.username)
+                    if (sc.PlayerData.Username == client.PlayerData.Username)
                     {
-                        sc.homeTileID = client.homeTileID;
+                        sc.PlayerData.HomeTileId = client.PlayerData.HomeTileId;
                         break;
                     }
                 }
@@ -27,14 +27,14 @@ namespace OpenWorldServer
             int factionValue = 0;
             foreach (ServerClient sc in Networking.connectedClients)
             {
-                if (sc.username == client.username) continue;
+                if (sc.PlayerData.Username == client.PlayerData.Username) continue;
                 else
                 {
-                    if (client.faction == null) factionValue = 0;
-                    if (sc.faction == null) factionValue = 0;
-                    else if (client.faction != null && sc.faction != null)
+                    if (client.PlayerData.Faction == null) factionValue = 0;
+                    if (sc.PlayerData.Faction == null) factionValue = 0;
+                    else if (client.PlayerData.Faction != null && sc.PlayerData.Faction != null)
                     {
-                        if (client.faction.name == sc.faction.name) factionValue = 1;
+                        if (client.PlayerData.Faction.name == sc.PlayerData.Faction.name) factionValue = 1;
                         else factionValue = 2;
                     }
                 }
@@ -43,7 +43,7 @@ namespace OpenWorldServer
                 Networking.SendData(sc, dataString);
             }
 
-            Server.savedSettlements.Add(client.homeTileID, new List<string> { client.username });
+            Server.savedSettlements.Add(client.PlayerData.HomeTileId, new List<string> { client.PlayerData.Username });
 
             ConsoleUtils.LogToConsole("Settlement With ID [" + tileID + "] And Owner [" + username + "] Has Been Added");
         }
@@ -52,13 +52,13 @@ namespace OpenWorldServer
         {
             if (client != null)
             {
-                client.homeTileID = null;
+                client.PlayerData.HomeTileId = null;
 
                 foreach (ServerClient sc in Server.savedClients)
                 {
-                    if (sc.username == client.username)
+                    if (sc.PlayerData.Username == client.PlayerData.Username)
                     {
-                        sc.homeTileID = null;
+                        sc.PlayerData.HomeTileId = null;
                         break;
                     }
                 }
@@ -74,7 +74,7 @@ namespace OpenWorldServer
                 {
                     if (client != null)
                     {
-                        if (sc.username == client.username) continue;
+                        if (sc.PlayerData.Username == client.PlayerData.Username) continue;
                     }
 
                     Networking.SendData(sc, dataString);
@@ -90,15 +90,15 @@ namespace OpenWorldServer
         {
             foreach (ServerClient savedClient in Server.savedClients)
             {
-                if (savedClient.username == client.username)
+                if (savedClient.PlayerData.Username == client.PlayerData.Username)
                 {
-                    if (savedClient.homeTileID == tileID) return;
+                    if (savedClient.PlayerData.HomeTileId == tileID) return;
 
                     else
                     {
                         foreach (KeyValuePair<string, List<string>> pair in Server.savedSettlements)
                         {
-                            if (pair.Value[0] == client.username)
+                            if (pair.Value[0] == client.PlayerData.Username)
                             {
                                 RemoveSettlement(client, pair.Key);
                                 Thread.Sleep(500);
@@ -112,19 +112,19 @@ namespace OpenWorldServer
 
                 else
                 {
-                    if (savedClient.homeTileID == tileID)
+                    if (savedClient.PlayerData.HomeTileId == tileID)
                     {
                         Networking.SendData(client, "Disconnect│Corrupted");
 
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.LogToConsole("Player [" + client.username + "] Tried To Claim Used Tile! [" + tileID + "]");
+                        ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Claim Used Tile! [" + tileID + "]");
                         Console.ForegroundColor = ConsoleColor.White;
                         return;
                     }
                 }
             }
 
-            AddSettlement(client, tileID, client.username);
+            AddSettlement(client, tileID, client.PlayerData.Username);
         }
     }
 }

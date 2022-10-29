@@ -249,12 +249,12 @@ namespace OpenWorldServer.Services
                 this.EnsureBackupDir();
                 this.LogMigratingData(migrating);
 
-                var newBannedList = new List<BannedInfo>();
+                var newBannedList = new List<BanInfo>();
                 var formatter = new BinaryFormatter();
                 using (var f = File.OpenRead(oldPath))
                 {
                     var data = formatter.Deserialize(f) as BanDataHolder;
-                    newBannedList = data.BannedIPs.Select(kp => new BannedInfo()
+                    newBannedList = data.BannedIPs.Select(kp => new BanInfo()
                     {
                         Username = kp.Value,
                         IPAddress = kp.Key,

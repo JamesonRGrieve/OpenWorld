@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OpenWorldServer
+﻿namespace OpenWorldServer
 {
     public static class FactionBuildingHandler
     {
@@ -14,10 +10,10 @@ namespace OpenWorldServer
 
             foreach (Faction faction in Server.savedFactions)
             {
-                if (client.faction == null) factionValue = 0;
-                if (client.faction != null)
+                if (client.PlayerData.Faction == null) factionValue = 0;
+                if (client.PlayerData.Faction != null)
                 {
-                    if (client.faction == faction) factionValue = 1;
+                    if (client.PlayerData.Faction == faction) factionValue = 1;
                     else factionValue = 2;
                 }
 
@@ -56,10 +52,10 @@ namespace OpenWorldServer
             int factionValue = 0;
             foreach (ServerClient client in Networking.connectedClients)
             {
-                if (client.faction == null) factionValue = 0;
-                if (client.faction != null)
+                if (client.PlayerData.Faction == null) factionValue = 0;
+                if (client.PlayerData.Faction != null)
                 {
-                    if (client.faction == faction) factionValue = 1;
+                    if (client.PlayerData.Faction == faction) factionValue = 1;
                     else factionValue = 2;
                 }
 
@@ -88,12 +84,12 @@ namespace OpenWorldServer
         {
             if (structureType != 3) return true;
             else foreach (Faction serverFaction in Server.savedFactions)
-            {
-                foreach (FactionStructure structure in serverFaction.factionStructures)
                 {
-                    if (structure.structureType == 3) return false;
+                    foreach (FactionStructure structure in serverFaction.factionStructures)
+                    {
+                        if (structure.structureType == 3) return false;
+                    }
                 }
-            }
 
             return true;
         }

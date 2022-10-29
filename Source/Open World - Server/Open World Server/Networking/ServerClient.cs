@@ -1,32 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
+using OpenWorldServer.Data;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
     public class ServerClient
     {
-        //Security
+        public PlayerData PlayerData { get; set; }
+
         [NonSerialized] public TcpClient tcp;
-        public string username;
-        public string password;
-        public bool isAdmin = false;
-        public bool toWipe = false;
         [NonSerialized] public bool disconnectFlag;
-
-        //Relevant Data
-        public string homeTileID;
-        public List<string> giftString = new List<string>();
-        public List<string> tradeString = new List<string>();
-        public Faction faction;
-
-        //Wealth Data
-        public int pawnCount;
-        public float wealth;
-
-        //Variables Data
-        public bool isImmunized = false;
         [NonSerialized] public bool eventShielded;
         [NonSerialized] public bool inRTSE;
         [NonSerialized] public ServerClient inRtsActionWith;

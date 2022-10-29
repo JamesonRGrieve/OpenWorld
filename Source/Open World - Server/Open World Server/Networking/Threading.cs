@@ -37,7 +37,7 @@ namespace OpenWorldServer
         {
             Thread ClientThread = new Thread(() => Networking.ListenToClient(client));
             ClientThread.IsBackground = true;
-            ClientThread.Name = "User Thread " + client.username;
+            ClientThread.Name = "User Thread " + client.PlayerData.Username;
             ClientThread.Start();
         }
     }

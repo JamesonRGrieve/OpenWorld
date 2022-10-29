@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
@@ -78,6 +79,7 @@ namespace OpenWorldServer
         {
             AdoptConfigToStaticVars(this.serverConfig);
             Server.whitelistedUsernames = this.playerHandler.WhitelistedUser;
+            Server.bannedIPs = this.playerHandler.BannedPlayers.ToDictionary(b => b.IPAddress, b => b.Username);
             this.SetupHandlerProxy();
 
             FactionHandler.CheckFactions(true);

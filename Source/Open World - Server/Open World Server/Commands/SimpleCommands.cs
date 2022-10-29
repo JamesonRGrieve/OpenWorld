@@ -276,7 +276,7 @@ namespace OpenWorldServer
 
             foreach (ServerClient client in Server.savedClients)
             {
-                if (client.isAdmin) Server.adminList.Add(client.username);
+                if (client.PlayerData.IsAdmin) Server.adminList.Add(client.PlayerData.Username);
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -327,8 +327,8 @@ namespace OpenWorldServer
 
                 foreach (ServerClient client in Server.savedClients)
                 {
-                    client.wealth = 0;
-                    client.pawnCount = 0;
+                    client.PlayerData.Wealth = 0;
+                    client.PlayerData.PawnCount = 0;
                     PlayerUtils.SavePlayer(client);
                 }
 
@@ -354,7 +354,7 @@ namespace OpenWorldServer
             if (Networking.connectedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Connected");
             else foreach (ServerClient client in Networking.connectedClients)
                 {
-                    try { ConsoleUtils.WriteWithTime("" + client.username); }
+                    try { ConsoleUtils.WriteWithTime("" + client.PlayerData.Username); }
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -372,7 +372,7 @@ namespace OpenWorldServer
             if (Server.savedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Saved");
             else foreach (ServerClient savedClient in Server.savedClients)
                 {
-                    try { ConsoleUtils.WriteWithTime("" + savedClient.username); }
+                    try { ConsoleUtils.WriteWithTime("" + savedClient.PlayerData.Username); }
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
