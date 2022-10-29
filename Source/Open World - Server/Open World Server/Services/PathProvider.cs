@@ -14,6 +14,7 @@ namespace OpenWorldServer.Services
         //internal static readonly string PlayersFolderPath = Path.Combine(MainFolderPath, "Players");
 
         internal static readonly string ConfigFile = Path.Combine(MainFolderPath, "config.json");
+        internal static readonly string PlayerWhitelistFile = Path.Combine(MainFolderPath, "whitelist.json");
 
         public static void EnsureDirectories()
         {

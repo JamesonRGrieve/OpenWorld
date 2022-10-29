@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using System.Net;
 using OpenWorldServer.Data;
+using OpenWorldServer.Handlers;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
-    public static class Server
+    public class Server
     {
+        private readonly ServerConfig serverConfig;
+        private readonly PlayerHandler playerHandler;
+
+        public Server(ServerConfig serverConfig)
+        {
+            this.playerHandler = new PlayerHandler(serverConfig);
+
+            this.Run();
+        }
 
         //Paths
         public static string enforcedModsFolderPath;
         public static string whitelistedModsFolderPath;
         public static string blacklistedModsFolderPath;
-        public static string whitelistedUsersPath;
 
         //Player Parameters
         public static List<ServerClient> savedClients = new List<ServerClient>();
@@ -62,8 +71,11 @@ namespace OpenWorldServer
         public static int overallTemperature;
         public static int overallPopulation;
 
-        public static void Run()
+        public void Run()
         {
+            AdoptConfigToStaticVars(this.serverConfig);
+            Server.whitelistedUsernames = this.playerHandler.PlayerWhitelist.Usernames;
+
             ModHandler.CheckMods(true);
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);

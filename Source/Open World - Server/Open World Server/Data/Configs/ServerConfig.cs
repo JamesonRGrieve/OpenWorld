@@ -1,14 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Text.Json;
-using OpenWorldServer.Data.Configs;
+﻿using OpenWorldServer.Data.Configs;
 
 namespace OpenWorldServer.Data
 {
     public class ServerConfig
     {
-        public Version ConfigVersion { get; set; } = new Version(1, 0, 0, 0);
-
         public string ServerName { get; set; } = "My OpenWorld Server";
 
         public string Description { get; set; } = string.Empty;
@@ -34,8 +29,5 @@ namespace OpenWorldServer.Data
         public RoadConfig RoadSystem { get; set; } = new RoadConfig();
 
         public WorldConfig World { get; set; } = new WorldConfig();
-
-        public void Save(string filepath)
-            => File.WriteAllText(filepath, JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true }));
     }
 }

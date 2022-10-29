@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using OpenWorldServer.Data;
-using OpenWorldServer.Services;
+using OpenWorldServer.Utils;
 
-namespace OpenWorldServer.Migrations
+namespace OpenWorldServer.Services
 {
     internal class MigrationService
     {
@@ -14,14 +15,15 @@ namespace OpenWorldServer.Migrations
             ConsoleUtils.LogTitleToConsole("Checking for Migrations");
             this.MigrateConfig(serverConfig);
             this.MigrateWorldSettings(serverConfig);
-
-            serverConfig.Save(PathProvider.ConfigFile);
+            JsonDataHelper.Save(serverConfig, PathProvider.ConfigFile);
+            this.MigrateWhitelist();
         }
 
         public static MigrationService CreateAndMigrateAll(ServerConfig serverConfig)
         {
             var service = new MigrationService();
             service.MigrateAll(serverConfig);
+
             return service;
         }
 
@@ -212,6 +214,25 @@ namespace OpenWorldServer.Migrations
                 {
                     this.LogMigratedData(migrating, false, ex.Message);
                 }
+            }
+        }
+
+        private void MigrateWhitelist()
+        {
+            var oldPath = Path.Combine(PathProvider.MainFolderPath, "Whitelisted Players.txt");
+            if (File.Exists(oldPath))
+            {
+                const string migrating = "Whitelisted Players";
+                this.EnsureBackupDir();
+                this.LogMigratingData(migrating);
+
+                var players = File.ReadAllLines(oldPath);
+                var playerWhitelist = new PlayerWhitelist();
+                playerWhitelist.Usernames = players.ToList();
+
+                JsonDataHelper.Save(playerWhitelist, PathProvider.PlayerWhitelistFile);
+                File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
+                this.LogMigratedData(migrating, true);
             }
         }
     }

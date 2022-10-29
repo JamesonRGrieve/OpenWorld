@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using OpenWorldServer.Data;
+using OpenWorldServer.Utils;
 
 namespace OpenWorldServer
 {
@@ -106,8 +106,7 @@ namespace OpenWorldServer
             {
                 try
                 {
-                    var rawSettings = File.ReadAllText(filePath);
-                    config = JsonSerializer.Deserialize<ServerConfig>(rawSettings);
+                    config = JsonDataHelper.Load<ServerConfig>(filePath);
                 }
                 catch (Exception ex)
                 {
@@ -121,8 +120,7 @@ namespace OpenWorldServer
             else
             {
                 ConsoleUtils.LogToConsole("No Server Settings File found, generating new one", ConsoleColor.Yellow);
-
-                File.WriteAllText(filePath, JsonSerializer.Serialize(config, new JsonSerializerOptions() { WriteIndented = true }));
+                JsonDataHelper.Save(config, filePath);
             }
 
             ConsoleUtils.LogToConsole("Loaded Server Settings");

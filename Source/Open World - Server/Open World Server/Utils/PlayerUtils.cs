@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using OpenWorldServer.Services;
@@ -131,7 +130,6 @@ namespace OpenWorldServer
 
             CheckSavedPlayers();
             CheckForBannedPlayers();
-            CheckForWhitelistedPlayers();
 
             Console.WriteLine("");
         }
@@ -188,32 +186,6 @@ namespace OpenWorldServer
 
             if (Server.bannedIPs.Count == 0) ConsoleUtils.LogToConsole("No Banned Players Found, Ignoring");
             else ConsoleUtils.LogToConsole("Loaded [" + Server.bannedIPs.Count + "] Banned Players");
-        }
-
-        private static void CheckForWhitelistedPlayers()
-        {
-            Server.whitelistedUsernames.Clear();
-
-            if (!File.Exists(Server.whitelistedUsersPath))
-            {
-                File.Create(Server.whitelistedUsersPath);
-
-                ConsoleUtils.LogToConsole("No Whitelisted Players File Found, Generating");
-            }
-
-            else
-            {
-                if (File.ReadAllLines(Server.whitelistedUsersPath).Count() == 0) ConsoleUtils.LogToConsole("No Whitelisted Players Found, Ignoring");
-                else
-                {
-                    foreach (string str in File.ReadAllLines(Server.whitelistedUsersPath))
-                    {
-                        Server.whitelistedUsernames.Add(str);
-                    }
-
-                    ConsoleUtils.LogToConsole("Loaded [" + Server.whitelistedUsernames.Count + "] Whitelisted Players");
-                }
-            }
         }
 
         public static void CheckForPlayerWealth(ServerClient client)
