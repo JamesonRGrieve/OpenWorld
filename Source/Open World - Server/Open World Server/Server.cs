@@ -119,6 +119,11 @@ namespace OpenWorldServer
             Server.overallRainfall = serverConfig.World.OverallRainfall;
             Server.overallTemperature = serverConfig.World.OverallTemperature;
             Server.overallPopulation = serverConfig.World.OverallPopulation;
+
+            // Mods
+            Server.enforcedMods = HandlerProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();
+            Server.whitelistedMods = HandlerProxy.modHandler.WhitelisteddMods.ToArray().Select(m => m.Name).ToList();
+            Server.blacklistedMods = HandlerProxy.modHandler.BlacklistedMods.ToArray().Select(m => m.Name).ToList();
         }
 
         public void SetupHandlerProxy()

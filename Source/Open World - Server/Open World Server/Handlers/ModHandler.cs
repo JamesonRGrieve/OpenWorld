@@ -13,6 +13,12 @@ namespace OpenWorldServer.Handlers
         private readonly ServerConfig serverConfig;
         private readonly XmlSerializer xmlSerializer;
 
+        public ReadOnlySpan<ModMetaData> RequiredMods => this.requiredMods;
+
+        public ReadOnlySpan<ModMetaData> WhitelisteddMods => this.whitelistedMods;
+
+        public ReadOnlySpan<ModMetaData> BlacklistedMods => this.blacklistedMods;
+
         private ModMetaData[] requiredMods;
         private ModMetaData[] whitelistedMods;
         private ModMetaData[] blacklistedMods;
