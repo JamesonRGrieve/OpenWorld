@@ -294,13 +294,15 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Banned players: " + Server.bannedIPs.Count);
+            ConsoleUtils.WriteWithTime("Banned players: " + HandlerProxy.playerHandler.BannedPlayers.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.bannedIPs.Count == 0) ConsoleUtils.WriteWithTime("No Banned Players");
-            else foreach (KeyValuePair<string, string> pair in Server.bannedIPs)
+            if (HandlerProxy.playerHandler.BannedPlayers.Count == 0)
+                ConsoleUtils.WriteWithTime("No Banned Players");
+            else
+                foreach (var ban in HandlerProxy.playerHandler.BannedPlayers)
                 {
-                    ConsoleUtils.WriteWithTime("[" + pair.Value + "] - [" + pair.Key + "]");
+                    ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
                 }
 
             Console.WriteLine("");

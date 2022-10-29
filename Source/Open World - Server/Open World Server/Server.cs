@@ -65,7 +65,6 @@ namespace OpenWorldServer
         public static List<string> whitelistedUsernames = new List<string>();
         public static List<string> adminList = new List<string>();
         public static List<string> chatCache = new List<string>();
-        public static Dictionary<string, string> bannedIPs = new Dictionary<string, string>();
         public static List<Faction> savedFactions = new List<Faction>();
 
         //World Parameters
@@ -79,7 +78,6 @@ namespace OpenWorldServer
         {
             AdoptConfigToStaticVars(this.serverConfig);
             Server.whitelistedUsernames = this.playerHandler.WhitelistedUser;
-            Server.bannedIPs = this.playerHandler.BannedPlayers.ToDictionary(b => b.IPAddress, b => b.Username);
             this.SetupHandlerProxy();
 
             FactionHandler.CheckFactions(true);

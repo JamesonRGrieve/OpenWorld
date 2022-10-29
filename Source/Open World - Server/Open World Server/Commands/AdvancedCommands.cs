@@ -677,14 +677,12 @@ namespace OpenWorldServer
 
             else
             {
-                foreach (KeyValuePair<string, string> pair in Server.bannedIPs)
+                var banInfo = HandlerProxy.playerHandler.GetBanInfo(clientID);
+                if (banInfo != null)
                 {
-                    if (pair.Value == clientID)
-                    {
-                        HandlerProxy.playerHandler.UnbanPlayer(pair.Value);
-                        ConsoleUtils.LogToConsole(Environment.NewLine);
-                        return;
-                    }
+                    HandlerProxy.playerHandler.UnbanPlayer(banInfo);
+                    ConsoleUtils.LogToConsole(Environment.NewLine);
+                    return;
                 }
 
                 Console.ForegroundColor = ConsoleColor.Green;

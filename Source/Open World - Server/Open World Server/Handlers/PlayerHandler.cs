@@ -67,12 +67,14 @@ namespace OpenWorldServer.Handlers
             });
 
             this.SaveBannedPlayers();
-            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Been Banned", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has been Banned", ConsoleColor.Green);
         }
+
+        internal BanInfo GetBanInfo(string username) => this.BannedPlayers.Find(b => b.Username == username);
 
         internal void UnbanPlayer(string username)
         {
-            var banInfo = this.BannedPlayers.Find(b => b.Username == username);
+            var banInfo = this.GetBanInfo(username);
             if (banInfo == null)
             {
                 ConsoleUtils.LogToConsole("Player [" + username + "] is not banned", ConsoleColor.Yellow);
