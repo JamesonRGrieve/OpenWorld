@@ -155,10 +155,7 @@ namespace OpenWorldServer
         {
             Console.Clear();
 
-            ConsoleUtils.LogToConsole("COMMAND CURRENTLY BROKEN", ConsoleColor.Red);
-            return;
-
-            //OldModHandler.CheckMods(false);
+            HandlerProxy.modHandler.ReloadModFolders();
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Mods Have Been Reloaded");
             Console.WriteLine("");
