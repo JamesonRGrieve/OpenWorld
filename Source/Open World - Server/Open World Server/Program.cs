@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.IO;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 
@@ -21,7 +20,6 @@ namespace OpenWorldServer
             MigrationService.CreateAndMigrateAll(serverConfig); // Temp Migration Helper
             server = new Server(serverConfig);
 
-            SetPaths();
             ServerUtils.CheckServerVersion();
 
             server.Run();
@@ -41,13 +39,6 @@ namespace OpenWorldServer
             CultureInfo.DefaultThreadCurrentUICulture = usCulture;
 
             ConsoleUtils.LogToConsole("New Culture Info: [" + CultureInfo.CurrentCulture + "]");
-        }
-
-        public static void SetPaths()
-        {
-            Server.enforcedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Enforced Mods"); // Remove space from path
-            Server.whitelistedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Whitelisted Mods");
-            Server.blacklistedModsFolderPath = Path.Combine(PathProvider.MainFolderPath, "Blacklisted Mods");
         }
 
     }

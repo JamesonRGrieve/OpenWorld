@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace OpenWorldServer
@@ -157,7 +156,10 @@ namespace OpenWorldServer
         {
             Console.Clear();
 
-            ModHandler.CheckMods(false);
+            ConsoleUtils.LogToConsole("COMMAND CURRENTLY BROKEN", ConsoleColor.Red);
+            return;
+
+            //OldModHandler.CheckMods(false);
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Mods Have Been Reloaded");
             Console.WriteLine("");
@@ -355,15 +357,15 @@ namespace OpenWorldServer
 
             if (Networking.connectedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Connected");
             else foreach (ServerClient client in Networking.connectedClients)
-            {
-                try { ConsoleUtils.WriteWithTime("" + client.username); }
-                catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString());
-                    Console.ForegroundColor = ConsoleColor.White;
+                    try { ConsoleUtils.WriteWithTime("" + client.username); }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString());
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                 }
-            }
 
             Console.WriteLine("");
 
@@ -373,15 +375,15 @@ namespace OpenWorldServer
 
             if (Server.savedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Saved");
             else foreach (ServerClient savedClient in Server.savedClients)
-            {
-                try { ConsoleUtils.WriteWithTime("" + savedClient.username); }
-                catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)savedClient.tcp.Client.RemoteEndPoint).Address.ToString());
-                    Console.ForegroundColor = ConsoleColor.White;
+                    try { ConsoleUtils.WriteWithTime("" + savedClient.username); }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)savedClient.tcp.Client.RemoteEndPoint).Address.ToString());
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                 }
-            }
 
             Console.WriteLine("");
 
@@ -391,9 +393,9 @@ namespace OpenWorldServer
 
             if (Server.savedFactions.Count == 0) ConsoleUtils.WriteWithTime("No Factions Saved");
             else foreach (Faction savedFaction in Server.savedFactions)
-            {
-                ConsoleUtils.WriteWithTime(savedFaction.name);
-            }
+                {
+                    ConsoleUtils.WriteWithTime(savedFaction.name);
+                }
 
             Console.WriteLine("");
         }

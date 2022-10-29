@@ -11,18 +11,18 @@ namespace OpenWorldServer
     {
         private readonly ServerConfig serverConfig;
         private readonly PlayerHandler playerHandler;
+        private readonly ModHandler modHandler;
 
         public Server(ServerConfig serverConfig)
         {
+            this.serverConfig = serverConfig;
+
+            // Setting up Server
+            this.modHandler = new ModHandler(serverConfig);
             this.playerHandler = new PlayerHandler(serverConfig);
 
             this.Run();
         }
-
-        //Paths
-        public static string enforcedModsFolderPath;
-        public static string whitelistedModsFolderPath;
-        public static string blacklistedModsFolderPath;
 
         //Player Parameters
         public static List<ServerClient> savedClients = new List<ServerClient>();
@@ -76,7 +76,6 @@ namespace OpenWorldServer
             AdoptConfigToStaticVars(this.serverConfig);
             Server.whitelistedUsernames = this.playerHandler.PlayerWhitelist.Usernames;
 
-            ModHandler.CheckMods(true);
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);
 

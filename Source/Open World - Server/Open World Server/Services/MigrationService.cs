@@ -17,6 +17,7 @@ namespace OpenWorldServer.Services
             this.MigrateWorldSettings(serverConfig);
             JsonDataHelper.Save(serverConfig, PathProvider.ConfigFile);
             this.MigrateWhitelist();
+            this.MigrateModsFolder();
         }
 
         public static MigrationService CreateAndMigrateAll(ServerConfig serverConfig)
@@ -233,6 +234,36 @@ namespace OpenWorldServer.Services
                 JsonDataHelper.Save(playerWhitelist, PathProvider.PlayerWhitelistFile);
                 File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
                 this.LogMigratedData(migrating, true);
+            }
+        }
+
+        private void MigrateModsFolder()
+        {
+            this.MigrateModFolder(Path.Combine(PathProvider.MainFolderPath, "Enforced Mods"), PathProvider.RequiredModsFolderPath, "Enforced Mods");
+            this.MigrateModFolder(Path.Combine(PathProvider.MainFolderPath, "Whitelisted Mods"), PathProvider.WhitelistedModsFolderPath, "Whitelisted Mods");
+            this.MigrateModFolder(Path.Combine(PathProvider.MainFolderPath, "Blacklisted Mods"), PathProvider.BlacklistedModsFolderPath, "Blacklisted Mods");
+        }
+
+        private void MigrateModFolder(string source, string target, string title)
+        {
+            if (Directory.Exists(source))
+            {
+                this.LogMigratingData(title);
+
+                try
+                {
+                    if (Directory.Exists(target))
+                    {
+                        Directory.Delete(target, true);
+                    }
+
+                    Directory.Move(source, target);
+                    this.LogMigratedData(title, true);
+                }
+                catch (Exception ex)
+                {
+                    this.LogMigratedData(title, false, ex.Message);
+                }
             }
         }
     }
