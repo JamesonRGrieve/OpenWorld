@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -13,7 +11,7 @@ namespace OpenWorldServer
     {
         public static void SavePlayer(ServerClient playerToSave)
         {
-            string folderPath = Server.playersFolderPath;
+            string folderPath = PathProvider.PlayersFolderPath;
             string filePath = folderPath + Path.DirectorySeparatorChar + playerToSave.username + ".data";
 
             try
@@ -132,7 +130,6 @@ namespace OpenWorldServer
 
             CheckSavedPlayers();
             CheckForBannedPlayers();
-            CheckForWhitelistedPlayers();
 
             Console.WriteLine("");
         }
@@ -142,16 +139,16 @@ namespace OpenWorldServer
             Server.savedClients.Clear();
             Server.savedSettlements.Clear();
 
-            if (!Directory.Exists(Server.playersFolderPath))
+            if (!Directory.Exists(PathProvider.PlayersFolderPath))
             {
-                Directory.CreateDirectory(Server.playersFolderPath);
+                Directory.CreateDirectory(PathProvider.PlayersFolderPath);
                 ConsoleUtils.LogToConsole("No Players Folder Found, Generating");
                 return;
             }
 
             else
             {
-                string[] playerFiles = Directory.GetFiles(Server.playersFolderPath);
+                string[] playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath);
 
                 foreach (string file in playerFiles)
                 {
@@ -191,39 +188,13 @@ namespace OpenWorldServer
             else ConsoleUtils.LogToConsole("Loaded [" + Server.bannedIPs.Count + "] Banned Players");
         }
 
-        private static void CheckForWhitelistedPlayers()
-        {
-            Server.whitelistedUsernames.Clear();
-
-            if (!File.Exists(Server.whitelistedUsersPath))
-            {
-                File.Create(Server.whitelistedUsersPath);
-
-                ConsoleUtils.LogToConsole("No Whitelisted Players File Found, Generating");
-            }
-
-            else
-            {
-                if (File.ReadAllLines(Server.whitelistedUsersPath).Count() == 0) ConsoleUtils.LogToConsole("No Whitelisted Players Found, Ignoring");
-                else
-                {
-                    foreach (string str in File.ReadAllLines(Server.whitelistedUsersPath))
-                    {
-                        Server.whitelistedUsernames.Add(str);
-                    }
-
-                    ConsoleUtils.LogToConsole("Loaded [" + Server.whitelistedUsernames.Count + "] Whitelisted Players");
-                }
-            }
-        }
-
         public static void CheckForPlayerWealth(ServerClient client)
         {
             if (Server.usingWealthSystem == false) return;
             if (Server.banWealthThreshold == 0 && Server.warningWealthThreshold == 0) return;
             if (client.isAdmin) return;
 
-            int wealthToCompare = (int) Server.savedClients.Find(fetch => fetch.username == client.username).wealth;
+            int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.username == client.username).wealth;
 
             if (client.wealth - wealthToCompare > Server.banWealthThreshold && Server.banWealthThreshold > 0)
             {
@@ -246,7 +217,7 @@ namespace OpenWorldServer
                 Server.savedClients.Find(fetch => fetch.username == client.username).pawnCount = client.pawnCount;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                ConsoleUtils.LogToConsole("Player [" + client.username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int) client.wealth + "]");
+                ConsoleUtils.LogToConsole("Player [" + client.username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int)client.wealth + "]");
                 Console.ForegroundColor = ConsoleColor.White;
             }
             else
@@ -359,7 +330,7 @@ namespace OpenWorldServer
 
             dataToSend = dataToSend.Replace("GiftedItems│", "");
 
-            foreach(ServerClient sc in Server.savedClients)
+            foreach (ServerClient sc in Server.savedClients)
             {
                 if (sc.homeTileID == tileToSend)
                 {

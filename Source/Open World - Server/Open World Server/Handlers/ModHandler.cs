@@ -2,147 +2,75 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Xml.Serialization;
+using OpenWorldServer.Data;
+using OpenWorldServer.Services;
 
-namespace OpenWorldServer
+namespace OpenWorldServer.Handlers
 {
-    public static class ModHandler
+    public class ModHandler
     {
-        public static void CheckMods(bool newLine)
+        private readonly ServerConfig serverConfig;
+        private readonly XmlSerializer xmlSerializer;
+
+        private ModMetaData[] requiredMods;
+        private ModMetaData[] whitelistedMods;
+        private ModMetaData[] blacklistedMods;
+
+        public ModHandler(ServerConfig serverConfig)
         {
-            if (newLine) Console.WriteLine("");
+            this.serverConfig = serverConfig;
+            this.xmlSerializer = new XmlSerializer(typeof(ModMetaData));
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Mods Check:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            CheckEnforcedMods();
-            CheckWhitelistedMods();
-            CheckBlacklistedMods();
+            this.ReloadModFolders();
         }
 
-        public static void CheckEnforcedMods()
+        public void ReloadModFolders()
         {
-            if (!Directory.Exists(Server.enforcedModsFolderPath))
-            {
-                Directory.CreateDirectory(Server.enforcedModsFolderPath);
-                ConsoleUtils.LogToConsole("No Enforced Mods Folder Found, Generating");
-            }
+            ConsoleUtils.LogTitleToConsole("Reloading Mods");
+            this.requiredMods = this.GetMods(PathProvider.RequiredModsFolderPath);
+            this.whitelistedMods = this.GetMods(PathProvider.WhitelistedModsFolderPath);
+            this.blacklistedMods = this.GetMods(PathProvider.BlacklistedModsFolderPath);
+            ConsoleUtils.LogToConsole($"Loaded {this.requiredMods.Length} Required Mods", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded {this.whitelistedMods.Length} Whitelisted Mods", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded {this.blacklistedMods.Length} Blacklisted Mods", ConsoleColor.Green);
+        }
 
-            else
-            {
-                string[] modFolders = Directory.GetDirectories(Server.enforcedModsFolderPath);
+        private ModMetaData[] GetMods(string path)
+        {
+            const string aboutFileName = "About.xml";
+            const string aboutDirName = "About";
 
-                if (modFolders.Length == 0)
+            var mods = new List<ModMetaData>();
+            var foundModFolders = Directory.GetDirectories(path);
+            foreach (var folder in foundModFolders)
+            {
+                var aboutDir = Path.Combine(folder, aboutDirName);
+                // we look it up here so we can give a proper warning if for example there are more About Files somewhere hidden in the folder
+                var foundAboutFiles = Directory.GetFiles(aboutDir, aboutFileName, SearchOption.AllDirectories);
+                if (foundAboutFiles.Length > 1)
                 {
-                    ConsoleUtils.LogToConsole("No Enforced Mods Found, Ignoring");
-                    return;
+                    // This could be mean someone wanted to hide a mod
+                    ConsoleUtils.LogToConsole($"!! WARNING !! Found more than one '{aboutFileName}' in '{aboutDir}'. Skipping...", ConsoleColor.Red);
                 }
-
-                else LoadMods(modFolders, 0);
-            }
-        }
-
-        public static void CheckWhitelistedMods()
-        {
-            if (!Directory.Exists(Server.whitelistedModsFolderPath))
-            {
-                Directory.CreateDirectory(Server.whitelistedModsFolderPath);
-                ConsoleUtils.LogToConsole("No Whitelisted Mods Folder Found, Generating");
-            }
-
-            else
-            {
-                string[] modFolders = Directory.GetDirectories(Server.whitelistedModsFolderPath);
-
-                if (modFolders.Length == 0) ConsoleUtils.LogToConsole("No Whitelisted Mods Found, Ignoring");
-
-                else LoadMods(modFolders, 1);
-            }
-        }
-
-        public static void CheckBlacklistedMods()
-        {
-            if (!Directory.Exists(Server.blacklistedModsFolderPath))
-            {
-                Directory.CreateDirectory(Server.blacklistedModsFolderPath);
-                ConsoleUtils.LogToConsole("No Blacklisted Mods Folder Found, Generating");
-            }
-
-            else
-            {
-                string[] modFolders = Directory.GetDirectories(Server.blacklistedModsFolderPath);
-
-                if (modFolders.Length == 0) ConsoleUtils.LogToConsole("No Blacklisted Mods Found, Ignoring");
-
-                else LoadMods(modFolders, 2);
-            }
-        }
-
-        private static void LoadMods(string[] modFolders, int modType)
-        {
-            int failedToLoadMods = 0;
-            List<string> modList = new List<string>();
-
-            if (modType == 0) Server.enforcedMods.Clear();
-            else if (modType == 1) Server.whitelistedMods.Clear();
-            else if (modType == 2) Server.blacklistedMods.Clear();
-
-            foreach (string modFolder in modFolders)
-            {
-                try
+                else if (foundAboutFiles.Length == 1)
                 {
-                    string aboutFilePath = modFolder + Path.DirectorySeparatorChar + "About" + Path.DirectorySeparatorChar + "About.xml";
-                    string[] aboutLines = File.ReadAllLines(aboutFilePath);
-
-                    foreach (string line in aboutLines)
+                    try
                     {
-                        if (line.Contains("<name>") && line.Contains("</name>"))
+                        using (var fo = File.OpenRead(foundAboutFiles.First()))
                         {
-                            string modName = line;
-
-                            string purgeString = modName.Split('<')[0];
-                            modName = modName.Remove(0, purgeString.Count());
-
-                            modName = modName.Replace("<name>", "");
-                            modName = modName.Replace("</name>", "");
-
-                            if (modName.Contains("")) modName = modName.Replace("&amp", "&");
-                            if (modName.Contains("")) modName = modName.Replace("&quot", "&");
-                            if (modName.Contains("")) modName = modName.Replace("&lt", "&");
-
-                            modList.Add(modName);
-                            break;
+                            var mod = (ModMetaData)this.xmlSerializer.Deserialize(fo);
+                            mods.Add(mod);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        ConsoleUtils.LogToConsole($"Error reading Mod '{folder}'. Reason: {ex.Message}", ConsoleColor.Red);
+                    }
                 }
-
-                catch { failedToLoadMods++; }
             }
 
-            modList.Sort();
-            if (modType == 0)
-            {
-                Server.enforcedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.enforcedMods.Count() + "] Enforced Mods");
-            }
-            else if (modType == 1)
-            {
-                Server.whitelistedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.whitelistedMods.Count() + "] Whitelisted Mods");
-            }
-            else if (modType == 2)
-            {
-                Server.blacklistedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.blacklistedMods.Count() + "] Blacklisted Mods");
-            }
-
-            if (failedToLoadMods > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                ConsoleUtils.LogToConsole("Failed to load [" + failedToLoadMods + "] Mods");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
+            return mods.ToArray();
         }
     }
 }

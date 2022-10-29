@@ -1,25 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using OpenWorldServer.Data;
+using OpenWorldServer.Handlers;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
-    public static class Server
+    public class Server
     {
+        private readonly ServerConfig serverConfig;
+        private readonly PlayerHandler playerHandler;
+        private readonly ModHandler modHandler;
+
+        public Server(ServerConfig serverConfig)
+        {
+            this.serverConfig = serverConfig;
+
+            // Setting up Server
+            this.modHandler = new ModHandler(serverConfig);
+            this.playerHandler = new PlayerHandler(serverConfig);
+
+            this.Run();
+        }
+
         //Meta
         public static bool exit = false;
-
-        //Paths
-        public static string mainFolderPath;
-        public static string serverSettingsPath;
-        public static string worldSettingsPath;
-        public static string playersFolderPath;
-        public static string factionsFolderPath;
-        public static string enforcedModsFolderPath;
-        public static string whitelistedModsFolderPath;
-        public static string blacklistedModsFolderPath;
-        public static string whitelistedUsersPath;
-        public static string logFolderPath;
 
         //Player Parameters
         public static List<ServerClient> savedClients = new List<ServerClient>();
@@ -62,28 +68,56 @@ namespace OpenWorldServer
         public static List<Faction> savedFactions = new List<Faction>();
 
         //World Parameters
-        public static float globeCoverage;
+        public static double globeCoverage;
         public static string seed;
         public static int overallRainfall;
         public static int overallTemperature;
         public static int overallPopulation;
 
-        static void Main()
+        public void Run()
         {
-            ServerUtils.SetPaths();
-            ServerUtils.SetCulture();
+            AdoptConfigToStaticVars(this.serverConfig);
+            Server.whitelistedUsernames = this.playerHandler.PlayerWhitelist.Usernames;
 
-            ServerUtils.CheckServerVersion();
-            ServerUtils.CheckSettingsFile();
-
-            ModHandler.CheckMods(true);
             FactionHandler.CheckFactions(true);
-            WorldHandler.CheckWorldFile();
             PlayerUtils.CheckAllAvailablePlayers(false);
 
             Threading.GenerateThreads(0);
 
             while (!exit) ListenForCommands();
+        }
+
+        private static void AdoptConfigToStaticVars(ServerConfig serverConfig)
+        {
+            // This needs to be replaced with proper use of the server config in the classes
+
+            // Server Settings.txt
+            Server.serverName = serverConfig.ServerName;
+            Server.serverDescription = serverConfig.Description;
+            Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
+            Networking.serverPort = serverConfig.Port;
+            Server.maxPlayers = serverConfig.MaxPlayers;
+            Server.allowDevMode = serverConfig.AllowDevMode;
+            Server.usingWhitelist = serverConfig.WhitelistMode;
+            Server.warningWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold;
+            Server.banWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.BanThreshold;
+            Server.usingWealthSystem = serverConfig.AntiCheat.WealthCheckSystem.IsActive;
+            Server.usingIdleTimer = serverConfig.IdleSystem.IsActive;
+            Server.idleTimer = (int)serverConfig.IdleSystem.IdleThresholdInDays;
+            Server.usingRoadSystem = serverConfig.RoadSystem.IsActive;
+            Server.aggressiveRoadMode = serverConfig.RoadSystem.AggressiveRoadMode;
+            Server.forceModlist = serverConfig.ModsSystem.MatchModlist;
+            Server.forceModlistConfigs = serverConfig.ModsSystem.ModlistConfigMatch;
+            Server.usingModVerification = serverConfig.ModsSystem.ForceModVerification;
+            Server.usingChat = serverConfig.ChatSystem.IsActive;
+            Server.usingProfanityFilter = serverConfig.ChatSystem.UseProfanityFilter;
+
+            // World Settings.txt
+            Server.globeCoverage = serverConfig.World.GlobeCoverage;
+            Server.seed = serverConfig.World.Seed;
+            Server.overallRainfall = serverConfig.World.OverallRainfall;
+            Server.overallTemperature = serverConfig.World.OverallTemperature;
+            Server.overallPopulation = serverConfig.World.OverallPopulation;
         }
 
         public static void ListenForCommands()
