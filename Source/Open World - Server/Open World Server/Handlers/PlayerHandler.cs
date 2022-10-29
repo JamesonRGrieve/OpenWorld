@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 using OpenWorldServer.Utils;
@@ -9,14 +11,18 @@ namespace OpenWorldServer.Handlers
     {
         private readonly ServerConfig serverConfig;
 
-        public PlayerWhitelist PlayerWhitelist { get; private set; }
+        // This Props should be private so only the playerhandler handles those lists
+        public List<string> WhitelistedUser { get; set; } = new List<string>();
+
+        public List<BannedInfo> BannedPlayers { get; set; } = new List<BannedInfo>();
 
         public PlayerHandler(ServerConfig serverConfig)
         {
             this.serverConfig = serverConfig;
 
-            ConsoleUtils.LogToConsole($"Whiteliste Mode: {this.serverConfig.WhitelistMode}");
+            ConsoleUtils.LogToConsole($"Whitelist Mode: {this.serverConfig.WhitelistMode}");
             this.ReloadWhitelist();
+            this.ReloadBannedPlayers();
         }
 
         private void ReloadWhitelist()
@@ -24,13 +30,25 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogTitleToConsole("Reloading Whitelist");
             if (!File.Exists(PathProvider.PlayerWhitelistFile))
             {
-                this.PlayerWhitelist = new PlayerWhitelist();
-                ConsoleUtils.LogToConsole($"Generating new Whitelist file..", System.ConsoleColor.Yellow);
-                JsonDataHelper.Save(this.PlayerWhitelist, PathProvider.PlayerWhitelistFile);
+                ConsoleUtils.LogToConsole($"Generating new Whitelist file..", ConsoleColor.Yellow);
+                JsonDataHelper.Save(this.WhitelistedUser, PathProvider.PlayerWhitelistFile);
             }
 
-            this.PlayerWhitelist = JsonDataHelper.Load<PlayerWhitelist>(PathProvider.PlayerWhitelistFile);
-            ConsoleUtils.LogToConsole("Loaded whitelist", System.ConsoleColor.Green);
+            this.WhitelistedUser = JsonDataHelper.LoadList<string>(PathProvider.PlayerWhitelistFile);
+            ConsoleUtils.LogToConsole($"Loaded whitelist - {this.WhitelistedUser.Count} Entries", ConsoleColor.Green);
+        }
+
+        private void ReloadBannedPlayers()
+        {
+            ConsoleUtils.LogTitleToConsole("Reloading Banned Players");
+            if (!File.Exists(PathProvider.BannedPlayersFile))
+            {
+                ConsoleUtils.LogToConsole($"Generating new Banlist file..", ConsoleColor.Yellow);
+                JsonDataHelper.Save(this.BannedPlayers, PathProvider.BannedPlayersFile);
+            }
+
+            this.BannedPlayers = JsonDataHelper.LoadList<BannedInfo>(PathProvider.PlayerWhitelistFile);
+            ConsoleUtils.LogToConsole($"Loaded Banlist - {this.BannedPlayers.Count} Entries", ConsoleColor.Green);
         }
     }
 }

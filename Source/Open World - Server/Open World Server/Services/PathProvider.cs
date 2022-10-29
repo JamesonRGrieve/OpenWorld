@@ -16,8 +16,9 @@ namespace OpenWorldServer.Services
 
         internal static readonly string ConfigFile = Path.Combine(MainFolderPath, "config.json");
         internal static readonly string PlayerWhitelistFile = Path.Combine(MainFolderPath, "whitelist.json");
+        internal static readonly string BannedPlayersFile = Path.Combine(MainFolderPath, "banlist.json");
 
-        public static void EnsureDirectories()
+        internal static void EnsureDirectories()
         {
             Directory.CreateDirectory(LogsFolderPath);
             Directory.CreateDirectory(PlayersFolderPath);

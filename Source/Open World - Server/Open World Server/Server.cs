@@ -77,7 +77,7 @@ namespace OpenWorldServer
         public void Run()
         {
             AdoptConfigToStaticVars(this.serverConfig);
-            Server.whitelistedUsernames = this.playerHandler.PlayerWhitelist.Usernames;
+            Server.whitelistedUsernames = this.playerHandler.WhitelistedUser;
 
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);

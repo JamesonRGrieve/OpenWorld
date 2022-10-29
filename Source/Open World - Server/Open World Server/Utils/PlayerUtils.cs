@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
+using OpenWorldServer.Deprecated;
 using OpenWorldServer.Services;
 
 namespace OpenWorldServer

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using OpenWorldServer.Data;
+using OpenWorldServer.Deprecated;
 using OpenWorldServer.Utils;
 
 namespace OpenWorldServer.Services
@@ -17,6 +20,7 @@ namespace OpenWorldServer.Services
             this.MigrateWorldSettings(serverConfig);
             JsonDataHelper.Save(serverConfig, PathProvider.ConfigFile);
             this.MigrateWhitelist();
+            this.MigrateBanlist();
             this.MigrateModsFolder();
         }
 
@@ -228,10 +232,36 @@ namespace OpenWorldServer.Services
                 this.LogMigratingData(migrating);
 
                 var players = File.ReadAllLines(oldPath);
-                var playerWhitelist = new PlayerWhitelist();
-                playerWhitelist.Usernames = players.ToList();
+                var playersList = players.ToList();
 
-                JsonDataHelper.Save(playerWhitelist, PathProvider.PlayerWhitelistFile);
+                JsonDataHelper.Save(playersList, PathProvider.PlayerWhitelistFile);
+                File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
+                this.LogMigratedData(migrating, true);
+            }
+        }
+
+        private void MigrateBanlist()
+        {
+            var oldPath = Path.Combine(PathProvider.MainFolderPath, "bans_ip.dat");
+            if (File.Exists(oldPath))
+            {
+                const string migrating = "Banned Players";
+                this.EnsureBackupDir();
+                this.LogMigratingData(migrating);
+
+                var newBannedList = new List<BannedInfo>();
+                var formatter = new BinaryFormatter();
+                using (var f = File.OpenRead(oldPath))
+                {
+                    var data = formatter.Deserialize(f) as BanDataHolder;
+                    newBannedList = data.BannedIPs.Select(kp => new BannedInfo()
+                    {
+                        Username = kp.Value,
+                        IPAddress = kp.Key,
+                    }).ToList();
+                }
+
+                JsonDataHelper.Save(newBannedList, PathProvider.BannedPlayersFile);
                 File.Move(oldPath, Path.Combine(this.fileBackupPath, Path.GetFileName(oldPath)), true);
                 this.LogMigratedData(migrating, true);
             }
