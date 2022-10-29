@@ -173,7 +173,7 @@ namespace OpenWorldServer
         {
             Server.bannedIPs.Clear();
 
-            if (!File.Exists(Server.mainFolderPath + Path.DirectorySeparatorChar + "bans_ip.dat"))
+            if (!File.Exists(PathProvider.MainFolderPath + Path.DirectorySeparatorChar + "bans_ip.dat"))
             {
                 ConsoleUtils.LogToConsole("No Bans File Found, Ignoring");
                 return;
