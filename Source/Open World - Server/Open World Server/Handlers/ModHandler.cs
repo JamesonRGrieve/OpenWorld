@@ -15,7 +15,7 @@ namespace OpenWorldServer.Handlers
 
         public ReadOnlySpan<ModMetaData> RequiredMods => this.requiredMods;
 
-        public ReadOnlySpan<ModMetaData> WhitelisteddMods => this.whitelistedMods;
+        public ReadOnlySpan<ModMetaData> WhitelistedMods => this.whitelistedMods;
 
         public ReadOnlySpan<ModMetaData> BlacklistedMods => this.blacklistedMods;
 
@@ -41,6 +41,12 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Loaded {this.whitelistedMods.Length} Whitelisted Mods", ConsoleColor.Green);
             ConsoleUtils.LogToConsole($"Loaded {this.blacklistedMods.Length} Blacklisted Mods", ConsoleColor.Green);
         }
+
+        public bool IsModEnforced(string modName) => this.requiredMods.Any(mmd => mmd.Name == modName);
+
+        public bool IsModWhitelisted(string modName) => this.whitelistedMods.Any(mmd => mmd.Name == modName);
+
+        public bool IsModBlacklisted(string modName) => this.blacklistedMods.Any(mmd => mmd.Name == modName);
 
         private ModMetaData[] GetMods(string path)
         {

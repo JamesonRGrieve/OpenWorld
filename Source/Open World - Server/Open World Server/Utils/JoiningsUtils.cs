@@ -253,25 +253,26 @@ namespace OpenWorldServer
 
             foreach (string clientMod in clientMods)
             {
-                if (Server.whitelistedMods.Contains(clientMod)) continue;
-                else if (Server.blacklistedMods.Contains(clientMod))
+                if (StaticProxy.modHandler.IsModWhitelisted(clientMod))
+                    continue;
+                else if (StaticProxy.modHandler.IsModBlacklisted(clientMod))
                 {
                     flagged = true;
                     flaggedMods += clientMod + "»";
                 }
-                else if (!Server.enforcedMods.Contains(clientMod))
+                else if (!StaticProxy.modHandler.IsModEnforced(clientMod))
                 {
                     flagged = true;
                     flaggedMods += clientMod + "»";
                 }
             }
 
-            foreach (string serverMod in Server.enforcedMods)
+            foreach (var modMetaData in StaticProxy.modHandler.RequiredMods)
             {
-                if (!clientMods.Contains(serverMod))
+                if (!clientMods.Contains(modMetaData.Name))
                 {
                     flagged = true;
-                    flaggedMods += serverMod + "»";
+                    flaggedMods += modMetaData.Name + "»";
                 }
             }
 

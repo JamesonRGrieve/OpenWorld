@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
@@ -36,11 +35,6 @@ namespace OpenWorldServer
         public static string serverVersion = "v1.4.1 Unstable";
 
 
-        //Server Mods
-        public static List<string> enforcedMods = new List<string>();
-        public static List<string> whitelistedMods = new List<string>();
-        public static List<string> blacklistedMods = new List<string>();
-
         //Server Lists
         public static List<string> adminList = new List<string>();
         public static List<string> chatCache = new List<string>();
@@ -66,11 +60,6 @@ namespace OpenWorldServer
             // Server Settings.txt
             Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
             Networking.serverPort = serverConfig.Port;
-
-            // Mods
-            Server.enforcedMods = StaticProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();
-            Server.whitelistedMods = StaticProxy.modHandler.WhitelisteddMods.ToArray().Select(m => m.Name).ToList();
-            Server.blacklistedMods = StaticProxy.modHandler.BlacklistedMods.ToArray().Select(m => m.Name).ToList();
         }
 
         public void SetupHandlerProxy()

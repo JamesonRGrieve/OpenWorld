@@ -104,27 +104,38 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Enforced Mods: " + Server.enforcedMods.Count);
+            ConsoleUtils.WriteWithTime("Server Enforced Mods: " + StaticProxy.modHandler.RequiredMods.Length);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.enforcedMods.Count == 0) ConsoleUtils.WriteWithTime("No Enforced Mods Found");
-            else foreach (string mod in Server.enforcedMods) ConsoleUtils.WriteWithTime(mod);
+            if (StaticProxy.modHandler.RequiredMods.Length == 0)
+                ConsoleUtils.WriteWithTime("No Enforced Mods Found");
+            else
+                foreach (var modMetaData in StaticProxy.modHandler.RequiredMods)
+                    ConsoleUtils.WriteWithTime(modMetaData.Name);
+
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Whitelisted Mods: " + Server.whitelistedMods.Count);
+            ConsoleUtils.WriteWithTime("Server Whitelisted Mods: " + StaticProxy.modHandler.WhitelistedMods.Length);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.whitelistedMods.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Mods Found");
-            else foreach (string whitelistedMod in Server.whitelistedMods) ConsoleUtils.WriteWithTime(whitelistedMod);
+            if (StaticProxy.modHandler.WhitelistedMods.Length == 0)
+                ConsoleUtils.WriteWithTime("No Whitelisted Mods Found");
+            else
+                foreach (var modMetaData in StaticProxy.modHandler.WhitelistedMods)
+                    ConsoleUtils.WriteWithTime(modMetaData.Name);
+
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Blacklisted Mods: " + Server.blacklistedMods.Count);
+            ConsoleUtils.WriteWithTime("Server Blacklisted Mods: " + StaticProxy.modHandler.BlacklistedMods.Length);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.whitelistedMods.Count == 0) ConsoleUtils.WriteWithTime("No Blacklisted Mods Found");
-            else foreach (string blacklistedMod in Server.blacklistedMods) ConsoleUtils.WriteWithTime(blacklistedMod);
+            if (StaticProxy.modHandler.BlacklistedMods.Length == 0)
+                ConsoleUtils.WriteWithTime("No Blacklisted Mods Found");
+            else
+                foreach (var modMetaData in StaticProxy.modHandler.BlacklistedMods)
+                    ConsoleUtils.WriteWithTime(modMetaData.Name);
             Console.WriteLine("");
         }
 
@@ -183,9 +194,9 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Mods:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Enforced Mods: " + Server.enforcedMods.Count);
-            ConsoleUtils.WriteWithTime("Whitelisted Mods: " + Server.whitelistedMods.Count);
-            ConsoleUtils.WriteWithTime("Blacklisted Mods: " + Server.blacklistedMods.Count);
+            ConsoleUtils.WriteWithTime("Enforced Mods: " + StaticProxy.modHandler.RequiredMods.Length);
+            ConsoleUtils.WriteWithTime("Whitelisted Mods: " + StaticProxy.modHandler.WhitelistedMods.Length);
+            ConsoleUtils.WriteWithTime("Blacklisted Mods: " + StaticProxy.modHandler.BlacklistedMods.Length);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
