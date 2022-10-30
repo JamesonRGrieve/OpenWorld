@@ -75,7 +75,7 @@ namespace OpenWorldServer
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
-            StaticProxy.playerHandler.ResetPlayerData(client);
+            StaticProxy.playerHandler.ResetPlayerData(client, true);
 
             Networking.SendData(client, GetPlanetToSend());
             Thread.Sleep(100);

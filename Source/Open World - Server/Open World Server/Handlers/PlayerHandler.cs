@@ -138,6 +138,7 @@ namespace OpenWorldServer.Handlers
                 if (!this.PlayerData.Contains(playerData))
                 {
                     this.PlayerData.Add(playerData);
+                    Server.savedClients.Add(new ServerClient(null) { PlayerData = playerData });
                 }
                 return true;
             }
@@ -147,9 +148,10 @@ namespace OpenWorldServer.Handlers
             }
         }
 
-        public void ResetPlayerData(ServerClient client) => client.PlayerData = this.ResetPlayerData(client.PlayerData);
+        public void ResetPlayerData(ServerClient client, bool saveGiftsAndTrades)
+            => client.PlayerData = this.ResetPlayerData(client.PlayerData, saveGiftsAndTrades);
 
-        public PlayerData ResetPlayerData(PlayerData playerData)
+        public PlayerData ResetPlayerData(PlayerData playerData, bool saveGiftsAndTrades)
         {
             var newPlayerData = new PlayerData()
             {
@@ -159,6 +161,12 @@ namespace OpenWorldServer.Handlers
 
             // ToDo: Cleanup Settlement BUT NOT LIKE THIS
             WorldUtils.RemoveSettlement(null, null);
+
+            if (saveGiftsAndTrades)
+            {
+                newPlayerData.TradeString = playerData.TradeString;
+                newPlayerData.GiftString = playerData.GiftString;
+            }
 
             this.RemovePlayData(playerData);
             this.SavePlayerData(newPlayerData);

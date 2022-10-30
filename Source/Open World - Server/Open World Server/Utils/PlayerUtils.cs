@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using OpenWorldServer.Services;
 
 namespace OpenWorldServer
@@ -12,16 +11,22 @@ namespace OpenWorldServer
         {
             try
             {
-                BinaryFormatter formatter = new BinaryFormatter();
-                FileStream s = File.Open(path, FileMode.Open);
-                object obj = formatter.Deserialize(s);
-                ServerClient playerToLoad = (ServerClient)obj;
+                //BinaryFormatter formatter = new BinaryFormatter();
+                //FileStream s = File.Open(path, FileMode.Open);
+                //object obj = formatter.Deserialize(s);
+                //ServerClient playerToLoad = (ServerClient)obj;
 
-                s.Flush();
-                s.Close();
-                s.Dispose();
+                //s.Flush();
+                //s.Close();
+                //s.Dispose();
 
-                if (playerToLoad == null) return;
+
+
+                var playerData = StaticProxy.playerHandler.GetPlayerData(Path.GetFileNameWithoutExtension(path));
+                if (playerData == null)
+                    return;
+
+                ServerClient playerToLoad = new ServerClient(null) { PlayerData = playerData };
 
                 if (!string.IsNullOrWhiteSpace(playerToLoad.PlayerData.HomeTileId))
                 {
@@ -59,16 +64,16 @@ namespace OpenWorldServer
 
         public static void GiveSavedDataToPlayer(ServerClient client)
         {
-            ServerClient savedClient = Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username);
-
-            client.PlayerData.Username = savedClient.PlayerData.Username;
-            client.PlayerData.HomeTileId = savedClient.PlayerData.HomeTileId;
-            client.PlayerData.GiftString = savedClient.PlayerData.GiftString;
-            client.PlayerData.TradeString = savedClient.PlayerData.TradeString;
-
-            if (savedClient.PlayerData.Faction != null)
+            var playerData = StaticProxy.playerHandler.GetPlayerData(client);
+            if (playerData != null)
             {
-                Faction factionToGive = Server.savedFactions.Find(fetch => fetch.name == savedClient.PlayerData.Faction.name);
+                return;
+            }
+
+            client.PlayerData = playerData;
+            if (client.PlayerData.Faction != null)
+            {
+                Faction factionToGive = Server.savedFactions.Find(fetch => fetch.name == client.PlayerData.Faction.name);
                 if (factionToGive != null) client.PlayerData.Faction = factionToGive;
                 else client.PlayerData.Faction = null;
             }
@@ -89,8 +94,8 @@ namespace OpenWorldServer
 
         private static void CheckSavedPlayers()
         {
-            Server.savedClients.Clear();
-            Server.savedSettlements.Clear();
+            //Server.savedClients.Clear();
+            //Server.savedSettlements.Clear();
 
             if (!Directory.Exists(PathProvider.PlayersFolderPath))
             {
