@@ -34,10 +34,6 @@ namespace OpenWorldServer
         //Server Details
         public static string serverVersion = "v1.4.1";
 
-
-        //Server Booleans
-        public static bool usingEnforcedDifficulty = false;
-
         //Server Lists
         public static List<string> adminList = new List<string>();
         public static List<string> chatCache = new List<string>();

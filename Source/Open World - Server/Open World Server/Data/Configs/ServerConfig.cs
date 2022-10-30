@@ -16,6 +16,8 @@ namespace OpenWorldServer.Data
 
         public bool AllowDevMode { get; set; } = false;
 
+        public bool ForceDifficulty { get; set; } = false;
+
         public bool WhitelistMode { get; set; } = false;
 
         public ModsConfig ModsSystem { get; set; } = new ModsConfig();

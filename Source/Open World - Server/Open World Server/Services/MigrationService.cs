@@ -64,6 +64,7 @@ namespace OpenWorldServer.Services
                 const string maxPlayerPrefix = "Max Players: ";
                 const string devModePrefix = "Allow Dev Mode: ";
                 const string whitelistPrefix = "Use Whitelist: ";
+                const string enforceDifficultyPrefix = "Use Enforced Difficulty: ";
                 const string wealthWarningPrefix = "Wealth Warning Threshold: ";
                 const string wealthBanPrefix = "Wealth Ban Threshold: ";
                 const string useWealthPrefix = "Use Wealth System: ";
@@ -104,6 +105,10 @@ namespace OpenWorldServer.Services
                         else if (setting.StartsWith(devModePrefix))
                         {
                             serverConfig.AllowDevMode = bool.Parse(setting.Replace(devModePrefix, string.Empty));
+                        }
+                        else if (setting.StartsWith(enforceDifficultyPrefix))
+                        {
+                            serverConfig.ForceDifficulty = bool.Parse(setting.Replace(enforceDifficultyPrefix, string.Empty));
                         }
                         else if (setting.StartsWith(whitelistPrefix))
                         {

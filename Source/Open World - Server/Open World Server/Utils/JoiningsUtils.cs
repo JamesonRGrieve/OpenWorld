@@ -197,9 +197,7 @@ namespace OpenWorldServer
 
             int modVerifyInt = StaticProxy.serverConfig.ModsSystem.ForceModVerification ? 1 : 0;
 
-            int enforcedDifficultyInt = Server.usingEnforcedDifficulty ? 1 : 0;
-
-            string name = Server.serverName;
+            int enforcedDifficultyInt = StaticProxy.serverConfig.ForceDifficulty ? 1 : 0;
 
             return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + enforcedDifficultyInt + "│" + name;
         }

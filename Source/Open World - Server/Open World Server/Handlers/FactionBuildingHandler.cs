@@ -13,8 +13,10 @@
                 if (client.PlayerData.Faction == null) factionValue = 0;
                 if (client.PlayerData.Faction != null)
                 {
-                    if (client.PlayerData.Faction == faction) factionValue = 1;
-                    else factionValue = 2;
+                    if (client.PlayerData.Faction == faction)
+                        factionValue = 1;
+                    else
+                        factionValue = 2;
                 }
 
                 foreach (FactionStructure structure in faction.factionStructures)
@@ -55,8 +57,10 @@
                 if (client.PlayerData.Faction == null) factionValue = 0;
                 if (client.PlayerData.Faction != null)
                 {
-                    if (client.PlayerData.Faction == faction) factionValue = 1;
-                    else factionValue = 2;
+                    if (client.PlayerData.Faction == faction)
+                        factionValue = 1;
+                    else
+                        factionValue = 2;
                 }
 
                 Networking.SendData(client, "FactionStructureBuilder│AddStructure" + "│" + newStructureTile + "│" + newStructureIntValue + "│" + factionValue);
@@ -86,8 +90,6 @@
 
             if (structureType != 3) return true;
             else foreach (Faction serverFaction in serverFactions)
-            {
-                foreach (FactionStructure structure in serverFaction.factionStructures)
                 {
                     foreach (FactionStructure structure in serverFaction.factionStructures)
                     {
