@@ -39,7 +39,7 @@ namespace OpenWorldServer
                 StaticProxy.playerHandler.SavePlayerData(client);
                 ConsoleUtils.LogToConsole("New Player [" + client.PlayerData.Username + "]");
             }
-            else if (client.PlayerData.Password != client.PlayerData.Password)
+            else if (playerData.Password != client.PlayerData.Password)
             {
                 Networking.SendData(client, "Disconnect│WrongPassword");
                 client.disconnectFlag = true;
