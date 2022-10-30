@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
@@ -17,6 +18,8 @@ namespace OpenWorldServer.Handlers
 
         public List<BanInfo> BannedPlayers { get; set; } = new List<BanInfo>();
 
+        public List<PlayerData> PlayerData { get; set; } = new List<PlayerData>();
+
         public PlayerHandler(ServerConfig serverConfig)
         {
             this.serverConfig = serverConfig;
@@ -24,6 +27,7 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Whitelist Mode: {this.serverConfig.WhitelistMode}");
             this.ReloadWhitelist();
             this.ReloadBannedPlayers();
+            this.LoadPlayerData();
         }
 
         private void ReloadWhitelist()
@@ -95,5 +99,111 @@ namespace OpenWorldServer.Handlers
             this.SaveBannedPlayers();
             ConsoleUtils.LogToConsole("Player [" + banInfo.Username + "] has been Unbanned", ConsoleColor.Green);
         }
+
+        private void LoadPlayerData()
+        {
+            ConsoleUtils.LogTitleToConsole("Loading Players and Settlements");
+            var playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath);
+
+            foreach (var playerFile in playerFiles)
+            {
+                this.PlayerData.Add(JsonDataHelper.Load<PlayerData>(playerFile));
+            }
+
+            ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleColor.Green);
+        }
+
+        public PlayerData GetPlayerData(ServerClient client)
+        {
+            if (client.IsLoggedIn)
+            {
+                // No need to access list. If player is already logged in, we mapped the PlayerData object to the Client
+                return client.PlayerData;
+            }
+
+            return this.GetPlayerData(client.PlayerData.Username);
+        }
+
+        public PlayerData GetPlayerData(string username)
+            => this.PlayerData.FirstOrDefault(pd => pd.Username == username);
+
+        public bool SavePlayerData(ServerClient client)
+            => this.SavePlayerData(client.PlayerData);
+
+        public bool SavePlayerData(PlayerData playerData)
+        {
+            var playerFile = this.GetPlayerDataFilePath(playerData.Username);
+            try
+            {
+                JsonDataHelper.Save(playerData, playerFile);
+                if (!this.PlayerData.Contains(playerData))
+                {
+                    this.PlayerData.Add(playerData);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void ResetPlayerData(ServerClient client) => client.PlayerData = this.ResetPlayerData(client.PlayerData);
+
+        public PlayerData ResetPlayerData(PlayerData playerData)
+        {
+            var newPlayerData = new PlayerData()
+            {
+                Username = playerData.Username,
+                Password = playerData.Password,
+            };
+
+            // ToDo: Cleanup Settlement BUT NOT LIKE THIS
+            WorldUtils.RemoveSettlement(null, null);
+
+            this.RemovePlayData(playerData);
+            this.SavePlayerData(newPlayerData);
+
+            return newPlayerData;
+        }
+
+        public void RemovePlayData(PlayerData playerData)
+        {
+            // We dont use the playerData directly since it could already
+            // be a new reference and wouldn't be find in the list by Contains
+
+            var oldData = this.GetPlayerData(playerData.Username);
+            if (oldData != null)
+            {
+                this.PlayerData.Remove(oldData);
+            }
+
+            var file = this.GetPlayerDataFilePath(playerData.Username);
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        }
+
+        public PlayerData ReloadPlayerData(string username)
+        {
+            var playerFile = this.GetPlayerDataFilePath(username);
+            if (File.Exists(playerFile))
+            {
+                var data = JsonDataHelper.Load<PlayerData>(playerFile);
+                var oldData = this.GetPlayerData(username);
+                if (oldData != null)
+                {
+                    this.PlayerData.Remove(oldData);
+                }
+
+                this.PlayerData.Add(data);
+                return data;
+            }
+
+            return null;
+        }
+
+        private string GetPlayerDataFilePath(string username) => Path.Combine(PathProvider.PlayersFolderPath, $"{username}.json");
     }
 }

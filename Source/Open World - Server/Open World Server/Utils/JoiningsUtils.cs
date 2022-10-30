@@ -32,8 +32,20 @@ namespace OpenWorldServer
             if (!ParseClientUsername(client)) return;
             CompareConnectingClientWithConnecteds(client);
 
-            if (!CheckIfUserExisted(client)) PlayerUtils.SaveNewPlayerFile(client.PlayerData.Username, client.PlayerData.Password);
-            else if (!CheckForPassword(client)) return;
+
+            var playerData = HandlerProxy.playerHandler.GetPlayerData(client);
+            if (playerData == null)
+            {
+                HandlerProxy.playerHandler.SavePlayerData(client);
+                ConsoleUtils.LogToConsole("New Player [" + client.PlayerData.Username + "]");
+            }
+            else if (client.PlayerData.Password != client.PlayerData.Password)
+            {
+                Networking.SendData(client, "Disconnect│WrongPassword");
+                client.disconnectFlag = true;
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has been Kicked for: [Wrong Password]");
+                return;
+            }
 
             ConsoleUtils.UpdateTitle();
             ServerUtils.SendPlayerListToAll(client);
@@ -46,7 +58,7 @@ namespace OpenWorldServer
             if (joinMode == "NewGame")
             {
                 SendNewGameData(client);
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Reset Game Progress");
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has reset game progress");
             }
 
             else if (joinMode == "LoadGame")
@@ -56,14 +68,14 @@ namespace OpenWorldServer
             }
 
             ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] " + "[" +
-                ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() + "] " + "Has Connected");
+                ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() + "] " + "has connected");
         }
 
         private static void SendNewGameData(ServerClient client)
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
-            PlayerUtils.SaveNewPlayerFile(client.PlayerData.Username, client.PlayerData.Password);
+            HandlerProxy.playerHandler.ResetPlayerData(client);
 
             Networking.SendData(client, GetPlanetToSend());
             Thread.Sleep(100);
@@ -114,34 +126,6 @@ namespace OpenWorldServer
             Networking.SendData(client, "LoadGame│");
         }
 
-        private static bool CheckIfUserExisted(ServerClient client)
-        {
-            ServerClient clientToFetch = Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username);
-
-            if (clientToFetch == null) return false;
-            else return true;
-        }
-
-        private static bool CheckForPassword(ServerClient client)
-        {
-            ServerClient clientToFetch = Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username);
-
-            client.PlayerData.Username = clientToFetch.PlayerData.Username;
-
-            if (clientToFetch.PlayerData.Password != client.PlayerData.Password)
-            {
-                Networking.SendData(client, "Disconnect│WrongPassword");
-
-                client.disconnectFlag = true;
-
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Been Kicked For: [Wrong Password]");
-
-                return false;
-            }
-
-            return true;
-        }
-
         public static string GetPlanetToSend()
         {
             string dataToSend = "Planet│";
@@ -170,8 +154,10 @@ namespace OpenWorldServer
                     int factionValue = 0;
 
                     ServerClient clientToCompare = Server.savedClients.Find(fetch => fetch.PlayerData.Username == pair.Value[0]);
-                    if (client.PlayerData.Faction == null) factionValue = 0;
-                    if (clientToCompare.PlayerData.Faction == null) factionValue = 0;
+                    if (client.PlayerData.Faction == null)
+                        factionValue = 0;
+                    if (clientToCompare.PlayerData.Faction == null)
+                        factionValue = 0;
                     else if (client.PlayerData.Faction != null && clientToCompare.PlayerData.Faction != null)
                     {
                         if (client.PlayerData.Faction.name == clientToCompare.PlayerData.Faction.name) factionValue = 1;

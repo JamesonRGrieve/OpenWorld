@@ -8,30 +8,6 @@ namespace OpenWorldServer
 {
     public static class PlayerUtils
     {
-        public static void SavePlayer(ServerClient playerToSave)
-        {
-            string folderPath = PathProvider.PlayersFolderPath;
-            string filePath = folderPath + Path.DirectorySeparatorChar + playerToSave.PlayerData.Username + ".data";
-
-            try
-            {
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                Stream s = File.OpenWrite(filePath);
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(s, playerToSave);
-
-                s.Flush();
-                s.Close();
-                s.Dispose();
-            }
-
-            catch { }
-        }
-
         public static void LoadPlayer(string path)
         {
             try
@@ -53,7 +29,7 @@ namespace OpenWorldServer
                     catch
                     {
                         playerToLoad.PlayerData.HomeTileId = null;
-                        SavePlayer(playerToLoad);
+                        HandlerProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Cloned Entry! Fixing");
@@ -67,7 +43,7 @@ namespace OpenWorldServer
                     if (factionToFech == null)
                     {
                         playerToLoad.PlayerData.Faction = null;
-                        SavePlayer(playerToLoad);
+                        HandlerProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Missing Faction! Fixing");
@@ -79,27 +55,6 @@ namespace OpenWorldServer
             }
 
             catch { }
-        }
-
-        public static void SaveNewPlayerFile(string username, string password)
-        {
-            ServerClient playerToOverwrite = Server.savedClients.Find(fetch => fetch.PlayerData.Username == username);
-
-            if (playerToOverwrite != null)
-            {
-                if (!string.IsNullOrWhiteSpace(playerToOverwrite.PlayerData.HomeTileId)) WorldUtils.RemoveSettlement(playerToOverwrite, playerToOverwrite.PlayerData.HomeTileId);
-                playerToOverwrite.PlayerData.Wealth = 0;
-                playerToOverwrite.PlayerData.PawnCount = 0;
-                SavePlayer(playerToOverwrite);
-                return;
-            }
-
-            ServerClient dummy = new ServerClient(null);
-            dummy.PlayerData.Username = username;
-            dummy.PlayerData.Password = password;
-
-            Server.savedClients.Add(dummy);
-            SavePlayer(dummy);
         }
 
         public static void GiveSavedDataToPlayer(ServerClient client)
@@ -177,7 +132,7 @@ namespace OpenWorldServer
 
             if (client.PlayerData.Wealth - wealthToCompare > Server.banWealthThreshold && Server.banWealthThreshold > 0)
             {
-                PlayerUtils.SavePlayer(client);
+                HandlerProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
 
@@ -189,7 +144,7 @@ namespace OpenWorldServer
             }
             else if (client.PlayerData.Wealth - wealthToCompare > Server.warningWealthThreshold && Server.warningWealthThreshold > 0)
             {
-                PlayerUtils.SavePlayer(client);
+                HandlerProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
 
@@ -199,7 +154,7 @@ namespace OpenWorldServer
             }
             else
             {
-                PlayerUtils.SavePlayer(client);
+                HandlerProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
             }
@@ -312,7 +267,7 @@ namespace OpenWorldServer
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
                     sc.PlayerData.GiftString.Add(dataToSend);
-                    SavePlayer(sc);
+                    HandlerProxy.playerHandler.SavePlayerData(sc);
                     ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.PlayerData.Username + "] And [" + sc.PlayerData.Username + "] But Was Offline. Saving");
                     return;
                 }

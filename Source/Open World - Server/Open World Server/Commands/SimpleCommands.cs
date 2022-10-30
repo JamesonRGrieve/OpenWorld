@@ -331,7 +331,7 @@ namespace OpenWorldServer
                 {
                     client.PlayerData.Wealth = 0;
                     client.PlayerData.PawnCount = 0;
-                    PlayerUtils.SavePlayer(client);
+                    HandlerProxy.playerHandler.SavePlayerData(client);
                 }
 
                 Console.Clear();

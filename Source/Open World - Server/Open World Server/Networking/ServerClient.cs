@@ -7,6 +7,8 @@ namespace OpenWorldServer
     [System.Serializable]
     public class ServerClient
     {
+        public bool IsLoggedIn { get; set; } = false;
+
         public PlayerData PlayerData { get; set; }
 
         [NonSerialized] public TcpClient tcp;
@@ -18,6 +20,7 @@ namespace OpenWorldServer
         public ServerClient(TcpClient userSocket)
         {
             tcp = userSocket;
+            this.PlayerData = new PlayerData();
         }
     }
 }
