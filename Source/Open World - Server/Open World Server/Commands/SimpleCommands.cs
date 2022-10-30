@@ -196,57 +196,57 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Settlements: " + Server.savedSettlements.Count);
             ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistedUser.Count);
-            ConsoleUtils.WriteWithTime("Max Players: " + Server.maxPlayers);
+            ConsoleUtils.WriteWithTime("Max Players: " + StaticProxy.serverConfig.MaxPlayers);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Modlist Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Modlist Check: " + Server.forceModlist);
-            ConsoleUtils.WriteWithTime("Using Modlist Config Check: " + Server.forceModlistConfigs);
-            ConsoleUtils.WriteWithTime("Using Mod Verification: " + Server.usingModVerification);
+            ConsoleUtils.WriteWithTime("Using Modlist Check: " + StaticProxy.serverConfig.ModsSystem.MatchModlist);
+            ConsoleUtils.WriteWithTime("Using Modlist Config Check: " + StaticProxy.serverConfig.ModsSystem.ModlistConfigMatch);
+            ConsoleUtils.WriteWithTime("Using Mod Verification: " + StaticProxy.serverConfig.ModsSystem.ForceModVerification);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Chat Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Chat: " + Server.usingChat);
-            ConsoleUtils.WriteWithTime("Using Profanity Filter: " + Server.usingProfanityFilter);
+            ConsoleUtils.WriteWithTime("Using Chat: " + StaticProxy.serverConfig.ChatSystem.IsActive);
+            ConsoleUtils.WriteWithTime("Using Profanity Filter: " + StaticProxy.serverConfig.ChatSystem.UseProfanityFilter);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Wealth Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Wealth System: " + Server.usingWealthSystem);
-            ConsoleUtils.WriteWithTime("Warning Threshold: " + Server.warningWealthThreshold);
-            ConsoleUtils.WriteWithTime("Ban Threshold: " + Server.banWealthThreshold);
+            ConsoleUtils.WriteWithTime("Using Wealth System: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive);
+            ConsoleUtils.WriteWithTime("Warning Threshold: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold);
+            ConsoleUtils.WriteWithTime("Ban Threshold: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Idle Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Idle System: " + Server.usingIdleTimer);
-            ConsoleUtils.WriteWithTime("Idle Threshold: " + Server.idleTimer);
+            ConsoleUtils.WriteWithTime("Using Idle System: " + StaticProxy.serverConfig.IdleSystem.IsActive);
+            ConsoleUtils.WriteWithTime("Idle Threshold: " + StaticProxy.serverConfig.IdleSystem.IdleThresholdInDays);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Road Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Road System: " + Server.usingRoadSystem);
-            ConsoleUtils.WriteWithTime("Aggressive Road Mode: " + Server.aggressiveRoadMode);
+            ConsoleUtils.WriteWithTime("Using Road System: " + StaticProxy.serverConfig.RoadSystem.IsActive);
+            ConsoleUtils.WriteWithTime("Aggressive Road Mode: " + StaticProxy.serverConfig.RoadSystem.AggressiveRoadMode);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Miscellaneous Settings");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Using Whitelist: " + Server.usingWhitelist);
-            ConsoleUtils.WriteWithTime("Allow Dev Mode: " + Server.allowDevMode);
+            ConsoleUtils.WriteWithTime("Using Whitelist: " + StaticProxy.serverConfig.WhitelistMode);
+            ConsoleUtils.WriteWithTime("Allow Dev Mode: " + StaticProxy.serverConfig.AllowDevMode);
 
             Console.WriteLine("");
         }

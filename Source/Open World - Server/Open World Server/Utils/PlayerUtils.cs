@@ -105,10 +105,10 @@ namespace OpenWorldServer
 
                 foreach (string file in playerFiles)
                 {
-                    if (Server.usingIdleTimer)
+                    if (StaticProxy.serverConfig.IdleSystem.IsActive)
                     {
                         FileInfo fi = new FileInfo(file);
-                        if (fi.LastAccessTime < DateTime.Now.AddDays(-Server.idleTimer))
+                        if (fi.LastAccessTime < DateTime.Now.AddDays(-StaticProxy.serverConfig.IdleSystem.IdleThresholdInDays))
                         {
                             fi.Delete();
                         }
@@ -124,13 +124,13 @@ namespace OpenWorldServer
 
         public static void CheckForPlayerWealth(ServerClient client)
         {
-            if (Server.usingWealthSystem == false) return;
-            if (Server.banWealthThreshold == 0 && Server.warningWealthThreshold == 0) return;
+            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive == false) return;
+            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold == 0 && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold == 0) return;
             if (client.PlayerData.IsAdmin) return;
 
             int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth;
 
-            if (client.PlayerData.Wealth - wealthToCompare > Server.banWealthThreshold && Server.banWealthThreshold > 0)
+            if (client.PlayerData.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0)
             {
                 StaticProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
@@ -142,7 +142,7 @@ namespace OpenWorldServer
 
                 StaticProxy.playerHandler.BanPlayer(client, "Wealth Check triggered");
             }
-            else if (client.PlayerData.Wealth - wealthToCompare > Server.warningWealthThreshold && Server.warningWealthThreshold > 0)
+            else if (client.PlayerData.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0)
             {
                 StaticProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;

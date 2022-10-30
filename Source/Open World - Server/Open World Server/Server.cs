@@ -35,24 +35,6 @@ namespace OpenWorldServer
         //Server Details
         public static string serverVersion = "v1.4.1 Unstable";
 
-        //Server Variables
-        public static int maxPlayers = 300;
-        public static int warningWealthThreshold = 10000;
-        public static int banWealthThreshold = 100000;
-        public static int idleTimer = 7;
-
-        //Server Booleans
-        public static bool usingIdleTimer = false;
-        public static bool allowDevMode = false;
-        public static bool usingWhitelist = false;
-        public static bool usingWealthSystem = false;
-        public static bool usingRoadSystem = false;
-        public static bool aggressiveRoadMode = false;
-        public static bool forceModlist = false;
-        public static bool forceModlistConfigs = false;
-        public static bool usingModVerification = false;
-        public static bool usingChat = false;
-        public static bool usingProfanityFilter = false;
 
         //Server Mods
         public static List<string> enforcedMods = new List<string>();
@@ -84,21 +66,6 @@ namespace OpenWorldServer
             // Server Settings.txt
             Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
             Networking.serverPort = serverConfig.Port;
-            Server.maxPlayers = serverConfig.MaxPlayers;
-            Server.allowDevMode = serverConfig.AllowDevMode;
-            Server.usingWhitelist = serverConfig.WhitelistMode;
-            Server.warningWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold;
-            Server.banWealthThreshold = serverConfig.AntiCheat.WealthCheckSystem.BanThreshold;
-            Server.usingWealthSystem = serverConfig.AntiCheat.WealthCheckSystem.IsActive;
-            Server.usingIdleTimer = serverConfig.IdleSystem.IsActive;
-            Server.idleTimer = (int)serverConfig.IdleSystem.IdleThresholdInDays;
-            Server.usingRoadSystem = serverConfig.RoadSystem.IsActive;
-            Server.aggressiveRoadMode = serverConfig.RoadSystem.AggressiveRoadMode;
-            Server.forceModlist = serverConfig.ModsSystem.MatchModlist;
-            Server.forceModlistConfigs = serverConfig.ModsSystem.ModlistConfigMatch;
-            Server.usingModVerification = serverConfig.ModsSystem.ForceModVerification;
-            Server.usingChat = serverConfig.ChatSystem.IsActive;
-            Server.usingProfanityFilter = serverConfig.ChatSystem.UseProfanityFilter;
 
             // Mods
             Server.enforcedMods = StaticProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();

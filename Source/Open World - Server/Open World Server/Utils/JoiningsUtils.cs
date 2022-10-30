@@ -181,21 +181,21 @@ namespace OpenWorldServer
             }
             else client.PlayerData.IsAdmin = false;
 
-            int devInt = client.PlayerData.IsAdmin || Server.allowDevMode ? 1 : 0;
+            int devInt = client.PlayerData.IsAdmin || StaticProxy.serverConfig.AllowDevMode ? 1 : 0;
 
             int wipeInt = client.PlayerData.ToWipe ? 1 : 0;
 
             int roadInt = 0;
-            if (Server.usingRoadSystem) roadInt = 1;
-            if (Server.usingRoadSystem && Server.aggressiveRoadMode) roadInt = 2;
+            if (StaticProxy.serverConfig.RoadSystem.IsActive) roadInt = 1;
+            if (StaticProxy.serverConfig.RoadSystem.IsActive && StaticProxy.serverConfig.RoadSystem.AggressiveRoadMode) roadInt = 2;
 
             string name = StaticProxy.serverConfig.ServerName;
 
-            int chatInt = Server.usingChat ? 1 : 0;
+            int chatInt = StaticProxy.serverConfig.ChatSystem.IsActive ? 1 : 0;
 
-            int profanityInt = Server.usingProfanityFilter ? 1 : 0;
+            int profanityInt = StaticProxy.serverConfig.ChatSystem.UseProfanityFilter ? 1 : 0;
 
-            int modVerifyInt = Server.usingModVerification ? 1 : 0;
+            int modVerifyInt = StaticProxy.serverConfig.ModsSystem.ForceModVerification ? 1 : 0;
 
             return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + name;
         }
@@ -243,7 +243,7 @@ namespace OpenWorldServer
         public static bool CompareModsWithClient(ServerClient client, string data)
         {
             if (client.PlayerData.IsAdmin) return true;
-            if (!Server.forceModlist) return true;
+            if (!StaticProxy.serverConfig.ModsSystem.MatchModlist) return true;
 
             string[] clientMods = data.Split('»');
 
@@ -347,7 +347,7 @@ namespace OpenWorldServer
         {
             if (client.PlayerData.IsAdmin) return true;
 
-            if (Networking.connectedClients.Count() >= Server.maxPlayers + 1)
+            if (Networking.connectedClients.Count() >= StaticProxy.serverConfig.MaxPlayers + 1)
             {
                 Networking.SendData(client, "Disconnect│ServerFull");
                 client.disconnectFlag = true;
