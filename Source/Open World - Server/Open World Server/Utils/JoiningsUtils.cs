@@ -130,11 +130,11 @@ namespace OpenWorldServer
         {
             string dataToSend = "Planet│";
 
-            double mmGC = Server.globeCoverage;
-            string mmS = Server.seed;
-            int mmOR = Server.overallRainfall;
-            int mmOT = Server.overallTemperature;
-            int mmOP = Server.overallPopulation;
+            double mmGC = StaticProxy.serverConfig.World.GlobeCoverage;
+            string mmS = StaticProxy.serverConfig.World.Seed;
+            int mmOR = StaticProxy.serverConfig.World.OverallRainfall;
+            int mmOT = StaticProxy.serverConfig.World.OverallTemperature;
+            int mmOP = StaticProxy.serverConfig.World.OverallPopulation;
 
             return dataToSend + mmGC + "│" + mmS + "│" + mmOR + "│" + mmOT + "│" + mmOP;
         }
@@ -189,7 +189,7 @@ namespace OpenWorldServer
             if (Server.usingRoadSystem) roadInt = 1;
             if (Server.usingRoadSystem && Server.aggressiveRoadMode) roadInt = 2;
 
-            string name = Server.serverName;
+            string name = StaticProxy.serverConfig.ServerName;
 
             int chatInt = Server.usingChat ? 1 : 0;
 

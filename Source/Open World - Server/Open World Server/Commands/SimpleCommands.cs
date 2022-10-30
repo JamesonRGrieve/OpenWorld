@@ -81,8 +81,8 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Server Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Server Name: " + Server.serverName);
-            ConsoleUtils.WriteWithTime("Server Description: " + Server.serverDescription);
+            ConsoleUtils.WriteWithTime("Server Name: " + StaticProxy.serverConfig.ServerName);
+            ConsoleUtils.WriteWithTime("Server Description: " + StaticProxy.serverConfig.Description);
             ConsoleUtils.WriteWithTime("Server Local IP: " + Networking.localAddress);
             ConsoleUtils.WriteWithTime("Server Port: " + Networking.serverPort);
             Console.WriteLine("");
@@ -91,11 +91,11 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("World Settings:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Globe Coverage: " + Server.globeCoverage);
-            ConsoleUtils.WriteWithTime("Seed: " + Server.seed);
-            ConsoleUtils.WriteWithTime("Overall Rainfall: " + Server.overallRainfall);
-            ConsoleUtils.WriteWithTime("Overall Temperature: " + Server.overallTemperature);
-            ConsoleUtils.WriteWithTime("Overall Population: " + Server.overallPopulation);
+            ConsoleUtils.WriteWithTime("Globe Coverage: " + StaticProxy.serverConfig.World.GlobeCoverage);
+            ConsoleUtils.WriteWithTime("Seed: " + StaticProxy.serverConfig.World.Seed);
+            ConsoleUtils.WriteWithTime("Overall Rainfall: " + StaticProxy.serverConfig.World.OverallRainfall);
+            ConsoleUtils.WriteWithTime("Overall Temperature: " + StaticProxy.serverConfig.World.OverallTemperature);
+            ConsoleUtils.WriteWithTime("Overall Population: " + StaticProxy.serverConfig.World.OverallPopulation);
             Console.WriteLine("");
         }
 

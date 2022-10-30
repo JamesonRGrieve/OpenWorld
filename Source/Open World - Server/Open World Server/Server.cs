@@ -33,8 +33,6 @@ namespace OpenWorldServer
         public static Dictionary<string, List<string>> savedSettlements = new Dictionary<string, List<string>>();
 
         //Server Details
-        public static string serverName = "";
-        public static string serverDescription = "";
         public static string serverVersion = "v1.4.1 Unstable";
 
         //Server Variables
@@ -66,13 +64,6 @@ namespace OpenWorldServer
         public static List<string> chatCache = new List<string>();
         public static List<Faction> savedFactions = new List<Faction>();
 
-        //World Parameters
-        public static double globeCoverage;
-        public static string seed;
-        public static int overallRainfall;
-        public static int overallTemperature;
-        public static int overallPopulation;
-
         public void Run()
         {
             AdoptConfigToStaticVars(this.serverConfig);
@@ -91,8 +82,6 @@ namespace OpenWorldServer
             // This needs to be replaced with proper use of the server config in the classes
 
             // Server Settings.txt
-            Server.serverName = serverConfig.ServerName;
-            Server.serverDescription = serverConfig.Description;
             Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
             Networking.serverPort = serverConfig.Port;
             Server.maxPlayers = serverConfig.MaxPlayers;
@@ -110,13 +99,6 @@ namespace OpenWorldServer
             Server.usingModVerification = serverConfig.ModsSystem.ForceModVerification;
             Server.usingChat = serverConfig.ChatSystem.IsActive;
             Server.usingProfanityFilter = serverConfig.ChatSystem.UseProfanityFilter;
-
-            // World Settings.txt
-            Server.globeCoverage = serverConfig.World.GlobeCoverage;
-            Server.seed = serverConfig.World.Seed;
-            Server.overallRainfall = serverConfig.World.OverallRainfall;
-            Server.overallTemperature = serverConfig.World.OverallTemperature;
-            Server.overallPopulation = serverConfig.World.OverallPopulation;
 
             // Mods
             Server.enforcedMods = StaticProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();
