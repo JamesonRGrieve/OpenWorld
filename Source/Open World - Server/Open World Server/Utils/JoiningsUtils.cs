@@ -20,7 +20,7 @@ namespace OpenWorldServer
             if (!CompareConnectingClientWithPlayerCount(client)) return;
             if (!CompareConnectingClientVersion(client, playerVersion)) return;
 
-            if (!HandlerProxy.playerHandler.IsWhitelisted(client))
+            if (!StaticProxy.playerHandler.IsWhitelisted(client))
             {
                 Networking.SendData(client, "Disconnect│Whitelist");
                 client.disconnectFlag = true;
@@ -33,10 +33,10 @@ namespace OpenWorldServer
             CompareConnectingClientWithConnecteds(client);
 
 
-            var playerData = HandlerProxy.playerHandler.GetPlayerData(client);
+            var playerData = StaticProxy.playerHandler.GetPlayerData(client);
             if (playerData == null)
             {
-                HandlerProxy.playerHandler.SavePlayerData(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
                 ConsoleUtils.LogToConsole("New Player [" + client.PlayerData.Username + "]");
             }
             else if (client.PlayerData.Password != client.PlayerData.Password)
@@ -75,7 +75,7 @@ namespace OpenWorldServer
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
-            HandlerProxy.playerHandler.ResetPlayerData(client);
+            StaticProxy.playerHandler.ResetPlayerData(client);
 
             Networking.SendData(client, GetPlanetToSend());
             Thread.Sleep(100);
@@ -330,7 +330,7 @@ namespace OpenWorldServer
 
         public static bool CompareClientIPWithBans(ServerClient client)
         {
-            var banInfo = HandlerProxy.playerHandler.GetBanInfo(client.PlayerData.Username);
+            var banInfo = StaticProxy.playerHandler.GetBanInfo(client.PlayerData.Username);
             if (banInfo != null &&
                 (banInfo.IPAddress == ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() || banInfo.Username == client.PlayerData.Username))
             {

@@ -155,7 +155,7 @@ namespace OpenWorldServer
         {
             Console.Clear();
 
-            HandlerProxy.modHandler.ReloadModFolders();
+            StaticProxy.modHandler.ReloadModFolders();
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.WriteWithTime("Mods Have Been Reloaded");
             Console.WriteLine("");
@@ -195,7 +195,7 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Settlements: " + Server.savedSettlements.Count);
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + HandlerProxy.playerHandler.WhitelistedUser.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistedUser.Count);
             ConsoleUtils.WriteWithTime("Max Players: " + Server.maxPlayers);
             Console.WriteLine("");
 
@@ -258,11 +258,11 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + HandlerProxy.playerHandler.WhitelistedUser.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistedUser.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (HandlerProxy.playerHandler.WhitelistedUser.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
-            else foreach (string str in HandlerProxy.playerHandler.WhitelistedUser) ConsoleUtils.WriteWithTime("" + str);
+            if (StaticProxy.playerHandler.WhitelistedUser.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
+            else foreach (string str in StaticProxy.playerHandler.WhitelistedUser) ConsoleUtils.WriteWithTime("" + str);
 
             Console.WriteLine("");
         }
@@ -294,13 +294,13 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Banned players: " + HandlerProxy.playerHandler.BannedPlayers.Count);
+            ConsoleUtils.WriteWithTime("Banned players: " + StaticProxy.playerHandler.BannedPlayers.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (HandlerProxy.playerHandler.BannedPlayers.Count == 0)
+            if (StaticProxy.playerHandler.BannedPlayers.Count == 0)
                 ConsoleUtils.WriteWithTime("No Banned Players");
             else
-                foreach (var ban in HandlerProxy.playerHandler.BannedPlayers)
+                foreach (var ban in StaticProxy.playerHandler.BannedPlayers)
                 {
                     ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
                 }
@@ -331,7 +331,7 @@ namespace OpenWorldServer
                 {
                     client.PlayerData.Wealth = 0;
                     client.PlayerData.PawnCount = 0;
-                    HandlerProxy.playerHandler.SavePlayerData(client);
+                    StaticProxy.playerHandler.SavePlayerData(client);
                 }
 
                 Console.Clear();

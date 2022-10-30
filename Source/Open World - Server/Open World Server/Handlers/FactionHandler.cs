@@ -52,7 +52,7 @@ namespace OpenWorldServer
 
             ServerClient clientToSave = Server.savedClients.Find(fetch => fetch.PlayerData.Username == factionLeader.PlayerData.Username);
             clientToSave.PlayerData.Faction = newFaction;
-            PlayerUtils.SavePlayer(clientToSave);
+            StaticProxy.playerHandler.SavePlayerData(clientToSave);
 
             Networking.SendData(factionLeader, "FactionManagement│Created");
 
@@ -160,7 +160,7 @@ namespace OpenWorldServer
             if (saved != null)
             {
                 saved.PlayerData.Faction = faction;
-                PlayerUtils.SavePlayer(saved);
+                StaticProxy.playerHandler.SavePlayerData(saved);
             }
 
             UpdateAllPlayerDetailsInFaction(faction);
@@ -188,7 +188,7 @@ namespace OpenWorldServer
             if (saved != null)
             {
                 saved.PlayerData.Faction = null;
-                PlayerUtils.SavePlayer(saved);
+                StaticProxy.playerHandler.SavePlayerData(saved);
             }
 
             if (faction.members.Count > 0)
@@ -216,7 +216,7 @@ namespace OpenWorldServer
                 if (saved != null)
                 {
                     saved.PlayerData.Faction = null;
-                    PlayerUtils.SavePlayer(saved);
+                    StaticProxy.playerHandler.SavePlayerData(saved);
                 }
             }
 

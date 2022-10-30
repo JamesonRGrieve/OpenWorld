@@ -119,15 +119,16 @@ namespace OpenWorldServer
             Server.overallPopulation = serverConfig.World.OverallPopulation;
 
             // Mods
-            Server.enforcedMods = HandlerProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();
-            Server.whitelistedMods = HandlerProxy.modHandler.WhitelisteddMods.ToArray().Select(m => m.Name).ToList();
-            Server.blacklistedMods = HandlerProxy.modHandler.BlacklistedMods.ToArray().Select(m => m.Name).ToList();
+            Server.enforcedMods = StaticProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList();
+            Server.whitelistedMods = StaticProxy.modHandler.WhitelisteddMods.ToArray().Select(m => m.Name).ToList();
+            Server.blacklistedMods = StaticProxy.modHandler.BlacklistedMods.ToArray().Select(m => m.Name).ToList();
         }
 
         public void SetupHandlerProxy()
         {
-            HandlerProxy.modHandler = this.modHandler;
-            HandlerProxy.playerHandler = this.playerHandler;
+            StaticProxy.serverConfig = this.serverConfig;
+            StaticProxy.modHandler = this.modHandler;
+            StaticProxy.playerHandler = this.playerHandler;
         }
 
         public static void ListenForCommands()

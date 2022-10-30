@@ -21,7 +21,7 @@ namespace OpenWorldServer
                     }
                 }
 
-                PlayerUtils.SavePlayer(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
             }
 
             int factionValue = 0;
@@ -63,7 +63,7 @@ namespace OpenWorldServer
                     }
                 }
 
-                PlayerUtils.SavePlayer(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
             }
 
             if (!string.IsNullOrWhiteSpace(tile))

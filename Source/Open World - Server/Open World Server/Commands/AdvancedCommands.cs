@@ -208,7 +208,7 @@ namespace OpenWorldServer
                 {
                     targetClient.PlayerData.IsImmunized = true;
                     Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsImmunized = true;
-                    PlayerUtils.SavePlayer(targetClient);
+                    StaticProxy.playerHandler.SavePlayerData(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Inmmunized");
@@ -245,7 +245,7 @@ namespace OpenWorldServer
                 {
                     targetClient.PlayerData.IsImmunized = false;
                     Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsImmunized = false;
-                    PlayerUtils.SavePlayer(targetClient);
+                    StaticProxy.playerHandler.SavePlayerData(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Deinmmunized");
@@ -432,7 +432,7 @@ namespace OpenWorldServer
                     {
                         targetClient.PlayerData.IsAdmin = true;
                         Server.savedClients.Find(fetch => fetch.PlayerData.Username == clientID).PlayerData.IsAdmin = true;
-                        PlayerUtils.SavePlayer(targetClient);
+                        StaticProxy.playerHandler.SavePlayerData(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Promote");
 
@@ -481,7 +481,7 @@ namespace OpenWorldServer
                     {
                         targetClient.PlayerData.IsAdmin = false;
                         Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsAdmin = false;
-                        PlayerUtils.SavePlayer(targetClient);
+                        StaticProxy.playerHandler.SavePlayerData(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Demote");
 
@@ -658,7 +658,7 @@ namespace OpenWorldServer
 
                 else
                 {
-                    HandlerProxy.playerHandler.BanPlayer(targetClient);
+                    StaticProxy.playerHandler.BanPlayer(targetClient);
                     ConsoleUtils.LogToConsole(Environment.NewLine);
                 }
             }
@@ -677,10 +677,10 @@ namespace OpenWorldServer
 
             else
             {
-                var banInfo = HandlerProxy.playerHandler.GetBanInfo(clientID);
+                var banInfo = StaticProxy.playerHandler.GetBanInfo(clientID);
                 if (banInfo != null)
                 {
-                    HandlerProxy.playerHandler.UnbanPlayer(banInfo);
+                    StaticProxy.playerHandler.UnbanPlayer(banInfo);
                     ConsoleUtils.LogToConsole(Environment.NewLine);
                     return;
                 }

@@ -29,7 +29,7 @@ namespace OpenWorldServer
                     catch
                     {
                         playerToLoad.PlayerData.HomeTileId = null;
-                        HandlerProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
+                        StaticProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Cloned Entry! Fixing");
@@ -43,7 +43,7 @@ namespace OpenWorldServer
                     if (factionToFech == null)
                     {
                         playerToLoad.PlayerData.Faction = null;
-                        HandlerProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
+                        StaticProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Missing Faction! Fixing");
@@ -132,7 +132,7 @@ namespace OpenWorldServer
 
             if (client.PlayerData.Wealth - wealthToCompare > Server.banWealthThreshold && Server.banWealthThreshold > 0)
             {
-                HandlerProxy.playerHandler.SavePlayerData(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
 
@@ -140,11 +140,11 @@ namespace OpenWorldServer
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "]'s Wealth Triggered Alarm [" + wealthToCompare + " > " + (int)client.PlayerData.Wealth + "], Banning");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                HandlerProxy.playerHandler.BanPlayer(client, "Wealth Check triggered");
+                StaticProxy.playerHandler.BanPlayer(client, "Wealth Check triggered");
             }
             else if (client.PlayerData.Wealth - wealthToCompare > Server.warningWealthThreshold && Server.warningWealthThreshold > 0)
             {
-                HandlerProxy.playerHandler.SavePlayerData(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
 
@@ -154,7 +154,7 @@ namespace OpenWorldServer
             }
             else
             {
-                HandlerProxy.playerHandler.SavePlayerData(client);
+                StaticProxy.playerHandler.SavePlayerData(client);
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
                 Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
             }
@@ -267,7 +267,7 @@ namespace OpenWorldServer
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
                     sc.PlayerData.GiftString.Add(dataToSend);
-                    HandlerProxy.playerHandler.SavePlayerData(sc);
+                    StaticProxy.playerHandler.SavePlayerData(sc);
                     ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.PlayerData.Username + "] And [" + sc.PlayerData.Username + "] But Was Offline. Saving");
                     return;
                 }
