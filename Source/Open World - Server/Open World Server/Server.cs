@@ -62,7 +62,6 @@ namespace OpenWorldServer
         public static List<string> blacklistedMods = new List<string>();
 
         //Server Lists
-        public static List<string> whitelistedUsernames = new List<string>();
         public static List<string> adminList = new List<string>();
         public static List<string> chatCache = new List<string>();
         public static List<Faction> savedFactions = new List<Faction>();
@@ -77,7 +76,6 @@ namespace OpenWorldServer
         public void Run()
         {
             AdoptConfigToStaticVars(this.serverConfig);
-            Server.whitelistedUsernames = this.playerHandler.WhitelistedUser;
             this.SetupHandlerProxy();
 
             FactionHandler.CheckFactions(true);

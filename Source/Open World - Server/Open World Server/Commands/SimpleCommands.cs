@@ -195,7 +195,7 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Settlements: " + Server.savedSettlements.Count);
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + Server.whitelistedUsernames.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + HandlerProxy.playerHandler.WhitelistedUser.Count);
             ConsoleUtils.WriteWithTime("Max Players: " + Server.maxPlayers);
             Console.WriteLine("");
 
@@ -258,11 +258,11 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + Server.whitelistedUsernames.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + HandlerProxy.playerHandler.WhitelistedUser.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.whitelistedUsernames.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
-            else foreach (string str in Server.whitelistedUsernames) ConsoleUtils.WriteWithTime("" + str);
+            if (HandlerProxy.playerHandler.WhitelistedUser.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
+            else foreach (string str in HandlerProxy.playerHandler.WhitelistedUser) ConsoleUtils.WriteWithTime("" + str);
 
             Console.WriteLine("");
         }

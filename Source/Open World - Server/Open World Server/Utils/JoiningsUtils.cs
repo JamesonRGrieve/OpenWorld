@@ -19,7 +19,14 @@ namespace OpenWorldServer
 
             if (!CompareConnectingClientWithPlayerCount(client)) return;
             if (!CompareConnectingClientVersion(client, playerVersion)) return;
-            if (!CompareConnectingClientWithWhitelist(client)) return;
+
+            if (!HandlerProxy.playerHandler.IsWhitelisted(client))
+            {
+                Networking.SendData(client, "Disconnect│Whitelist");
+                client.disconnectFlag = true;
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] tried to Join but is not Whitelisted");
+            }
+
             if (!CompareModsWithClient(client, playerMods)) return;
             if (!CompareClientIPWithBans(client)) return;
             if (!ParseClientUsername(client)) return;
@@ -309,22 +316,6 @@ namespace OpenWorldServer
             }
 
             return true;
-        }
-
-        public static bool CompareConnectingClientWithWhitelist(ServerClient client)
-        {
-            if (!Server.usingWhitelist) return true;
-            if (client.PlayerData.IsAdmin) return true;
-
-            foreach (string str in Server.whitelistedUsernames)
-            {
-                if (str == client.PlayerData.Username) return true;
-            }
-
-            Networking.SendData(client, "Disconnect│Whitelist");
-            client.disconnectFlag = true;
-            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Not Whitelisted");
-            return false;
         }
 
         public static bool CompareConnectingClientVersion(ServerClient client, string clientVersion)

@@ -39,6 +39,12 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Loaded whitelist - {this.WhitelistedUser.Count} Entries", ConsoleColor.Green);
         }
 
+        internal bool IsWhitelisted(ServerClient client)
+            => client.PlayerData.IsAdmin || this.IsWhitelisted(client.PlayerData.Username);
+
+        private bool IsWhitelisted(string username)
+            => !this.serverConfig.WhitelistMode || this.WhitelistedUser.Contains(username);
+
         private void ReloadBannedPlayers()
         {
             ConsoleUtils.LogTitleToConsole("Reloading Banned Players");
