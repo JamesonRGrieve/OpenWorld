@@ -32,8 +32,11 @@ namespace OpenWorldServer
         public static Dictionary<string, List<string>> savedSettlements = new Dictionary<string, List<string>>();
 
         //Server Details
-        public static string serverVersion = "v1.4.1 Unstable";
+        public static string serverVersion = "v1.4.1";
 
+
+        //Server Booleans
+        public static bool usingEnforcedDifficulty = false;
 
         //Server Lists
         public static List<string> adminList = new List<string>();

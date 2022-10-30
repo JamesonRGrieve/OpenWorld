@@ -21,6 +21,7 @@ namespace OpenWorld
         public int chatMode = 0;
         public int modVerificationMode = 0;
         public int profanityMode = 0;
+        public int enforcedDifficultyMode = 0;
 
         //Player Flags
         public bool pvpFlag;
@@ -123,6 +124,6 @@ namespace OpenWorld
         public string receiveGiftsData;
         public string serverStatusString;
         public int transferMode;
-        public string versionCode = "Going 1.4";
+        public string versionCode = "Faction Warfare";
     }
 }

@@ -197,7 +197,11 @@ namespace OpenWorldServer
 
             int modVerifyInt = StaticProxy.serverConfig.ModsSystem.ForceModVerification ? 1 : 0;
 
-            return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + name;
+            int enforcedDifficultyInt = Server.usingEnforcedDifficulty ? 1 : 0;
+
+            string name = Server.serverName;
+
+            return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + enforcedDifficultyInt + "│" + name;
         }
 
         public static string GetGiftsToSend(ServerClient client)
