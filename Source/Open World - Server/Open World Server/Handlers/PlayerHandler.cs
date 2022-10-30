@@ -102,7 +102,7 @@ namespace OpenWorldServer.Handlers
         private void LoadPlayerData()
         {
             ConsoleUtils.LogTitleToConsole("Loading Players and Settlements");
-            var playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath);
+            var playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath, "*.json");
 
             foreach (var playerFile in playerFiles)
             {
