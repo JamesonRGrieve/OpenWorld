@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
@@ -125,7 +124,7 @@ namespace OpenWorldServer.Handlers
         }
 
         public PlayerData GetPlayerData(string username)
-            => this.PlayerData.FirstOrDefault(pd => pd.Username == username);
+            => this.PlayerData.Find(pd => pd.Username == username);
 
         public bool SavePlayerData(ServerClient client)
             => this.SavePlayerData(client.PlayerData);
