@@ -622,13 +622,16 @@ namespace OpenWorldServer
                     ConsoleUtils.WriteWithTime("Structures:");
                     Console.ForegroundColor = ConsoleColor.White;
 
-                    if (factionToSearch.factionStructures.Count == 0) ConsoleUtils.WriteWithTime("No Structures");
+                    if (factionToSearch.factionStructures.Count == 0)
+                        ConsoleUtils.WriteWithTime("No Structures");
                     else
+                    {
                         FactionStructure[] structures = factionToSearch.factionStructures.ToArray();
                         foreach (FactionStructure structure in structures)
                         {
                             ConsoleUtils.WriteWithTime("[" + structure.structureTile + "]" + " - " + structure.structureName);
                         }
+                    }
 
                     Console.WriteLine();
                 }

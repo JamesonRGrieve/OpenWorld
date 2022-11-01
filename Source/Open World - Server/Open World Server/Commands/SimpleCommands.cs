@@ -163,9 +163,6 @@ namespace OpenWorldServer
             StaticProxy.modHandler.ReloadModFolders();
             Console.ForegroundColor = ConsoleColor.Green;
 
-            WorldHandler.CheckWorldFile();
-            Console.ForegroundColor = ConsoleColor.Green;
-
             FactionHandler.CheckFactions(false);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("");
@@ -311,7 +308,7 @@ namespace OpenWorldServer
                 ConsoleUtils.WriteWithTime("No Banned Players");
             else
             {
-				// ToDo: Use Copy of Dictionary
+                // ToDo: Use Copy of Dictionary
                 foreach (var ban in StaticProxy.playerHandler.BannedPlayers)
                 {
                     ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
@@ -369,16 +366,16 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             if (Networking.connectedClients.Count == 0)
-				ConsoleUtils.WriteWithTime("No Players Connected");
+                ConsoleUtils.WriteWithTime("No Players Connected");
             else
             {
                 ServerClient[] clients = Networking.connectedClients.ToArray();
                 foreach (ServerClient client in clients)
                 {
                     try
-					{
-						ConsoleUtils.WriteWithTime("" + client.PlayerData.Username);
-					}
+                    {
+                        ConsoleUtils.WriteWithTime("" + client.PlayerData.Username);
+                    }
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -386,6 +383,7 @@ namespace OpenWorldServer
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
+            }
 
             Console.WriteLine("");
 
@@ -393,7 +391,8 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.savedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Saved");
+            if (Server.savedClients.Count == 0)
+                ConsoleUtils.WriteWithTime("No Players Saved");
             else
             {
                 ServerClient[] savedClients = Server.savedClients.ToArray();
@@ -407,6 +406,7 @@ namespace OpenWorldServer
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
+            }
 
             Console.WriteLine("");
 
@@ -414,13 +414,16 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Saved Factions: " + Server.savedFactions.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.savedFactions.Count == 0) ConsoleUtils.WriteWithTime("No Factions Saved");
+            if (Server.savedFactions.Count == 0)
+                ConsoleUtils.WriteWithTime("No Factions Saved");
             else
+            {
                 Faction[] factions = Server.savedFactions.ToArray();
                 foreach (Faction savedFaction in factions)
                 {
                     ConsoleUtils.WriteWithTime(savedFaction.name);
                 }
+            }
 
             Console.WriteLine("");
         }
