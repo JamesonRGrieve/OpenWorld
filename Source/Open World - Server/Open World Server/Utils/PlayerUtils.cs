@@ -88,7 +88,6 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             CheckSavedPlayers();
-
             Console.WriteLine("");
         }
 
@@ -167,7 +166,8 @@ namespace OpenWorldServer
 
         public static bool CheckForConnectedPlayers(string tileID)
         {
-            foreach (ServerClient client in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient client in clients)
             {
                 if (client.PlayerData.HomeTileId == tileID) return true;
             }
@@ -182,7 +182,8 @@ namespace OpenWorldServer
 
         public static bool CheckForPlayerShield(string tileID)
         {
-            foreach (ServerClient client in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient client in clients)
             {
                 if (client.PlayerData.HomeTileId == tileID && !client.eventShielded && !client.PlayerData.IsImmunized)
                 {
@@ -210,7 +211,8 @@ namespace OpenWorldServer
 
         public static string GetSpyData(string tileID, ServerClient origin)
         {
-            foreach (ServerClient client in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient client in clients)
             {
                 if (client.PlayerData.HomeTileId == tileID)
                 {
@@ -239,7 +241,8 @@ namespace OpenWorldServer
         {
             string dataToSend = "ForcedEvent│" + data.Split('│')[1];
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[2])
                 {
@@ -255,7 +258,8 @@ namespace OpenWorldServer
             string tileToSend = data.Split('│')[1];
             string dataToSend = "GiftedItems│" + data.Split('│')[2];
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
@@ -267,7 +271,8 @@ namespace OpenWorldServer
 
             dataToSend = dataToSend.Replace("GiftedItems│", "");
 
-            foreach (ServerClient sc in Server.savedClients)
+            ServerClient[] savedClients = Server.savedClients.ToArray();
+            foreach(ServerClient sc in savedClients)
             {
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
@@ -283,7 +288,8 @@ namespace OpenWorldServer
         {
             string dataToSend = "TradeRequest│" + invoker.PlayerData.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[1])
                 {
@@ -297,7 +303,8 @@ namespace OpenWorldServer
         {
             string dataToSend = "BarterRequest│" + invoker.PlayerData.HomeTileId + "│" + data.Split('│')[2];
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[1])
                 {

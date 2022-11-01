@@ -27,7 +27,8 @@ namespace OpenWorldServer
 
                 Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
-                foreach (ServerClient sc in Networking.connectedClients)
+                ServerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (ServerClient sc in clients)
                 {
                     Networking.SendData(sc, "ChatMessage│SERVER│" + commandData);
                 }
@@ -45,7 +46,8 @@ namespace OpenWorldServer
 
             else
             {
-                foreach (ServerClient sc in Networking.connectedClients)
+                ServerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (ServerClient sc in clients)
                 {
                     Networking.SendData(sc, "Notification│" + commandData);
                 }
@@ -167,7 +169,8 @@ namespace OpenWorldServer
 
             else
             {
-                foreach (ServerClient client in Networking.connectedClients)
+                ServerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (ServerClient client in clients)
                 {
                     Networking.SendData(client, "GiftedItems│" + itemID + "┼" + itemQuantity + "┼" + itemQuality + "┼");
 
@@ -382,7 +385,8 @@ namespace OpenWorldServer
                 Console.WriteLine();
             }
 
-            foreach (ServerClient client in Networking.connectedClients)
+            ServerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (ServerClient client in clients)
             {
                 Networking.SendData(client, "ForcedEvent│" + eventID);
             }
@@ -619,7 +623,9 @@ namespace OpenWorldServer
                     Console.ForegroundColor = ConsoleColor.White;
 
                     if (factionToSearch.factionStructures.Count == 0) ConsoleUtils.WriteWithTime("No Structures");
-                    else foreach (FactionStructure structure in factionToSearch.factionStructures)
+                    else
+                        FactionStructure[] structures = factionToSearch.factionStructures.ToArray();
+                        foreach (FactionStructure structure in structures)
                         {
                             ConsoleUtils.WriteWithTime("[" + structure.structureTile + "]" + " - " + structure.structureName);
                         }

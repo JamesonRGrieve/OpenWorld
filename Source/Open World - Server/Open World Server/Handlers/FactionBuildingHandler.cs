@@ -8,7 +8,8 @@
 
             int factionValue = 0;
 
-            foreach (Faction faction in Server.savedFactions)
+            Faction[] factions = Server.savedFactions.ToArray();
+            foreach (Faction faction in factions)
             {
                 if (client.PlayerData.Faction == null) factionValue = 0;
                 if (client.PlayerData.Faction != null)
@@ -19,7 +20,8 @@
                         factionValue = 2;
                 }
 
-                foreach (FactionStructure structure in faction.factionStructures)
+                FactionStructure[] structures = faction.factionStructures.ToArray();
+                foreach (FactionStructure structure in structures)
                 {
                     dataToSend += structure.structureTile + ":" + structure.structureType + ":" + factionValue + "»";
                 }

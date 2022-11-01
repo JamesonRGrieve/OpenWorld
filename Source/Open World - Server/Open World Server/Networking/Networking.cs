@@ -49,7 +49,6 @@ namespace OpenWorldServer
         public static void ListenToClient(ServerClient client)
         {
             NetworkStream s = client.tcp.GetStream();
-            StreamWriter sw = new StreamWriter(s);
             StreamReader sr = new StreamReader(s, true);
 
             while (true)
@@ -60,13 +59,11 @@ namespace OpenWorldServer
                 {
                     if (client.disconnectFlag) return;
 
-                    if (!s.DataAvailable) continue;
-
                     string encryptedData = sr.ReadLine();
                     string data = Encryption.DecryptString(encryptedData);
                     //if (data != "Ping") Debug.WriteLine(data);
 
-                    if (encryptedData != null)
+                    if (data != null)
                     {
                         if (data.StartsWith("Connect│"))
                         {
@@ -152,10 +149,10 @@ namespace OpenWorldServer
 
         public static void KickClients(ServerClient client, string kickMode)
         {
-            try { client.tcp.Close(); }
-            catch { }
-
             connectedClients.Remove(client);
+
+            try { client.tcp.Dispose(); }
+            catch { }
 
             if (kickMode == "Normal") ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Disconnected");
             else if (kickMode == "Silent") { }
@@ -171,12 +168,11 @@ namespace OpenWorldServer
 
             while (true)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
 
                 try
                 {
-                    List<ServerClient> actualClients = new List<ServerClient>();
-                    actualClients.AddRange(connectedClients);
+                    ServerClient[] actualClients = connectedClients.ToArray();
 
                     List<ServerClient> clientsToDisconnect = new List<ServerClient>();
 

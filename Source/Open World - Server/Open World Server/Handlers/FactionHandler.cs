@@ -98,7 +98,18 @@ namespace OpenWorldServer
                     s.Close();
                     s.Dispose();
 
-                    if (!Server.savedFactions.Contains(factionToLoad)) Server.savedFactions.Add(factionToLoad);
+                    if (factionToLoad.members.Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        ConsoleUtils.WriteWithTime("Faction Had 0 Members, Removing");
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        DisbandFaction(factionToLoad);
+                        continue;
+                    }
+
+                    Faction factionToFetch = Server.savedFactions.Find(fetch => fetch.name == factionToLoad.name);
+                    if (factionToFetch == null) Server.savedFactions.Add(factionToLoad);
                 }
                 catch { failedToLoadFactions++; }
             }
@@ -133,7 +144,8 @@ namespace OpenWorldServer
 
                 dataToSend += factionToCheck.name + "│";
 
-                foreach (KeyValuePair<ServerClient, MemberRank> member in factionToCheck.members)
+                Dictionary<ServerClient, MemberRank> members = factionToCheck.members;
+                foreach (KeyValuePair<ServerClient, MemberRank> member in members)
                 {
                     dataToSend += member.Key.PlayerData.Username + ":" + (int)member.Value + "»";
                 }
@@ -288,7 +300,8 @@ namespace OpenWorldServer
 
         public static MemberRank GetMemberPowers(Faction faction, ServerClient memberToCheck)
         {
-            foreach (KeyValuePair<ServerClient, MemberRank> pair in faction.members)
+            Dictionary<ServerClient, MemberRank> members = faction.members;
+            foreach (KeyValuePair<ServerClient, MemberRank> pair in members)
             {
                 if (pair.Key.PlayerData.Username == memberToCheck.PlayerData.Username)
                 {

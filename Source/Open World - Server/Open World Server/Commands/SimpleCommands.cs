@@ -141,13 +141,7 @@ namespace OpenWorldServer
 
         public static void ExitCommand()
         {
-            List<ServerClient> clientsToKick = new List<ServerClient>();
-
-            foreach (ServerClient sc in Networking.connectedClients)
-            {
-                clientsToKick.Add(sc);
-            }
-
+            ServerClient[] clientsToKick = Networking.connectedClients.ToArray();
             foreach (ServerClient sc in clientsToKick)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
@@ -168,13 +162,16 @@ namespace OpenWorldServer
 
             StaticProxy.modHandler.ReloadModFolders();
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Mods Have Been Reloaded");
+
+            WorldHandler.CheckWorldFile();
+            Console.ForegroundColor = ConsoleColor.Green;
+
+            FactionHandler.CheckFactions(false);
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("");
 
             PlayerUtils.CheckAllAvailablePlayers(false);
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Players Have Been Reloaded");
-            Console.WriteLine("");
         }
 
         public static void StatusCommand()
@@ -286,7 +283,8 @@ namespace OpenWorldServer
 
             Server.adminList.Clear();
 
-            foreach (ServerClient client in Server.savedClients)
+            ServerClient[] savedClients = Server.savedClients.ToArray();
+            foreach (ServerClient client in savedClients)
             {
                 if (client.PlayerData.IsAdmin) Server.adminList.Add(client.PlayerData.Username);
             }
@@ -312,10 +310,13 @@ namespace OpenWorldServer
             if (StaticProxy.playerHandler.BannedPlayers.Count == 0)
                 ConsoleUtils.WriteWithTime("No Banned Players");
             else
+            {
+				// ToDo: Use Copy of Dictionary
                 foreach (var ban in StaticProxy.playerHandler.BannedPlayers)
                 {
                     ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
                 }
+            }
 
             Console.WriteLine("");
         }
@@ -332,14 +333,16 @@ namespace OpenWorldServer
 
             if (response == "Y")
             {
-                foreach (ServerClient client in Networking.connectedClients)
+                ServerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (ServerClient client in clients)
                 {
                     client.disconnectFlag = true;
                 }
 
                 Thread.Sleep(1000);
 
-                foreach (ServerClient client in Server.savedClients)
+                ServerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (ServerClient client in savedClients)
                 {
                     client.PlayerData.Wealth = 0;
                     client.PlayerData.PawnCount = 0;
@@ -365,10 +368,17 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Networking.connectedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Connected");
-            else foreach (ServerClient client in Networking.connectedClients)
+            if (Networking.connectedClients.Count == 0)
+				ConsoleUtils.WriteWithTime("No Players Connected");
+            else
+            {
+                ServerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (ServerClient client in clients)
                 {
-                    try { ConsoleUtils.WriteWithTime("" + client.PlayerData.Username); }
+                    try
+					{
+						ConsoleUtils.WriteWithTime("" + client.PlayerData.Username);
+					}
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -384,7 +394,10 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             if (Server.savedClients.Count == 0) ConsoleUtils.WriteWithTime("No Players Saved");
-            else foreach (ServerClient savedClient in Server.savedClients)
+            else
+            {
+                ServerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (ServerClient savedClient in savedClients)
                 {
                     try { ConsoleUtils.WriteWithTime("" + savedClient.PlayerData.Username); }
                     catch
@@ -402,7 +415,9 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             if (Server.savedFactions.Count == 0) ConsoleUtils.WriteWithTime("No Factions Saved");
-            else foreach (Faction savedFaction in Server.savedFactions)
+            else
+                Faction[] factions = Server.savedFactions.ToArray();
+                foreach (Faction savedFaction in factions)
                 {
                     ConsoleUtils.WriteWithTime(savedFaction.name);
                 }
@@ -419,10 +434,14 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             if (Server.savedSettlements.Count == 0) ConsoleUtils.WriteWithTime("No Active Settlements");
-            else foreach (KeyValuePair<string, List<string>> pair in Server.savedSettlements)
+            else
+            {
+                Dictionary<string, List<string>> settlements = Server.savedSettlements;
+                foreach (KeyValuePair<string, List<string>> pair in settlements)
                 {
                     ConsoleUtils.WriteWithTime("[" + pair.Key + "] - [" + pair.Value[0] + "]");
                 }
+            }
 
             Console.WriteLine("");
         }
@@ -436,10 +455,14 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
 
             if (Server.chatCache.Count == 0) ConsoleUtils.WriteWithTime("No Chat Messages");
-            else foreach (string message in Server.chatCache)
+            else
+            {
+                string[] chat = Server.chatCache.ToArray();
+                foreach (string message in chat)
                 {
                     ConsoleUtils.WriteWithTime(message);
                 }
+            }
 
             Console.WriteLine("");
         }
