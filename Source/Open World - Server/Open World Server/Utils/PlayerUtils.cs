@@ -26,7 +26,7 @@ namespace OpenWorldServer
                 if (playerData == null)
                     return;
 
-                ServerClient playerToLoad = new ServerClient(null) { PlayerData = playerData };
+                PlayerClient playerToLoad = new PlayerClient(null) { PlayerData = playerData };
 
                 if (!string.IsNullOrWhiteSpace(playerToLoad.PlayerData.HomeTileId))
                 {
@@ -62,7 +62,7 @@ namespace OpenWorldServer
             catch { }
         }
 
-        public static void GiveSavedDataToPlayer(ServerClient client)
+        public static void GiveSavedDataToPlayer(PlayerClient client)
         {
             var playerData = StaticProxy.playerHandler.GetPlayerData(client);
             if (playerData != null)
@@ -126,7 +126,7 @@ namespace OpenWorldServer
             }
         }
 
-        public static void CheckForPlayerWealth(ServerClient client)
+        public static void CheckForPlayerWealth(PlayerClient client)
         {
             if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive == false) return;
             if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold == 0 && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold == 0) return;
@@ -166,8 +166,8 @@ namespace OpenWorldServer
 
         public static bool CheckForConnectedPlayers(string tileID)
         {
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient client in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient client in clients)
             {
                 if (client.PlayerData.HomeTileId == tileID) return true;
             }
@@ -175,19 +175,19 @@ namespace OpenWorldServer
             return false;
         }
 
-        public static ServerClient GetPlayerFromTile(string tileID)
+        public static PlayerClient GetPlayerFromTile(string tileID)
         {
             return Networking.connectedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
         }
 
         public static bool CheckForPlayerShield(string tileID)
         {
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient client in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient client in clients)
             {
-                if (client.PlayerData.HomeTileId == tileID && !client.eventShielded && !client.PlayerData.IsImmunized)
+                if (client.PlayerData.HomeTileId == tileID && !client.IsEventProtected && !client.PlayerData.IsImmunized)
                 {
-                    client.eventShielded = true;
+                    client.IsEventProtected = true;
                     return true;
                 }
             }
@@ -197,11 +197,11 @@ namespace OpenWorldServer
 
         public static bool CheckForPvpAvailability(string tileID)
         {
-            foreach (ServerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in Networking.connectedClients)
             {
-                if (client.PlayerData.HomeTileId == tileID && !client.inRTSE && !client.PlayerData.IsImmunized)
+                if (client.PlayerData.HomeTileId == tileID && !client.InRTSE && !client.PlayerData.IsImmunized)
                 {
-                    client.inRTSE = true;
+                    client.InRTSE = true;
                     return true;
                 }
             }
@@ -209,14 +209,14 @@ namespace OpenWorldServer
             return false;
         }
 
-        public static string GetSpyData(string tileID, ServerClient origin)
+        public static string GetSpyData(string tileID, PlayerClient origin)
         {
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient client in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient client in clients)
             {
                 if (client.PlayerData.HomeTileId == tileID)
                 {
-                    string dataToReturn = client.PlayerData.PawnCount.ToString() + "»" + client.PlayerData.Wealth.ToString() + "»" + client.eventShielded + "»" + client.inRTSE;
+                    string dataToReturn = client.PlayerData.PawnCount.ToString() + "»" + client.PlayerData.Wealth.ToString() + "»" + client.IsEventProtected + "»" + client.InRTSE;
 
                     if (client.PlayerData.GiftString.Count > 0) dataToReturn += "»" + "True";
                     else dataToReturn += "»" + "False";
@@ -237,12 +237,12 @@ namespace OpenWorldServer
             return "";
         }
 
-        public static void SendEventToPlayer(ServerClient invoker, string data)
+        public static void SendEventToPlayer(PlayerClient invoker, string data)
         {
             string dataToSend = "ForcedEvent│" + data.Split('│')[1];
 
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[2])
                 {
@@ -253,13 +253,13 @@ namespace OpenWorldServer
             }
         }
 
-        public static void SendGiftToPlayer(ServerClient invoker, string data)
+        public static void SendGiftToPlayer(PlayerClient invoker, string data)
         {
             string tileToSend = data.Split('│')[1];
             string dataToSend = "GiftedItems│" + data.Split('│')[2];
 
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
@@ -271,8 +271,8 @@ namespace OpenWorldServer
 
             dataToSend = dataToSend.Replace("GiftedItems│", "");
 
-            ServerClient[] savedClients = Server.savedClients.ToArray();
-            foreach(ServerClient sc in savedClients)
+            PlayerClient[] savedClients = Server.savedClients.ToArray();
+            foreach (PlayerClient sc in savedClients)
             {
                 if (sc.PlayerData.HomeTileId == tileToSend)
                 {
@@ -284,12 +284,12 @@ namespace OpenWorldServer
             }
         }
 
-        public static void SendTradeRequestToPlayer(ServerClient invoker, string data)
+        public static void SendTradeRequestToPlayer(PlayerClient invoker, string data)
         {
             string dataToSend = "TradeRequest│" + invoker.PlayerData.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
 
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[1])
                 {
@@ -299,12 +299,12 @@ namespace OpenWorldServer
             }
         }
 
-        public static void SendBarterRequestToPlayer(ServerClient invoker, string data)
+        public static void SendBarterRequestToPlayer(PlayerClient invoker, string data)
         {
             string dataToSend = "BarterRequest│" + invoker.PlayerData.HomeTileId + "│" + data.Split('│')[2];
 
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.HomeTileId == data.Split('│')[1])
                 {

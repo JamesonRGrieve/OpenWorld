@@ -39,7 +39,7 @@ namespace OpenWorldServer
             }
         }
 
-        public static void CreateFaction(string factionName, ServerClient factionLeader)
+        public static void CreateFaction(string factionName, PlayerClient factionLeader)
         {
             Faction newFaction = new Faction();
             newFaction.name = factionName;
@@ -49,7 +49,7 @@ namespace OpenWorldServer
 
             factionLeader.PlayerData.Faction = newFaction;
 
-            ServerClient clientToSave = Server.savedClients.Find(fetch => fetch.PlayerData.Username == factionLeader.PlayerData.Username);
+            PlayerClient clientToSave = Server.savedClients.Find(fetch => fetch.PlayerData.Username == factionLeader.PlayerData.Username);
             clientToSave.PlayerData.Faction = newFaction;
             StaticProxy.playerHandler.SavePlayerData(clientToSave);
 
@@ -132,7 +132,7 @@ namespace OpenWorldServer
             File.Delete(factionSavePath);
         }
 
-        public static string GetFactionDetails(ServerClient client)
+        public static string GetFactionDetails(PlayerClient client)
         {
             string dataToSend = "FactionManagement│Details│";
 
@@ -144,8 +144,8 @@ namespace OpenWorldServer
 
                 dataToSend += factionToCheck.name + "│";
 
-                Dictionary<ServerClient, MemberRank> members = factionToCheck.members;
-                foreach (KeyValuePair<ServerClient, MemberRank> member in members)
+                Dictionary<PlayerClient, MemberRank> members = factionToCheck.members;
+                foreach (KeyValuePair<PlayerClient, MemberRank> member in members)
                 {
                     dataToSend += member.Key.PlayerData.Username + ":" + (int)member.Value + "»";
                 }
@@ -154,12 +154,12 @@ namespace OpenWorldServer
             }
         }
 
-        public static void AddMember(Faction faction, ServerClient memberToAdd)
+        public static void AddMember(Faction faction, PlayerClient memberToAdd)
         {
             faction.members.Add(memberToAdd, MemberRank.Member);
             SaveFaction(faction);
 
-            ServerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == memberToAdd.PlayerData.Username);
+            PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == memberToAdd.PlayerData.Username);
             if (connected != null)
             {
                 connected.PlayerData.Faction = faction;
@@ -167,7 +167,7 @@ namespace OpenWorldServer
                 //Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            ServerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == memberToAdd.PlayerData.Username);
+            PlayerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == memberToAdd.PlayerData.Username);
             if (saved != null)
             {
                 saved.PlayerData.Faction = faction;
@@ -177,9 +177,9 @@ namespace OpenWorldServer
             UpdateAllPlayerDetailsInFaction(faction);
         }
 
-        public static void RemoveMember(Faction faction, ServerClient memberToRemove)
+        public static void RemoveMember(Faction faction, PlayerClient memberToRemove)
         {
-            foreach (KeyValuePair<ServerClient, MemberRank> pair in faction.members)
+            foreach (KeyValuePair<PlayerClient, MemberRank> pair in faction.members)
             {
                 if (pair.Key.PlayerData.Username == memberToRemove.PlayerData.Username)
                 {
@@ -188,14 +188,14 @@ namespace OpenWorldServer
                 }
             }
 
-            ServerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == memberToRemove.PlayerData.Username);
+            PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == memberToRemove.PlayerData.Username);
             if (connected != null)
             {
                 connected.PlayerData.Faction = null;
                 Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            ServerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == memberToRemove.PlayerData.Username);
+            PlayerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == memberToRemove.PlayerData.Username);
             if (saved != null)
             {
                 saved.PlayerData.Faction = null;
@@ -212,18 +212,18 @@ namespace OpenWorldServer
 
         public static void PurgeFaction(Faction faction)
         {
-            ServerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
+            PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
 
-            foreach (ServerClient dummy in dummyfactionMembers)
+            foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                ServerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
                 if (connected != null)
                 {
                     connected.PlayerData.Faction = null;
                     Networking.SendData(connected, GetFactionDetails(connected));
                 }
 
-                ServerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient saved = Server.savedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
                 if (saved != null)
                 {
                     saved.PlayerData.Faction = null;
@@ -234,12 +234,12 @@ namespace OpenWorldServer
             DisbandFaction(faction);
         }
 
-        public static void PromoteMember(Faction faction, ServerClient memberToPromote)
+        public static void PromoteMember(Faction faction, PlayerClient memberToPromote)
         {
-            ServerClient toPromote = null;
+            PlayerClient toPromote = null;
             MemberRank previousRank = 0;
 
-            foreach (KeyValuePair<ServerClient, MemberRank> pair in faction.members)
+            foreach (KeyValuePair<PlayerClient, MemberRank> pair in faction.members)
             {
                 if (pair.Key.PlayerData.Username == memberToPromote.PlayerData.Username)
                 {
@@ -259,12 +259,12 @@ namespace OpenWorldServer
             UpdateAllPlayerDetailsInFaction(faction);
         }
 
-        public static void DemoteMember(Faction faction, ServerClient memberToPromote)
+        public static void DemoteMember(Faction faction, PlayerClient memberToPromote)
         {
-            ServerClient toDemote = null;
+            PlayerClient toDemote = null;
             MemberRank previousRank = 0;
 
-            foreach (KeyValuePair<ServerClient, MemberRank> pair in faction.members)
+            foreach (KeyValuePair<PlayerClient, MemberRank> pair in faction.members)
             {
                 if (pair.Key.PlayerData.Username == memberToPromote.PlayerData.Username)
                 {
@@ -286,11 +286,11 @@ namespace OpenWorldServer
 
         public static void UpdateAllPlayerDetailsInFaction(Faction faction)
         {
-            ServerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
+            PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
 
-            foreach (ServerClient dummy in dummyfactionMembers)
+            foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                ServerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetFactionDetails(connected));
@@ -298,10 +298,10 @@ namespace OpenWorldServer
             }
         }
 
-        public static MemberRank GetMemberPowers(Faction faction, ServerClient memberToCheck)
+        public static MemberRank GetMemberPowers(Faction faction, PlayerClient memberToCheck)
         {
-            Dictionary<ServerClient, MemberRank> members = faction.members;
-            foreach (KeyValuePair<ServerClient, MemberRank> pair in members)
+            Dictionary<PlayerClient, MemberRank> members = faction.members;
+            foreach (KeyValuePair<PlayerClient, MemberRank> pair in members)
             {
                 if (pair.Key.PlayerData.Username == memberToCheck.PlayerData.Username)
                 {

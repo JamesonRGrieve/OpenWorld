@@ -32,10 +32,10 @@ namespace OpenWorldServer
 
         public static void SendProductionToMembers(Faction faction)
         {
-            ServerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
-            foreach (ServerClient dummy in dummyfactionMembers)
+            PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
+            foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                ServerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, "FactionManagement│ProductionSite│Tick");

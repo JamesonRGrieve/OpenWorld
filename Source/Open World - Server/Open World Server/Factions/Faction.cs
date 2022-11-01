@@ -9,7 +9,7 @@ namespace OpenWorldServer
     {
         public string name = "";
         public int wealth = 0;
-        public Dictionary<ServerClient, FactionHandler.MemberRank> members = new Dictionary<ServerClient, FactionHandler.MemberRank>();
+        public Dictionary<PlayerClient, FactionHandler.MemberRank> members = new Dictionary<PlayerClient, FactionHandler.MemberRank>();
         public List<FactionStructure> factionStructures = new List<FactionStructure>();
     }
 }

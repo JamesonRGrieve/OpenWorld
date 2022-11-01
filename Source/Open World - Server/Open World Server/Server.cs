@@ -28,7 +28,7 @@ namespace OpenWorldServer
         public static bool exit = false;
 
         //Player Parameters
-        public static List<ServerClient> savedClients = new List<ServerClient>();
+        public static List<PlayerClient> savedClients = new List<PlayerClient>();
         public static Dictionary<string, List<string>> savedSettlements = new Dictionary<string, List<string>>();
 
         //Server Details

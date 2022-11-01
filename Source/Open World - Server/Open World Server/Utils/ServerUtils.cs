@@ -41,7 +41,7 @@ namespace OpenWorldServer
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void SendChatMessage(ServerClient client, string data)
+        public static void SendChatMessage(PlayerClient client, string data)
         {
             string message = data.Split('│')[2];
 
@@ -51,16 +51,16 @@ namespace OpenWorldServer
 
             Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in Networking.connectedClients)
             {
                 if (sc == client) continue;
                 else Networking.SendData(sc, data);
             }
         }
 
-        public static void SendPlayerListToAll(ServerClient client)
+        public static void SendPlayerListToAll(PlayerClient client)
         {
-            foreach (ServerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in Networking.connectedClients)
             {
                 if (sc == client) continue;
 
@@ -68,13 +68,13 @@ namespace OpenWorldServer
             }
         }
 
-        public static void SendPlayerList(ServerClient client)
+        public static void SendPlayerList(PlayerClient client)
         {
             string playersToSend = GetPlayersToSend(client);
             Networking.SendData(client, playersToSend);
         }
 
-        public static string GetPlayersToSend(ServerClient client)
+        public static string GetPlayersToSend(PlayerClient client)
         {
             string dataToSend = "PlayerList│";
 
@@ -82,7 +82,7 @@ namespace OpenWorldServer
 
             else
             {
-                foreach (ServerClient sc in Networking.connectedClients)
+                foreach (PlayerClient sc in Networking.connectedClients)
                 {
                     if (sc == client) continue;
 

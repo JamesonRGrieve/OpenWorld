@@ -2,17 +2,17 @@
 {
     public static class NetworkingHandler
     {
-        public static void ConnectHandle(ServerClient client, string data)
+        public static void ConnectHandle(PlayerClient client, string data)
         {
             JoiningsUtils.LoginProcedures(client, data);
         }
 
-        public static void ChatMessageHandle(ServerClient client, string data)
+        public static void ChatMessageHandle(PlayerClient client, string data)
         {
             ServerUtils.SendChatMessage(client, data);
         }
 
-        public static void UserSettlementHandle(ServerClient client, string data)
+        public static void UserSettlementHandle(PlayerClient client, string data)
         {
             if (data.StartsWith("UserSettlement│NewSettlementID│"))
             {
@@ -41,7 +41,7 @@
             }
         }
 
-        public static void ForceEventHandle(ServerClient client, string data)
+        public static void ForceEventHandle(PlayerClient client, string data)
         {
             string dataToSend = "";
 
@@ -61,12 +61,12 @@
             Networking.SendData(client, dataToSend);
         }
 
-        public static void SendGiftHandle(ServerClient client, string data)
+        public static void SendGiftHandle(PlayerClient client, string data)
         {
             PlayerUtils.SendGiftToPlayer(client, data);
         }
 
-        public static void SendTradeHandle(ServerClient client, string data)
+        public static void SendTradeHandle(PlayerClient client, string data)
         {
             string dataToSend = "";
 
@@ -81,7 +81,7 @@
             Networking.SendData(client, dataToSend);
         }
 
-        public static void SendBarterHandle(ServerClient client, string data)
+        public static void SendBarterHandle(PlayerClient client, string data)
         {
             string dataToSend = "";
 
@@ -96,12 +96,12 @@
             Networking.SendData(client, dataToSend);
         }
 
-        public static void TradeStatusHandle(ServerClient client, string data)
+        public static void TradeStatusHandle(PlayerClient client, string data)
         {
             string username = data.Split('│')[2];
-            ServerClient target = null;
+            PlayerClient target = null;
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in Networking.connectedClients)
             {
                 if (sc.PlayerData.Username == username)
                 {
@@ -125,12 +125,12 @@
             }
         }
 
-        public static void BarterStatusHandle(ServerClient client, string data)
+        public static void BarterStatusHandle(PlayerClient client, string data)
         {
             string user = data.Split('│')[2];
-            ServerClient target = null;
+            PlayerClient target = null;
 
-            foreach (ServerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in Networking.connectedClients)
             {
                 if (sc.PlayerData.Username == user)
                 {
@@ -165,7 +165,7 @@
             }
         }
 
-        public static void SpyInfoHandle(ServerClient client, string data)
+        public static void SpyInfoHandle(PlayerClient client, string data)
         {
             string dataToSend = "";
 
@@ -178,7 +178,7 @@
             Networking.SendData(client, dataToSend);
         }
 
-        public static void FactionManagementHandle(ServerClient client, string data)
+        public static void FactionManagementHandle(PlayerClient client, string data)
         {
             if (data == "FactionManagement│Refresh")
             {
@@ -247,7 +247,7 @@
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID)) Networking.SendData(client, "PlayerNotConnected│");
                 else
                 {
-                    ServerClient memberToAdd = PlayerUtils.GetPlayerFromTile(tileID);
+                    PlayerClient memberToAdd = PlayerUtils.GetPlayerFromTile(tileID);
                     if (memberToAdd.PlayerData.Faction != null) Networking.SendData(client, "FactionManagement│AlreadyInFaction");
                     else Networking.SendData(memberToAdd, "FactionManagement│Invite│" + client.PlayerData.Faction.name);
                 }
@@ -270,7 +270,7 @@
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.PlayerData.Faction.name);
-                    ServerClient memberToRemove = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
+                    PlayerClient memberToRemove = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
 
                     if (memberToRemove.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToRemove.PlayerData.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -279,7 +279,7 @@
 
                 else
                 {
-                    ServerClient memberToRemove = PlayerUtils.GetPlayerFromTile(tileID);
+                    PlayerClient memberToRemove = PlayerUtils.GetPlayerFromTile(tileID);
 
                     if (memberToRemove.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToRemove.PlayerData.Faction != client.PlayerData.Faction) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -304,7 +304,7 @@
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.PlayerData.Faction.name);
-                    ServerClient memberToPromote = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
+                    PlayerClient memberToPromote = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
 
                     if (memberToPromote.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToPromote.PlayerData.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -313,7 +313,7 @@
 
                 else
                 {
-                    ServerClient memberToPromote = PlayerUtils.GetPlayerFromTile(tileID);
+                    PlayerClient memberToPromote = PlayerUtils.GetPlayerFromTile(tileID);
 
                     if (memberToPromote.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToPromote.PlayerData.Faction != client.PlayerData.Faction) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -338,7 +338,7 @@
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.PlayerData.Faction.name);
-                    ServerClient memberToDemote = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
+                    PlayerClient memberToDemote = Server.savedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
 
                     if (memberToDemote.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToDemote.PlayerData.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -347,7 +347,7 @@
 
                 else
                 {
-                    ServerClient memberToDemote = PlayerUtils.GetPlayerFromTile(tileID);
+                    PlayerClient memberToDemote = PlayerUtils.GetPlayerFromTile(tileID);
 
                     if (memberToDemote.PlayerData.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToDemote.PlayerData.Faction != client.PlayerData.Faction) Networking.SendData(client, "FactionManagement│NotInFaction");

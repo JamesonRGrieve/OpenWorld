@@ -2,7 +2,7 @@
 {
     public static class FactionBuildingHandler
     {
-        public static string GetAllFactionStructures(ServerClient client)
+        public static string GetAllFactionStructures(PlayerClient client)
         {
             string dataToSend = "FactionStructures│";
 
@@ -54,7 +54,7 @@
             FactionHandler.SaveFaction(faction);
 
             int factionValue = 0;
-            foreach (ServerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in Networking.connectedClients)
             {
                 if (client.PlayerData.Faction == null) factionValue = 0;
                 if (client.PlayerData.Faction != null)
@@ -80,7 +80,7 @@
 
             FactionHandler.SaveFaction(faction);
 
-            foreach (ServerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in Networking.connectedClients)
             {
                 Networking.SendData(client, "FactionStructureBuilder│RemoveStructure" + "│" + structureTile);
             }

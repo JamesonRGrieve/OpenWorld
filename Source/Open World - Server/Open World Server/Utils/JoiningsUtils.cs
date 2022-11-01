@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using OpenWorldServer.Enums;
 
 namespace OpenWorldServer
 {
     public static class JoiningsUtils
     {
-        public static void LoginProcedures(ServerClient client, string data)
+        public static void LoginProcedures(PlayerClient client, string data)
         {
             client.PlayerData.Username = data.Split('│')[1].ToLower();
             client.PlayerData.Password = data.Split('│')[2];
@@ -23,7 +24,7 @@ namespace OpenWorldServer
             if (!StaticProxy.playerHandler.IsWhitelisted(client))
             {
                 Networking.SendData(client, "Disconnect│Whitelist");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] tried to Join but is not Whitelisted");
             }
 
@@ -42,7 +43,7 @@ namespace OpenWorldServer
             else if (playerData.Password != client.PlayerData.Password)
             {
                 Networking.SendData(client, "Disconnect│WrongPassword");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has been Kicked for: [Wrong Password]");
                 return;
             }
@@ -50,28 +51,43 @@ namespace OpenWorldServer
             ConsoleUtils.UpdateTitle();
             ServerUtils.SendPlayerListToAll(client);
 
-            CheckForJoinMode(client, joinMode);
+            CheckForJoinMode(client, ParseJoinMode(joinMode));
         }
 
-        private static void CheckForJoinMode(ServerClient client, string joinMode)
+        private static JoinMode ParseJoinMode(string joinMode)
         {
-            if (joinMode == "NewGame")
+            // We cant use this since a typo could be a bigger problem.
+            // When the protocol is changed to send a byte for the JoinMode, we can use it to parse by casting.
+            // return (JoinMode)Enum.Parse(typeof(JoinMode), joinMode);
+
+            switch (joinMode)
+            {
+                case "NewGame":
+                    return JoinMode.NewGame;
+                case "LoadGame":
+                    return JoinMode.LoadGame;
+                default:
+                    throw new ArgumentException($"JoinMode '{joinMode}' is not a vaild JoinMode");
+            }
+        }
+
+        private static void CheckForJoinMode(PlayerClient client, JoinMode joinMode)
+        {
+            if (joinMode == JoinMode.NewGame)
             {
                 SendNewGameData(client);
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has reset game progress");
             }
-
-            else if (joinMode == "LoadGame")
+            else if (joinMode == JoinMode.LoadGame)
             {
                 PlayerUtils.GiveSavedDataToPlayer(client);
                 SendLoadGameData(client);
             }
 
-            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] " + "[" +
-                ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() + "] " + "has connected");
+            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] " + "[" + client.IPAddress.ToString() + "] " + "has connected");
         }
 
-        private static void SendNewGameData(ServerClient client)
+        private static void SendNewGameData(PlayerClient client)
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
@@ -99,7 +115,7 @@ namespace OpenWorldServer
             Networking.SendData(client, "NewGame│");
         }
 
-        private static void SendLoadGameData(ServerClient client)
+        private static void SendLoadGameData(PlayerClient client)
         {
             string settlementsToSend = GetSettlementsToSend(client);
             Networking.SendData(client, settlementsToSend);
@@ -139,7 +155,7 @@ namespace OpenWorldServer
             return dataToSend + mmGC + "│" + mmS + "│" + mmOR + "│" + mmOT + "│" + mmOP;
         }
 
-        public static string GetSettlementsToSend(ServerClient client)
+        public static string GetSettlementsToSend(PlayerClient client)
         {
             string dataToSend = "Settlements│";
 
@@ -154,7 +170,7 @@ namespace OpenWorldServer
 
                     int factionValue = 0;
 
-                    ServerClient clientToCompare = Server.savedClients.Find(fetch => fetch.PlayerData.Username == pair.Value[0]);
+                    PlayerClient clientToCompare = Server.savedClients.Find(fetch => fetch.PlayerData.Username == pair.Value[0]);
                     if (client.PlayerData.Faction == null)
                         factionValue = 0;
                     if (clientToCompare.PlayerData.Faction == null)
@@ -172,7 +188,7 @@ namespace OpenWorldServer
             }
         }
 
-        public static string GetVariablesToSend(ServerClient client)
+        public static string GetVariablesToSend(PlayerClient client)
         {
             string dataToSend = "Variables│";
 
@@ -203,7 +219,7 @@ namespace OpenWorldServer
             return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + enforcedDifficultyInt + "│" + name;
         }
 
-        public static string GetGiftsToSend(ServerClient client)
+        public static string GetGiftsToSend(PlayerClient client)
         {
             string dataToSend = "GiftedItems│";
 
@@ -223,7 +239,7 @@ namespace OpenWorldServer
             }
         }
 
-        public static string GetTradesToSend(ServerClient client)
+        public static string GetTradesToSend(PlayerClient client)
         {
             string dataToSend = "TradedItems│";
 
@@ -243,7 +259,7 @@ namespace OpenWorldServer
             }
         }
 
-        public static bool CompareModsWithClient(ServerClient client, string data)
+        public static bool CompareModsWithClient(PlayerClient client, string data)
         {
             if (client.PlayerData.IsAdmin) return true;
             if (!StaticProxy.serverConfig.ModsSystem.MatchModlist) return true;
@@ -285,23 +301,23 @@ namespace OpenWorldServer
                 flaggedMods = flaggedMods.Remove(flaggedMods.Count() - 1, 1);
                 Networking.SendData(client, "Disconnect│WrongMods│" + flaggedMods);
 
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 return false;
             }
             else return true;
         }
 
-        public static bool CompareConnectingClientWithConnecteds(ServerClient client)
+        public static bool CompareConnectingClientWithConnecteds(PlayerClient client)
         {
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.Username == client.PlayerData.Username)
                 {
                     if (sc == client) continue;
 
                     Networking.SendData(sc, "Disconnect│AnotherLogin");
-                    sc.disconnectFlag = true;
+                    sc.IsDisconnecting = true;
                     return false;
                 }
             }
@@ -309,7 +325,7 @@ namespace OpenWorldServer
             return true;
         }
 
-        public static bool CompareConnectingClientVersion(ServerClient client, string clientVersion)
+        public static bool CompareConnectingClientVersion(PlayerClient client, string clientVersion)
         {
             string latestVersion;
 
@@ -327,20 +343,20 @@ namespace OpenWorldServer
             else
             {
                 Networking.SendData(client, "Disconnect│Version");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Using Other Version");
                 return false;
             }
         }
 
-        public static bool CompareClientIPWithBans(ServerClient client)
+        public static bool CompareClientIPWithBans(PlayerClient client)
         {
             var banInfo = StaticProxy.playerHandler.GetBanInfo(client.PlayerData.Username);
             if (banInfo != null &&
-                (banInfo.IPAddress == ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() || banInfo.Username == client.PlayerData.Username))
+                (banInfo.IPAddress == client.IPAddress.ToString() || banInfo.Username == client.PlayerData.Username))
             {
                 Networking.SendData(client, "Disconnect│Banned");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Banned");
                 return false;
             }
@@ -348,33 +364,33 @@ namespace OpenWorldServer
             return true;
         }
 
-        public static bool CompareConnectingClientWithPlayerCount(ServerClient client)
+        public static bool CompareConnectingClientWithPlayerCount(PlayerClient client)
         {
             if (client.PlayerData.IsAdmin) return true;
 
             if (Networking.connectedClients.Count() >= StaticProxy.serverConfig.MaxPlayers + 1)
             {
                 Networking.SendData(client, "Disconnect│ServerFull");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 return false;
             }
 
             return true;
         }
 
-        public static bool ParseClientUsername(ServerClient client)
+        public static bool ParseClientUsername(PlayerClient client)
         {
             if (string.IsNullOrWhiteSpace(client.PlayerData.Username))
             {
                 Networking.SendData(client, "Disconnect│Corrupted");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 return false;
             }
 
             if (!client.PlayerData.Username.All(character => Char.IsLetterOrDigit(character) || character == '_' || character == '-'))
             {
                 Networking.SendData(client, "Disconnect│Corrupted");
-                client.disconnectFlag = true;
+                client.IsDisconnecting = true;
                 return false;
             }
 

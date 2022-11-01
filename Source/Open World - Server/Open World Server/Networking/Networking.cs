@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using OpenWorldServer.Enums;
 
 namespace OpenWorldServer
 {
@@ -13,7 +14,7 @@ namespace OpenWorldServer
         public static IPAddress localAddress;
         public static int serverPort = 0;
 
-        public static List<ServerClient> connectedClients = new List<ServerClient>();
+        public static List<PlayerClient> connectedClients = new List<PlayerClient>();
 
         public static void ReadyServer()
         {
@@ -37,7 +38,7 @@ namespace OpenWorldServer
         {
             TcpListener listener = (TcpListener)ar.AsyncState;
 
-            ServerClient newServerClient = new ServerClient(listener.EndAcceptTcpClient(ar));
+            PlayerClient newServerClient = new PlayerClient(listener.EndAcceptTcpClient(ar));
 
             connectedClients.Add(newServerClient);
 
@@ -46,9 +47,9 @@ namespace OpenWorldServer
             ListenForIncomingUsers();
         }
 
-        public static void ListenToClient(ServerClient client)
+        public static void ListenToClient(PlayerClient client)
         {
-            NetworkStream s = client.tcp.GetStream();
+            NetworkStream s = client.ClientStream;
             StreamReader sr = new StreamReader(s, true);
 
             while (true)
@@ -57,7 +58,7 @@ namespace OpenWorldServer
 
                 try
                 {
-                    if (client.disconnectFlag) return;
+                    if (client.IsDisconnecting) return;
 
                     string encryptedData = sr.ReadLine();
                     string data = Encryption.DecryptString(encryptedData);
@@ -124,20 +125,23 @@ namespace OpenWorldServer
 
                 catch
                 {
-                    client.disconnectFlag = true;
+                    client.IsDisconnecting = true;
                     return;
                 }
             }
         }
 
-        public static void SendData(ServerClient client, string data)
+        public static void SendData(PlayerClient client, string data)
         {
-            if (!client.tcp.Connected) client.disconnectFlag = true;
+            if (!client.IsConnected)
+            {
+                client.IsDisconnecting = true;
+            }
             else
             {
                 try
                 {
-                    NetworkStream s = client.tcp.GetStream();
+                    NetworkStream s = client.ClientStream;
                     StreamWriter sw = new StreamWriter(s);
 
                     sw.WriteLine(Encryption.EncryptString(data));
@@ -147,15 +151,22 @@ namespace OpenWorldServer
             }
         }
 
-        public static void KickClients(ServerClient client, string kickMode)
+        public static void KickClients(PlayerClient client, KickMode kickMode)
         {
             connectedClients.Remove(client);
 
-            try { client.tcp.Dispose(); }
-            catch { }
+            try
+            {
+                client.Dispose();
+            }
+            catch
+            {
+            }
 
-            if (kickMode == "Normal") ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Disconnected");
-            else if (kickMode == "Silent") { }
+            if (kickMode == KickMode.Normal)
+            {
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Disconnected");
+            }
 
             ServerUtils.SendPlayerListToAll(null);
 
@@ -172,24 +183,25 @@ namespace OpenWorldServer
 
                 try
                 {
-                    ServerClient[] actualClients = connectedClients.ToArray();
+                    PlayerClient[] actualClients = connectedClients.ToArray();
 
-                    List<ServerClient> clientsToDisconnect = new List<ServerClient>();
+                    List<PlayerClient> clientsToDisconnect = new List<PlayerClient>();
 
-                    foreach (ServerClient client in actualClients)
+                    foreach (PlayerClient client in actualClients)
                     {
-                        if (client.disconnectFlag) clientsToDisconnect.Add(client);
+                        if (client.IsDisconnecting)
+                            clientsToDisconnect.Add(client);
 
                         Thread.Sleep(1);
 
                         SendData(client, "Ping");
                     }
 
-                    foreach (ServerClient client in clientsToDisconnect)
+                    foreach (PlayerClient client in clientsToDisconnect)
                     {
                         Thread.Sleep(1);
 
-                        KickClients(client, "Normal");
+                        KickClients(client, KickMode.Normal);
                     }
                 }
 

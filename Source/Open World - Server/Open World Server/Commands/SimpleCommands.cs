@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
 using System.Threading;
 
 namespace OpenWorldServer
@@ -141,11 +140,11 @@ namespace OpenWorldServer
 
         public static void ExitCommand()
         {
-            ServerClient[] clientsToKick = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clientsToKick)
+            PlayerClient[] clientsToKick = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clientsToKick)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
-                sc.disconnectFlag = true;
+                sc.IsDisconnecting = true;
             }
 
             Server.exit = true;
@@ -280,8 +279,8 @@ namespace OpenWorldServer
 
             Server.adminList.Clear();
 
-            ServerClient[] savedClients = Server.savedClients.ToArray();
-            foreach (ServerClient client in savedClients)
+            PlayerClient[] savedClients = Server.savedClients.ToArray();
+            foreach (PlayerClient client in savedClients)
             {
                 if (client.PlayerData.IsAdmin) Server.adminList.Add(client.PlayerData.Username);
             }
@@ -330,16 +329,16 @@ namespace OpenWorldServer
 
             if (response == "Y")
             {
-                ServerClient[] clients = Networking.connectedClients.ToArray();
-                foreach (ServerClient client in clients)
+                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (PlayerClient client in clients)
                 {
-                    client.disconnectFlag = true;
+                    client.IsDisconnecting = true;
                 }
 
                 Thread.Sleep(1000);
 
-                ServerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (ServerClient client in savedClients)
+                PlayerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (PlayerClient client in savedClients)
                 {
                     client.PlayerData.Wealth = 0;
                     client.PlayerData.PawnCount = 0;
@@ -369,8 +368,8 @@ namespace OpenWorldServer
                 ConsoleUtils.WriteWithTime("No Players Connected");
             else
             {
-                ServerClient[] clients = Networking.connectedClients.ToArray();
-                foreach (ServerClient client in clients)
+                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (PlayerClient client in clients)
                 {
                     try
                     {
@@ -379,7 +378,7 @@ namespace OpenWorldServer
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString());
+                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + client.IPAddress.ToString());
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
@@ -395,14 +394,14 @@ namespace OpenWorldServer
                 ConsoleUtils.WriteWithTime("No Players Saved");
             else
             {
-                ServerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (ServerClient savedClient in savedClients)
+                PlayerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (PlayerClient savedClient in savedClients)
                 {
                     try { ConsoleUtils.WriteWithTime("" + savedClient.PlayerData.Username); }
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + ((IPEndPoint)savedClient.tcp.Client.RemoteEndPoint).Address.ToString());
+                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + savedClient.IPAddress.ToString());
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }

@@ -6,14 +6,14 @@ namespace OpenWorldServer
 {
     public static class WorldUtils
     {
-        public static void AddSettlement(ServerClient? client, string tileID, string username)
+        public static void AddSettlement(PlayerClient? client, string tileID, string username)
         {
             if (client != null)
             {
                 client.PlayerData.HomeTileId = tileID;
 
-                ServerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (ServerClient sc in savedClients)
+                PlayerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (PlayerClient sc in savedClients)
                 {
                     if (sc.PlayerData.Username == client.PlayerData.Username)
                     {
@@ -26,8 +26,8 @@ namespace OpenWorldServer
             }
 
             int factionValue = 0;
-            ServerClient[] clients = Networking.connectedClients.ToArray();
-            foreach (ServerClient sc in clients)
+            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            foreach (PlayerClient sc in clients)
             {
                 if (sc.PlayerData.Username == client.PlayerData.Username) continue;
                 else
@@ -50,14 +50,14 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("Settlement With ID [" + tileID + "] And Owner [" + username + "] Has Been Added");
         }
 
-        public static void RemoveSettlement(ServerClient? client, string tile)
+        public static void RemoveSettlement(PlayerClient? client, string tile)
         {
             if (client != null)
             {
                 client.PlayerData.HomeTileId = null;
 
-                ServerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (ServerClient sc in savedClients)
+                PlayerClient[] savedClients = Server.savedClients.ToArray();
+                foreach (PlayerClient sc in savedClients)
                 {
                     if (sc.PlayerData.Username == client.PlayerData.Username)
                     {
@@ -73,8 +73,8 @@ namespace OpenWorldServer
             {
                 string dataString = "SettlementBuilder│RemoveSettlement│" + tile;
 
-                ServerClient[] clients = Networking.connectedClients.ToArray();
-                foreach (ServerClient sc in clients)
+                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                foreach (PlayerClient sc in clients)
                 {
                     if (client != null)
                     {
@@ -90,10 +90,10 @@ namespace OpenWorldServer
             }
         }
 
-        public static void CheckForTileDisponibility(ServerClient client, string tileID)
+        public static void CheckForTileDisponibility(PlayerClient client, string tileID)
         {
-            ServerClient[] savedClients = Server.savedClients.ToArray();
-            foreach (ServerClient savedClient in savedClients)
+            PlayerClient[] savedClients = Server.savedClients.ToArray();
+            foreach (PlayerClient savedClient in savedClients)
             {
                 if (savedClient.PlayerData.Username == client.PlayerData.Username)
                 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 using OpenWorldServer.Utils;
@@ -42,7 +41,7 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Loaded whitelist - {this.WhitelistedUser.Count} Entries", ConsoleColor.Green);
         }
 
-        internal bool IsWhitelisted(ServerClient client)
+        internal bool IsWhitelisted(PlayerClient client)
             => client.PlayerData.IsAdmin || this.IsWhitelisted(client.PlayerData.Username);
 
         private bool IsWhitelisted(string username)
@@ -63,10 +62,10 @@ namespace OpenWorldServer.Handlers
 
         private void SaveBannedPlayers() => JsonDataHelper.Save(this.BannedPlayers, PathProvider.BannedPlayersFile);
 
-        internal void BanPlayer(ServerClient client, string reason = "")
+        internal void BanPlayer(PlayerClient client, string reason = "")
         {
-            var ip = ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString();
-            client.disconnectFlag = true;
+            var ip = client.IPAddress.ToString();
+            client.IsDisconnecting = true;
             this.BannedPlayers.Add(new BanInfo()
             {
                 Username = client.PlayerData.Username,
@@ -112,7 +111,7 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleColor.Green);
         }
 
-        public PlayerData GetPlayerData(ServerClient client)
+        public PlayerData GetPlayerData(PlayerClient client)
         {
             if (client.IsLoggedIn)
             {
@@ -126,7 +125,7 @@ namespace OpenWorldServer.Handlers
         public PlayerData GetPlayerData(string username)
             => this.PlayerData.Find(pd => pd.Username == username);
 
-        public bool SavePlayerData(ServerClient client)
+        public bool SavePlayerData(PlayerClient client)
             => this.SavePlayerData(client.PlayerData);
 
         public bool SavePlayerData(PlayerData playerData)
@@ -138,7 +137,7 @@ namespace OpenWorldServer.Handlers
                 if (!this.PlayerData.Contains(playerData))
                 {
                     this.PlayerData.Add(playerData);
-                    Server.savedClients.Add(new ServerClient(null) { PlayerData = playerData });
+                    Server.savedClients.Add(new PlayerClient(null) { PlayerData = playerData });
                 }
                 return true;
             }
@@ -148,7 +147,7 @@ namespace OpenWorldServer.Handlers
             }
         }
 
-        public void ResetPlayerData(ServerClient client, bool saveGiftsAndTrades)
+        public void ResetPlayerData(PlayerClient client, bool saveGiftsAndTrades)
             => client.PlayerData = this.ResetPlayerData(client.PlayerData, saveGiftsAndTrades);
 
         public PlayerData ResetPlayerData(PlayerData playerData, bool saveGiftsAndTrades)
