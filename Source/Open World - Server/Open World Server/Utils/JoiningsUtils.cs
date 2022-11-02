@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using OpenWorldServer.Enums;
 
@@ -74,8 +73,9 @@ namespace OpenWorldServer
         private static void CheckForJoinMode(PlayerClient client, JoinMode joinMode)
         {
             if (joinMode == JoinMode.NewGame)
-			{
+            {
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has started a new game");
+                SendNewGameData(client);
             }
             else if (joinMode == JoinMode.LoadGame)
             {
