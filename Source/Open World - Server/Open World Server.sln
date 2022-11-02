@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32630.194
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open World Server", "Open World Server\Open World Server.csproj", "{26E85368-8466-44DE-B53C-5BC1AF834E3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWorld.Shared", "..\OpenWorld.Shared\OpenWorld.Shared.csproj", "{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,26 @@ Global
 		{26E85368-8466-44DE-B53C-5BC1AF834E3A}.Release|LinuxX32.Build.0 = Release|Any CPU
 		{26E85368-8466-44DE-B53C-5BC1AF834E3A}.Release|LinuxX64.ActiveCfg = Release|Any CPU
 		{26E85368-8466-44DE-B53C-5BC1AF834E3A}.Release|LinuxX64.Build.0 = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|ARM32.ActiveCfg = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|ARM32.Build.0 = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|LinuxX32.ActiveCfg = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|LinuxX32.Build.0 = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|LinuxX64.ActiveCfg = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Debug|LinuxX64.Build.0 = Debug|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|ARM32.ActiveCfg = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|ARM32.Build.0 = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|ARM64.Build.0 = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|LinuxX32.ActiveCfg = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|LinuxX32.Build.0 = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|LinuxX64.ActiveCfg = Release|Any CPU
+		{EEFA8782-0BCA-4F12-B79E-0A99EF5CA756}.Release|LinuxX64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

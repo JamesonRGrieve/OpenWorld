@@ -14,4 +14,8 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Relese|AnyCPU'">
 		<PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\OpenWorld.Shared\OpenWorld.Shared.csproj" />
+	</ItemGroup>
 </Project>

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
-using OpenWorldServer.Data;
-using OpenWorldServer.Utils;
 
 namespace OpenWorldServer
 {
@@ -121,38 +118,6 @@ namespace OpenWorldServer
 
                 return dataToSend;
             }
-        }
-
-        internal static ServerConfig LoadServerConfig(string filePath)
-        {
-            var config = new ServerConfig();
-
-            Console.WriteLine();
-            ConsoleUtils.LogToConsole("Loading Server Settings", ConsoleColor.Green);
-
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    config = JsonDataHelper.Load<ServerConfig>(filePath);
-                }
-                catch (Exception ex)
-                {
-                    // Possible error would be incorrect data
-                    ConsoleUtils.LogToConsole("Error while loading Server Settings:", ConsoleColor.Red);
-                    ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
-
-                    return null;
-                }
-            }
-            else
-            {
-                ConsoleUtils.LogToConsole("No Server Settings File found, generating new one", ConsoleColor.Yellow);
-                JsonDataHelper.Save(config, filePath);
-            }
-
-            ConsoleUtils.LogToConsole("Loaded Server Settings");
-            return config;
         }
     }
 }

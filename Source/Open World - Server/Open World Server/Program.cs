@@ -1,6 +1,9 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.IO;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
+using OpenWorldServer.Utils;
 
 namespace OpenWorldServer
 {
@@ -15,7 +18,7 @@ namespace OpenWorldServer
             PathProvider.EnsureDirectories();
 
             SetCulture();
-            serverConfig = ServerUtils.LoadServerConfig(PathProvider.ConfigFile);
+            serverConfig = LoadServerConfig(PathProvider.ConfigFile);
 
             MigrationService.CreateAndMigrateAll(serverConfig); // Temp Migration Helper
             server = new Server(serverConfig);
@@ -41,5 +44,36 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("New Culture Info: [" + CultureInfo.CurrentCulture + "]");
         }
 
+        private static ServerConfig LoadServerConfig(string filePath)
+        {
+            var config = new ServerConfig();
+
+            Console.WriteLine();
+            ConsoleUtils.LogToConsole("Loading Server Settings", ConsoleColor.Green);
+
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    config = JsonDataHelper.Load<ServerConfig>(filePath);
+                }
+                catch (Exception ex)
+                {
+                    // Possible error would be incorrect data
+                    ConsoleUtils.LogToConsole("Error while loading Server Settings:", ConsoleColor.Red);
+                    ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
+
+                    return null;
+                }
+            }
+            else
+            {
+                ConsoleUtils.LogToConsole("No Server Settings File found, generating new one", ConsoleColor.Yellow);
+                JsonDataHelper.Save(config, filePath);
+            }
+
+            ConsoleUtils.LogToConsole("Loaded Server Settings");
+            return config;
+        }
     }
 }
