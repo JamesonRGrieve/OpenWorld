@@ -335,8 +335,6 @@ namespace OpenWorldServer
                     client.IsDisconnecting = true;
                 }
 
-                Thread.Sleep(1000);
-
                 PlayerClient[] savedClients = Server.savedClients.ToArray();
                 foreach (PlayerClient client in savedClients)
                 {
