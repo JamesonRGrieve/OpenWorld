@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -126,6 +125,7 @@ namespace OpenWorldServer
         public static void SendData(PlayerClient client, string data)
         {
             try
+            {
                 NetworkStream s = client.ClientStream;
                 StreamWriter sw = new StreamWriter(s);
 
