@@ -3,6 +3,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using OpenWorld.Shared.Networking;
+using OpenWorld.Shared.Networking.Packets;
 
 namespace OpenWorldServer
 {
@@ -60,7 +62,7 @@ namespace OpenWorldServer
 
                     if (data.StartsWith("Connect│"))
                     {
-                        NetworkingHandler.ConnectHandle(client, data);
+                        NetworkingHandler.ConnectHandle(client, PacketHandler.GetPacket<ConnectPacket>(data));
                     }
 
                     else if (data.StartsWith("ChatMessage│"))

@@ -2,23 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Enums;
 
 namespace OpenWorldServer
 {
     public static class JoiningsUtils
     {
-        public static void LoginProcedures(PlayerClient client, string data)
+        internal static void LoginProcedures(PlayerClient client, ConnectPacket packet)
         {
-            client.PlayerData.Username = data.Split('│')[1].ToLower();
-            client.PlayerData.Password = data.Split('│')[2];
+            client.PlayerData.Username = packet.Username;
+            client.PlayerData.Password = packet.Password;
 
-            string playerVersion = data.Split('│')[3];
-            string joinMode = data.Split('│')[4];
-            string playerMods = data.Split('│')[5];
 
-            if (!CompareConnectingClientWithPlayerCount(client)) return;
-            if (!CompareConnectingClientVersion(client, playerVersion)) return;
+            if (!CompareConnectingClientWithPlayerCount(client))
+                return;
+
+            if (!CompareConnectingClientVersion(client, packet.Version))
+                return;
 
             if (!StaticProxy.playerHandler.IsWhitelisted(client))
             {
@@ -27,9 +28,15 @@ namespace OpenWorldServer
                 ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] tried to Join but is not Whitelisted");
             }
 
-            if (!CompareModsWithClient(client, playerMods)) return;
-            if (!CompareClientIPWithBans(client)) return;
-            if (!ParseClientUsername(client)) return;
+            if (!CompareModsWithClient(client, packet.Mods))
+                return;
+
+            if (!CompareClientIPWithBans(client))
+                return;
+
+            if (!ParseClientUsername(client))
+                return;
+
             CompareConnectingClientWithConnecteds(client);
 
 
@@ -50,24 +57,7 @@ namespace OpenWorldServer
             ConsoleUtils.UpdateTitle();
             ServerUtils.SendPlayerListToAll(client);
 
-            CheckForJoinMode(client, ParseJoinMode(joinMode));
-        }
-
-        private static JoinMode ParseJoinMode(string joinMode)
-        {
-            // We cant use this since a typo could be a bigger problem.
-            // When the protocol is changed to send a byte for the JoinMode, we can use it to parse by casting.
-            // return (JoinMode)Enum.Parse(typeof(JoinMode), joinMode);
-
-            switch (joinMode)
-            {
-                case "NewGame":
-                    return JoinMode.NewGame;
-                case "LoadGame":
-                    return JoinMode.LoadGame;
-                default:
-                    throw new ArgumentException($"JoinMode '{joinMode}' is not a vaild JoinMode");
-            }
+            CheckForJoinMode(client, packet.JoinMode);
         }
 
         private static void CheckForJoinMode(PlayerClient client, JoinMode joinMode)
@@ -258,12 +248,12 @@ namespace OpenWorldServer
             }
         }
 
-        public static bool CompareModsWithClient(PlayerClient client, string data)
+        public static bool CompareModsWithClient(PlayerClient client, string[] mods)
         {
             if (client.PlayerData.IsAdmin) return true;
             if (!StaticProxy.serverConfig.ModsSystem.MatchModlist) return true;
 
-            string[] clientMods = data.Split('»');
+            string[] clientMods = mods;
 
             string flaggedMods = "";
 

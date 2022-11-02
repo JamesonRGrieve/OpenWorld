@@ -1,10 +1,12 @@
-﻿namespace OpenWorldServer
+﻿using OpenWorld.Shared.Networking.Packets;
+
+namespace OpenWorldServer
 {
     public static class NetworkingHandler
     {
-        public static void ConnectHandle(PlayerClient client, string data)
+        internal static void ConnectHandle(PlayerClient client, ConnectPacket packet)
         {
-            JoiningsUtils.LoginProcedures(client, data);
+            JoiningsUtils.LoginProcedures(client, packet);
         }
 
         public static void ChatMessageHandle(PlayerClient client, string data)
