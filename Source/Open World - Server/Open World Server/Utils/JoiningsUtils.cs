@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Enums;
 
@@ -11,8 +10,8 @@ namespace OpenWorldServer
     {
         internal static void LoginProcedures(PlayerClient client, ConnectPacket packet)
         {
-            client.PlayerData.Username = packet.Username;
-            client.PlayerData.Password = packet.Password;
+            client.Account.Username = packet.Username;
+            client.Account.Password = packet.Password;
 
 
             if (!CompareConnectingClientWithPlayerCount(client))
@@ -21,11 +20,11 @@ namespace OpenWorldServer
             if (!CompareConnectingClientVersion(client, packet.Version))
                 return;
 
-            if (!StaticProxy.playerHandler.IsWhitelisted(client))
+            if (!StaticProxy.playerHandler.WhitelistHandler.IsWhitelisted(client))
             {
                 Networking.SendData(client, "Disconnect│Whitelist");
                 client.IsDisconnecting = true;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] tried to Join but is not Whitelisted");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to Join but is not Whitelisted");
             }
 
             if (!CompareModsWithClient(client, packet.Mods))
@@ -40,17 +39,17 @@ namespace OpenWorldServer
             CompareConnectingClientWithConnecteds(client);
 
 
-            var playerData = StaticProxy.playerHandler.GetPlayerData(client);
+            var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(client);
             if (playerData == null)
             {
-                StaticProxy.playerHandler.SavePlayerData(client);
-                ConsoleUtils.LogToConsole("New Player [" + client.PlayerData.Username + "]");
+                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                ConsoleUtils.LogToConsole("New Player [" + client.Account.Username + "]");
             }
-            else if (playerData.Password != client.PlayerData.Password)
+            else if (playerData.Password != client.Account.Password)
             {
                 Networking.SendData(client, "Disconnect│WrongPassword");
                 client.IsDisconnecting = true;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has been Kicked for: [Wrong Password]");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has been Kicked for: [Wrong Password]");
                 return;
             }
 
@@ -64,7 +63,7 @@ namespace OpenWorldServer
         {
             if (joinMode == JoinMode.NewGame)
             {
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has started a new game");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has started a new game");
                 SendNewGameData(client);
             }
             else if (joinMode == JoinMode.LoadGame)
@@ -73,14 +72,14 @@ namespace OpenWorldServer
                 SendLoadGameData(client);
             }
 
-            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has Connected");
+            ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Connected");
         }
 
         private static void SendNewGameData(PlayerClient client)
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
-            StaticProxy.playerHandler.ResetPlayerData(client, true);
+            StaticProxy.playerHandler.AccountsHandler.ResetAccount(client, true);
 
             Networking.SendData(client, GetPlanetToSend());
 
@@ -140,18 +139,18 @@ namespace OpenWorldServer
                 Dictionary<string, List<string>> settlements = Server.savedSettlements;
                 foreach (KeyValuePair<string, List<string>> pair in settlements)
                 {
-                    if (pair.Value[0] == client.PlayerData.Username) continue;
+                    if (pair.Value[0] == client.Account.Username) continue;
 
                     int factionValue = 0;
 
-                    PlayerClient clientToCompare = Server.savedClients.Find(fetch => fetch.PlayerData.Username == pair.Value[0]);
-                    if (client.PlayerData.Faction == null)
+                    PlayerClient clientToCompare = Server.savedClients.Find(fetch => fetch.Account.Username == pair.Value[0]);
+                    if (client.Account.Faction == null)
                         factionValue = 0;
-                    if (clientToCompare.PlayerData.Faction == null)
+                    if (clientToCompare.Account.Faction == null)
                         factionValue = 0;
-                    else if (client.PlayerData.Faction != null && clientToCompare.PlayerData.Faction != null)
+                    else if (client.Account.Faction != null && clientToCompare.Account.Faction != null)
                     {
-                        if (client.PlayerData.Faction.name == clientToCompare.PlayerData.Faction.name) factionValue = 1;
+                        if (client.Account.Faction.name == clientToCompare.Account.Faction.name) factionValue = 1;
                         else factionValue = 2;
                     }
 
@@ -166,15 +165,15 @@ namespace OpenWorldServer
         {
             string dataToSend = "Variables│";
 
-            if (Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username) != null)
+            if (Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username) != null)
             {
-                client.PlayerData.IsAdmin = Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.IsAdmin;
+                client.Account.IsAdmin = Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.IsAdmin;
             }
-            else client.PlayerData.IsAdmin = false;
+            else client.Account.IsAdmin = false;
 
-            int devInt = client.PlayerData.IsAdmin || StaticProxy.serverConfig.AllowDevMode ? 1 : 0;
+            int devInt = client.Account.IsAdmin || StaticProxy.serverConfig.AllowDevMode ? 1 : 0;
 
-            int wipeInt = client.PlayerData.ToWipe ? 1 : 0;
+            int wipeInt = client.Account.ToWipe ? 1 : 0;
 
             int roadInt = 0;
             if (StaticProxy.serverConfig.RoadSystem.IsActive) roadInt = 1;
@@ -197,17 +196,17 @@ namespace OpenWorldServer
         {
             string dataToSend = "GiftedItems│";
 
-            if (client.PlayerData.GiftString.Count == 0) return dataToSend;
+            if (client.Account.GiftString.Count == 0) return dataToSend;
 
             else
             {
                 string giftsToSend = "";
 
-                foreach (string str in client.PlayerData.GiftString) giftsToSend += str + "»";
+                foreach (string str in client.Account.GiftString) giftsToSend += str + "»";
 
                 dataToSend += giftsToSend;
 
-                client.PlayerData.GiftString.Clear();
+                client.Account.GiftString.Clear();
 
                 return dataToSend;
             }
@@ -217,17 +216,17 @@ namespace OpenWorldServer
         {
             string dataToSend = "TradedItems│";
 
-            if (client.PlayerData.TradeString.Count == 0) return dataToSend;
+            if (client.Account.TradeString.Count == 0) return dataToSend;
 
             else
             {
                 string tradesToSend = "";
 
-                foreach (string str in client.PlayerData.TradeString) tradesToSend += str + "»";
+                foreach (string str in client.Account.TradeString) tradesToSend += str + "»";
 
                 dataToSend += tradesToSend;
 
-                client.PlayerData.TradeString.Clear();
+                client.Account.TradeString.Clear();
 
                 return dataToSend;
             }
@@ -235,7 +234,7 @@ namespace OpenWorldServer
 
         public static bool CompareModsWithClient(PlayerClient client, string[] mods)
         {
-            if (client.PlayerData.IsAdmin) return true;
+            if (client.Account.IsAdmin) return true;
             if (!StaticProxy.serverConfig.ModsSystem.MatchModlist) return true;
 
             string[] clientMods = mods;
@@ -271,7 +270,7 @@ namespace OpenWorldServer
 
             if (flagged)
             {
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] " + "Doesn't Have The Required Mod Or Mod Files Mismatch!");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] " + "Doesn't Have The Required Mod Or Mod Files Mismatch!");
                 flaggedMods = flaggedMods.Remove(flaggedMods.Count() - 1, 1);
                 Networking.SendData(client, "Disconnect│WrongMods│" + flaggedMods);
 
@@ -286,7 +285,7 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
-                if (sc.PlayerData.Username == client.PlayerData.Username)
+                if (sc.Account.Username == client.Account.Username)
                 {
                     if (sc == client) continue;
 
@@ -308,20 +307,20 @@ namespace OpenWorldServer
             {
                 Networking.SendData(client, "Disconnect│Version");
                 client.IsDisconnecting = true;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Using Other Version");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] Tried To Join But Is Using Other Version");
                 return false;
             }
         }
 
         public static bool CompareClientIPWithBans(PlayerClient client)
         {
-            var banInfo = StaticProxy.playerHandler.GetBanInfo(client.PlayerData.Username);
+            var banInfo = StaticProxy.playerHandler.BanlistHandler.GetBanInfo(client.Account.Username);
             if (banInfo != null &&
-                (banInfo.IPAddress == client.IPAddress.ToString() || banInfo.Username == client.PlayerData.Username))
+                (banInfo.IPAddress == client.IPAddress.ToString() || banInfo.Username == client.Account.Username))
             {
                 Networking.SendData(client, "Disconnect│Banned");
                 client.IsDisconnecting = true;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Tried To Join But Is Banned");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] Tried To Join But Is Banned");
                 return false;
             }
 
@@ -330,7 +329,7 @@ namespace OpenWorldServer
 
         public static bool CompareConnectingClientWithPlayerCount(PlayerClient client)
         {
-            if (client.PlayerData.IsAdmin) return true;
+            if (client.Account.IsAdmin) return true;
 
             if (Networking.connectedClients.Count() >= StaticProxy.serverConfig.MaxPlayers + 1)
             {
@@ -344,14 +343,14 @@ namespace OpenWorldServer
 
         public static bool ParseClientUsername(PlayerClient client)
         {
-            if (string.IsNullOrWhiteSpace(client.PlayerData.Username))
+            if (string.IsNullOrWhiteSpace(client.Account.Username))
             {
                 Networking.SendData(client, "Disconnect│Corrupted");
                 client.IsDisconnecting = true;
                 return false;
             }
 
-            if (!client.PlayerData.Username.All(character => Char.IsLetterOrDigit(character) || character == '_' || character == '-'))
+            if (!client.Account.Username.All(character => Char.IsLetterOrDigit(character) || character == '_' || character == '-'))
             {
                 Networking.SendData(client, "Disconnect│Corrupted");
                 client.IsDisconnecting = true;

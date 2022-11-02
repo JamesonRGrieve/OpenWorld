@@ -11,10 +11,10 @@
             Faction[] factions = Server.savedFactions.ToArray();
             foreach (Faction faction in factions)
             {
-                if (client.PlayerData.Faction == null) factionValue = 0;
-                if (client.PlayerData.Faction != null)
+                if (client.Account.Faction == null) factionValue = 0;
+                if (client.Account.Faction != null)
                 {
-                    if (client.PlayerData.Faction == faction)
+                    if (client.Account.Faction == faction)
                         factionValue = 1;
                     else
                         factionValue = 2;
@@ -56,10 +56,10 @@
             int factionValue = 0;
             foreach (PlayerClient client in Networking.connectedClients)
             {
-                if (client.PlayerData.Faction == null) factionValue = 0;
-                if (client.PlayerData.Faction != null)
+                if (client.Account.Faction == null) factionValue = 0;
+                if (client.Account.Faction != null)
                 {
-                    if (client.PlayerData.Faction == faction)
+                    if (client.Account.Faction == faction)
                         factionValue = 1;
                     else
                         factionValue = 2;

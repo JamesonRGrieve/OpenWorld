@@ -24,6 +24,7 @@ namespace OpenWorldServer
             server = new Server(serverConfig);
 
             ServerUtils.CheckServerVersion();
+            ServerUtils.CheckClientVersionRequirement();
 
             server.Run();
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 
 namespace OpenWorldServer
 {
@@ -199,7 +198,7 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Settlements: " + Server.savedSettlements.Count);
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistedUser.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
             ConsoleUtils.WriteWithTime("Max Players: " + StaticProxy.serverConfig.MaxPlayers);
             Console.WriteLine("");
 
@@ -263,11 +262,11 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistedUser.Count);
+            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (StaticProxy.playerHandler.WhitelistedUser.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
-            else foreach (string str in StaticProxy.playerHandler.WhitelistedUser) ConsoleUtils.WriteWithTime("" + str);
+            if (StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
+            else foreach (string str in StaticProxy.playerHandler.WhitelistHandler.Whitelist) ConsoleUtils.WriteWithTime("" + str);
 
             Console.WriteLine("");
         }
@@ -282,7 +281,7 @@ namespace OpenWorldServer
             PlayerClient[] savedClients = Server.savedClients.ToArray();
             foreach (PlayerClient client in savedClients)
             {
-                if (client.PlayerData.IsAdmin) Server.adminList.Add(client.PlayerData.Username);
+                if (client.Account.IsAdmin) Server.adminList.Add(client.Account.Username);
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -300,15 +299,15 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Banned players: " + StaticProxy.playerHandler.BannedPlayers.Count);
+            ConsoleUtils.WriteWithTime("Banned players: " + StaticProxy.playerHandler.BanlistHandler.Banlist.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (StaticProxy.playerHandler.BannedPlayers.Count == 0)
+            if (StaticProxy.playerHandler.BanlistHandler.Banlist.Count == 0)
                 ConsoleUtils.WriteWithTime("No Banned Players");
             else
             {
                 // ToDo: Use Copy of Dictionary
-                foreach (var ban in StaticProxy.playerHandler.BannedPlayers)
+                foreach (var ban in StaticProxy.playerHandler.BanlistHandler.Banlist)
                 {
                     ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
                 }
@@ -338,9 +337,9 @@ namespace OpenWorldServer
                 PlayerClient[] savedClients = Server.savedClients.ToArray();
                 foreach (PlayerClient client in savedClients)
                 {
-                    client.PlayerData.Wealth = 0;
-                    client.PlayerData.PawnCount = 0;
-                    StaticProxy.playerHandler.SavePlayerData(client);
+                    client.Account.Wealth = 0;
+                    client.Account.PawnCount = 0;
+                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
                 }
 
                 Console.Clear();
@@ -371,7 +370,7 @@ namespace OpenWorldServer
                 {
                     try
                     {
-                        ConsoleUtils.WriteWithTime("" + client.PlayerData.Username);
+                        ConsoleUtils.WriteWithTime("" + client.Account.Username);
                     }
                     catch
                     {
@@ -395,7 +394,7 @@ namespace OpenWorldServer
                 PlayerClient[] savedClients = Server.savedClients.ToArray();
                 foreach (PlayerClient savedClient in savedClients)
                 {
-                    try { ConsoleUtils.WriteWithTime("" + savedClient.PlayerData.Username); }
+                    try { ConsoleUtils.WriteWithTime("" + savedClient.Account.Username); }
                     catch
                     {
                         Console.ForegroundColor = ConsoleColor.Red;

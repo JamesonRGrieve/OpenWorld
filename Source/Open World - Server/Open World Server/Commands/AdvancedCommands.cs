@@ -76,7 +76,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -90,7 +90,7 @@ namespace OpenWorldServer
                     Networking.SendData(targetClient, "Notification│" + text);
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Sent Letter To [" + targetClient.PlayerData.Username + "]");
+                    ConsoleUtils.WriteWithTime("Sent Letter To [" + targetClient.Account.Username + "]");
                     Console.WriteLine();
                 }
             }
@@ -124,7 +124,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -138,7 +138,7 @@ namespace OpenWorldServer
                     Networking.SendData(targetClient, "GiftedItems│" + itemID + "┼" + itemQuantity + "┼" + itemQuality + "┼");
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Item Has Neen Gifted To Player [" + targetClient.PlayerData.Username + "]");
+                    ConsoleUtils.WriteWithTime("Item Has Neen Gifted To Player [" + targetClient.Account.Username + "]");
                     Console.WriteLine();
                 }
             }
@@ -197,7 +197,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -208,12 +208,12 @@ namespace OpenWorldServer
 
                 else
                 {
-                    targetClient.PlayerData.IsImmunized = true;
-                    Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsImmunized = true;
-                    StaticProxy.playerHandler.SavePlayerData(targetClient);
+                    targetClient.Account.IsImmunized = true;
+                    Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsImmunized = true;
+                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Inmmunized");
+                    ConsoleUtils.WriteWithTime("Player [" + targetClient.Account.Username + "] Has Been Inmmunized");
                     Console.WriteLine();
                 }
             }
@@ -234,7 +234,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -245,12 +245,12 @@ namespace OpenWorldServer
 
                 else
                 {
-                    targetClient.PlayerData.IsImmunized = false;
-                    Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsImmunized = false;
-                    StaticProxy.playerHandler.SavePlayerData(targetClient);
+                    targetClient.Account.IsImmunized = false;
+                    Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsImmunized = false;
+                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Deinmmunized");
+                    ConsoleUtils.WriteWithTime("Player [" + targetClient.Account.Username + "] Has Been Deinmmunized");
                     Console.WriteLine();
                 }
             }
@@ -271,7 +271,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -283,10 +283,10 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.IsEventProtected = true;
-                    Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).IsEventProtected = true;
+                    Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).IsEventProtected = true;
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Protected");
+                    ConsoleUtils.WriteWithTime("Player [" + targetClient.Account.Username + "] Has Been Protected");
                     Console.WriteLine();
                 }
             }
@@ -307,7 +307,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -319,10 +319,10 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.IsEventProtected = false;
-                    Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).IsEventProtected = false;
+                    Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).IsEventProtected = false;
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Deprotected");
+                    ConsoleUtils.WriteWithTime("Player [" + targetClient.Account.Username + "] Has Been Deprotected");
                     Console.WriteLine();
                 }
             }
@@ -351,7 +351,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -365,7 +365,7 @@ namespace OpenWorldServer
                     Networking.SendData(targetClient, "ForcedEvent│" + eventID);
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Sent Event [" + eventID + "] to [" + targetClient.PlayerData.Username + "]");
+                    ConsoleUtils.WriteWithTime("Sent Event [" + eventID + "] to [" + targetClient.Account.Username + "]");
                     Console.WriteLine();
                 }
             }
@@ -412,7 +412,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -423,23 +423,23 @@ namespace OpenWorldServer
 
                 else
                 {
-                    if (targetClient.PlayerData.IsAdmin == true)
+                    if (targetClient.Account.IsAdmin == true)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        ConsoleUtils.LogToConsole("Player [" + targetClient.PlayerData.Username + "] Was Already An Administrator");
+                        ConsoleUtils.LogToConsole("Player [" + targetClient.Account.Username + "] Was Already An Administrator");
                         ConsoleUtils.LogToConsole(Environment.NewLine);
                     }
 
                     else
                     {
-                        targetClient.PlayerData.IsAdmin = true;
-                        Server.savedClients.Find(fetch => fetch.PlayerData.Username == clientID).PlayerData.IsAdmin = true;
-                        StaticProxy.playerHandler.SavePlayerData(targetClient);
+                        targetClient.Account.IsAdmin = true;
+                        Server.savedClients.Find(fetch => fetch.Account.Username == clientID).Account.IsAdmin = true;
+                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Promote");
 
                         Console.ForegroundColor = ConsoleColor.Green;
-                        ConsoleUtils.LogToConsole("Player [" + targetClient.PlayerData.Username + "] Has Been Promoted");
+                        ConsoleUtils.LogToConsole("Player [" + targetClient.Account.Username + "] Has Been Promoted");
                         ConsoleUtils.LogToConsole(Environment.NewLine);
                     }
                 }
@@ -461,7 +461,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -472,23 +472,23 @@ namespace OpenWorldServer
 
                 else
                 {
-                    if (!targetClient.PlayerData.IsAdmin)
+                    if (!targetClient.Account.IsAdmin)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        ConsoleUtils.LogToConsole("Player [" + targetClient.PlayerData.Username + "] Is Not An Administrator");
+                        ConsoleUtils.LogToConsole("Player [" + targetClient.Account.Username + "] Is Not An Administrator");
                         ConsoleUtils.LogToConsole(Environment.NewLine);
                     }
 
                     else
                     {
-                        targetClient.PlayerData.IsAdmin = false;
-                        Server.savedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username).PlayerData.IsAdmin = false;
-                        StaticProxy.playerHandler.SavePlayerData(targetClient);
+                        targetClient.Account.IsAdmin = false;
+                        Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsAdmin = false;
+                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Demote");
 
                         Console.ForegroundColor = ConsoleColor.Green;
-                        ConsoleUtils.LogToConsole("Player [" + targetClient.PlayerData.Username + "] Has Been Demoted");
+                        ConsoleUtils.LogToConsole("Player [" + targetClient.Account.Username + "] Has Been Demoted");
                         ConsoleUtils.LogToConsole(Environment.NewLine);
                     }
                 }
@@ -511,7 +511,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Server.savedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Server.savedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -525,9 +525,9 @@ namespace OpenWorldServer
                     bool isConnected = false;
                     string ip = "None";
 
-                    if (Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username) != null)
+                    if (Networking.connectedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username) != null)
                     {
-                        clientToInvestigate = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == targetClient.PlayerData.Username);
+                        clientToInvestigate = Networking.connectedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username);
                         isConnected = true;
                         ip = clientToInvestigate.IPAddress.ToString();
                     }
@@ -535,22 +535,22 @@ namespace OpenWorldServer
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Player Details: ");
                     Console.ForegroundColor = ConsoleColor.White;
-                    ConsoleUtils.WriteWithTime("Username: [" + targetClient.PlayerData.Username + "]");
-                    ConsoleUtils.WriteWithTime("Password: [" + targetClient.PlayerData.Password + "]");
+                    ConsoleUtils.WriteWithTime("Username: [" + targetClient.Account.Username + "]");
+                    ConsoleUtils.WriteWithTime("Password: [" + targetClient.Account.Password + "]");
                     Console.WriteLine();
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Security: ");
                     Console.ForegroundColor = ConsoleColor.White;
                     ConsoleUtils.WriteWithTime("Connection IP: [" + ip + "]");
-                    ConsoleUtils.WriteWithTime("Admin: [" + targetClient.PlayerData.IsAdmin + "]");
+                    ConsoleUtils.WriteWithTime("Admin: [" + targetClient.Account.IsAdmin + "]");
                     Console.WriteLine();
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Status: ");
                     Console.ForegroundColor = ConsoleColor.White;
                     ConsoleUtils.WriteWithTime("Online: [" + isConnected + "]");
-                    ConsoleUtils.WriteWithTime("Immunized: [" + targetClient.PlayerData.IsImmunized + "]");
+                    ConsoleUtils.WriteWithTime("Immunized: [" + targetClient.Account.IsImmunized + "]");
                     ConsoleUtils.WriteWithTime("Event Shielded: [" + targetClient.IsEventProtected + "]");
                     ConsoleUtils.WriteWithTime("In RTSE: [" + (targetClient.RtsActionPartner != null).ToString() + "]");
                     Console.WriteLine();
@@ -558,17 +558,17 @@ namespace OpenWorldServer
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Wealth: ");
                     Console.ForegroundColor = ConsoleColor.White;
-                    ConsoleUtils.WriteWithTime("Stored Gifts: [" + targetClient.PlayerData.GiftString.Count + "]");
-                    ConsoleUtils.WriteWithTime("Stored Trades: [" + targetClient.PlayerData.TradeString.Count + "]");
-                    ConsoleUtils.WriteWithTime("Wealth Value: [" + targetClient.PlayerData.Wealth + "]");
-                    ConsoleUtils.WriteWithTime("Pawn Count: [" + targetClient.PlayerData.PawnCount + "]");
+                    ConsoleUtils.WriteWithTime("Stored Gifts: [" + targetClient.Account.GiftString.Count + "]");
+                    ConsoleUtils.WriteWithTime("Stored Trades: [" + targetClient.Account.TradeString.Count + "]");
+                    ConsoleUtils.WriteWithTime("Wealth Value: [" + targetClient.Account.Wealth + "]");
+                    ConsoleUtils.WriteWithTime("Pawn Count: [" + targetClient.Account.PawnCount + "]");
                     Console.WriteLine();
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Details: ");
                     Console.ForegroundColor = ConsoleColor.White;
-                    ConsoleUtils.WriteWithTime("Home Tile ID: [" + targetClient.PlayerData.HomeTileId + "]");
-                    ConsoleUtils.WriteWithTime("Faction: [" + (targetClient.PlayerData.Faction == null ? "None" : targetClient.PlayerData.Faction.name) + "]");
+                    ConsoleUtils.WriteWithTime("Home Tile ID: [" + targetClient.Account.HomeTileId + "]");
+                    ConsoleUtils.WriteWithTime("Faction: [" + (targetClient.Account.Faction == null ? "None" : targetClient.Account.Faction.name) + "]");
                     Console.WriteLine();
                 }
             }
@@ -606,7 +606,7 @@ namespace OpenWorldServer
 
                     foreach (KeyValuePair<PlayerClient, FactionHandler.MemberRank> member in factionToSearch.members)
                     {
-                        ConsoleUtils.WriteWithTime("[" + member.Value + "]" + " - " + member.Key.PlayerData.Username);
+                        ConsoleUtils.WriteWithTime("[" + member.Value + "]" + " - " + member.Key.Account.Username);
                     }
 
                     Console.WriteLine();
@@ -654,7 +654,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -665,7 +665,7 @@ namespace OpenWorldServer
 
                 else
                 {
-                    StaticProxy.playerHandler.BanPlayer(targetClient);
+                    StaticProxy.playerHandler.BanlistHandler.BanPlayer(targetClient);
                     ConsoleUtils.LogToConsole(Environment.NewLine);
                 }
             }
@@ -684,10 +684,10 @@ namespace OpenWorldServer
 
             else
             {
-                var banInfo = StaticProxy.playerHandler.GetBanInfo(clientID);
+                var banInfo = StaticProxy.playerHandler.BanlistHandler.GetBanInfo(clientID);
                 if (banInfo != null)
                 {
-                    StaticProxy.playerHandler.UnbanPlayer(banInfo);
+                    StaticProxy.playerHandler.BanlistHandler.UnbanPlayer(banInfo);
                     ConsoleUtils.LogToConsole(Environment.NewLine);
                     return;
                 }
@@ -713,7 +713,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == clientID);
+                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -726,7 +726,7 @@ namespace OpenWorldServer
                 {
                     targetClient.IsDisconnecting = true;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    ConsoleUtils.WriteWithTime("Player [" + targetClient.PlayerData.Username + "] Has Been Kicked");
+                    ConsoleUtils.WriteWithTime("Player [" + targetClient.Account.Username + "] Has Been Kicked");
                     Console.WriteLine();
                 }
             }

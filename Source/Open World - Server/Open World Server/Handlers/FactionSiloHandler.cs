@@ -90,7 +90,7 @@ namespace OpenWorldServer
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetSiloContents(faction, siloTileID));
@@ -143,7 +143,7 @@ namespace OpenWorldServer
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.PlayerData.Username == dummy.PlayerData.Username);
+                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetSiloContents(faction, siloTileID));

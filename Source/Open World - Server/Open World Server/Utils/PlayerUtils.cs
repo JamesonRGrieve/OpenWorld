@@ -22,36 +22,36 @@ namespace OpenWorldServer
 
 
 
-                var playerData = StaticProxy.playerHandler.GetPlayerData(Path.GetFileNameWithoutExtension(path));
+                var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(Path.GetFileNameWithoutExtension(path));
                 if (playerData == null)
                     return;
 
-                PlayerClient playerToLoad = new PlayerClient(null) { PlayerData = playerData };
+                PlayerClient playerToLoad = new PlayerClient(null) { Account = playerData };
 
-                if (!string.IsNullOrWhiteSpace(playerToLoad.PlayerData.HomeTileId))
+                if (!string.IsNullOrWhiteSpace(playerToLoad.Account.HomeTileId))
                 {
-                    try { Server.savedSettlements.Add(playerToLoad.PlayerData.HomeTileId, new List<string>() { playerToLoad.PlayerData.Username }); }
+                    try { Server.savedSettlements.Add(playerToLoad.Account.HomeTileId, new List<string>() { playerToLoad.Account.Username }); }
                     catch
                     {
-                        playerToLoad.PlayerData.HomeTileId = null;
-                        StaticProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
+                        playerToLoad.Account.HomeTileId = null;
+                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(playerToLoad.Account);
 
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Cloned Entry! Fixing");
+                        ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.Account.Username + " Is Using A Cloned Entry! Fixing");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
 
-                if (playerToLoad.PlayerData.Faction != null)
+                if (playerToLoad.Account.Faction != null)
                 {
-                    Faction factionToFech = Server.savedFactions.Find(fetch => fetch.name == playerToLoad.PlayerData.Faction.name);
+                    Faction factionToFech = Server.savedFactions.Find(fetch => fetch.name == playerToLoad.Account.Faction.name);
                     if (factionToFech == null)
                     {
-                        playerToLoad.PlayerData.Faction = null;
-                        StaticProxy.playerHandler.SavePlayerData(playerToLoad.PlayerData);
+                        playerToLoad.Account.Faction = null;
+                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(playerToLoad.Account);
 
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.PlayerData.Username + " Is Using A Missing Faction! Fixing");
+                        ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.Account.Username + " Is Using A Missing Faction! Fixing");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
@@ -64,18 +64,18 @@ namespace OpenWorldServer
 
         public static void GiveSavedDataToPlayer(PlayerClient client)
         {
-            var playerData = StaticProxy.playerHandler.GetPlayerData(client);
+            var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(client);
             if (playerData != null)
             {
                 return;
             }
 
-            client.PlayerData = playerData;
-            if (client.PlayerData.Faction != null)
+            client.Account = playerData;
+            if (client.Account.Faction != null)
             {
-                Faction factionToGive = Server.savedFactions.Find(fetch => fetch.name == client.PlayerData.Faction.name);
-                if (factionToGive != null) client.PlayerData.Faction = factionToGive;
-                else client.PlayerData.Faction = null;
+                Faction factionToGive = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
+                if (factionToGive != null) client.Account.Faction = factionToGive;
+                else client.Account.Faction = null;
             }
         }
 
@@ -130,37 +130,37 @@ namespace OpenWorldServer
         {
             if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive == false) return;
             if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold == 0 && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold == 0) return;
-            if (client.PlayerData.IsAdmin) return;
+            if (client.Account.IsAdmin) return;
 
-            int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth;
+            int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth;
 
-            if (client.PlayerData.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0)
+            if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0)
             {
-                StaticProxy.playerHandler.SavePlayerData(client);
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
+                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "]'s Wealth Triggered Alarm [" + wealthToCompare + " > " + (int)client.PlayerData.Wealth + "], Banning");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Alarm [" + wealthToCompare + " > " + (int)client.Account.Wealth + "], Banning");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                StaticProxy.playerHandler.BanPlayer(client, "Wealth Check triggered");
+                StaticProxy.playerHandler.BanlistHandler.BanPlayer(client, "Wealth Check triggered");
             }
-            else if (client.PlayerData.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0)
+            else if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0)
             {
-                StaticProxy.playerHandler.SavePlayerData(client);
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
+                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int)client.PlayerData.Wealth + "]");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int)client.Account.Wealth + "]");
                 Console.ForegroundColor = ConsoleColor.White;
             }
             else
             {
-                StaticProxy.playerHandler.SavePlayerData(client);
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.Wealth = client.PlayerData.Wealth;
-                Server.savedClients.Find(fetch => fetch.PlayerData.Username == client.PlayerData.Username).PlayerData.PawnCount = client.PlayerData.PawnCount;
+                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
+                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
             }
         }
 
@@ -169,7 +169,7 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
-                if (client.PlayerData.HomeTileId == tileID) return true;
+                if (client.Account.HomeTileId == tileID) return true;
             }
 
             return false;
@@ -177,7 +177,7 @@ namespace OpenWorldServer
 
         public static PlayerClient GetPlayerFromTile(string tileID)
         {
-            return Networking.connectedClients.Find(fetch => fetch.PlayerData.HomeTileId == tileID);
+            return Networking.connectedClients.Find(fetch => fetch.Account.HomeTileId == tileID);
         }
 
         public static bool CheckForPlayerShield(string tileID)
@@ -185,7 +185,7 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
-                if (client.PlayerData.HomeTileId == tileID && !client.IsEventProtected && !client.PlayerData.IsImmunized)
+                if (client.Account.HomeTileId == tileID && !client.IsEventProtected && !client.Account.IsImmunized)
                 {
                     client.IsEventProtected = true;
                     return true;
@@ -199,7 +199,7 @@ namespace OpenWorldServer
         {
             foreach (PlayerClient client in Networking.connectedClients)
             {
-                if (client.PlayerData.HomeTileId == tileID && !client.InRTSE && !client.PlayerData.IsImmunized)
+                if (client.Account.HomeTileId == tileID && !client.InRTSE && !client.Account.IsImmunized)
                 {
                     client.InRTSE = true;
                     return true;
@@ -214,21 +214,21 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
-                if (client.PlayerData.HomeTileId == tileID)
+                if (client.Account.HomeTileId == tileID)
                 {
-                    string dataToReturn = client.PlayerData.PawnCount.ToString() + "»" + client.PlayerData.Wealth.ToString() + "»" + client.IsEventProtected + "»" + client.InRTSE;
+                    string dataToReturn = client.Account.PawnCount.ToString() + "»" + client.Account.Wealth.ToString() + "»" + client.IsEventProtected + "»" + client.InRTSE;
 
-                    if (client.PlayerData.GiftString.Count > 0) dataToReturn += "»" + "True";
+                    if (client.Account.GiftString.Count > 0) dataToReturn += "»" + "True";
                     else dataToReturn += "»" + "False";
 
-                    if (client.PlayerData.TradeString.Count > 0) dataToReturn += "»" + "True";
+                    if (client.Account.TradeString.Count > 0) dataToReturn += "»" + "True";
                     else dataToReturn += "»" + "False";
 
                     Random rnd = new Random();
                     int chance = rnd.Next(0, 2);
-                    if (chance == 1) Networking.SendData(client, "Spy│" + origin.PlayerData.Username);
+                    if (chance == 1) Networking.SendData(client, "Spy│" + origin.Account.Username);
 
-                    ConsoleUtils.LogToConsole("Spy Done Between [" + origin.PlayerData.Username + "] And [" + client.PlayerData.Username + "]");
+                    ConsoleUtils.LogToConsole("Spy Done Between [" + origin.Account.Username + "] And [" + client.Account.Username + "]");
 
                     return dataToReturn;
                 }
@@ -244,9 +244,9 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
-                if (sc.PlayerData.HomeTileId == data.Split('│')[2])
+                if (sc.Account.HomeTileId == data.Split('│')[2])
                 {
-                    ConsoleUtils.LogToConsole("Player [" + invoker.PlayerData.Username + "] Has Sent Forced Event [" + data.Split('│')[1] + "] To [" + sc.PlayerData.Username + "]");
+                    ConsoleUtils.LogToConsole("Player [" + invoker.Account.Username + "] Has Sent Forced Event [" + data.Split('│')[1] + "] To [" + sc.Account.Username + "]");
                     Networking.SendData(sc, dataToSend);
                     break;
                 }
@@ -261,10 +261,10 @@ namespace OpenWorldServer
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
-                if (sc.PlayerData.HomeTileId == tileToSend)
+                if (sc.Account.HomeTileId == tileToSend)
                 {
                     Networking.SendData(sc, dataToSend);
-                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.PlayerData.Username + "] And [" + sc.PlayerData.Username + "]");
+                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.Account.Username + "] And [" + sc.Account.Username + "]");
                     return;
                 }
             }
@@ -274,11 +274,11 @@ namespace OpenWorldServer
             PlayerClient[] savedClients = Server.savedClients.ToArray();
             foreach (PlayerClient sc in savedClients)
             {
-                if (sc.PlayerData.HomeTileId == tileToSend)
+                if (sc.Account.HomeTileId == tileToSend)
                 {
-                    sc.PlayerData.GiftString.Add(dataToSend);
-                    StaticProxy.playerHandler.SavePlayerData(sc);
-                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.PlayerData.Username + "] And [" + sc.PlayerData.Username + "] But Was Offline. Saving");
+                    sc.Account.GiftString.Add(dataToSend);
+                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(sc);
+                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.Account.Username + "] And [" + sc.Account.Username + "] But Was Offline. Saving");
                     return;
                 }
             }
@@ -286,12 +286,12 @@ namespace OpenWorldServer
 
         public static void SendTradeRequestToPlayer(PlayerClient invoker, string data)
         {
-            string dataToSend = "TradeRequest│" + invoker.PlayerData.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
+            string dataToSend = "TradeRequest│" + invoker.Account.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
 
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
-                if (sc.PlayerData.HomeTileId == data.Split('│')[1])
+                if (sc.Account.HomeTileId == data.Split('│')[1])
                 {
                     Networking.SendData(sc, dataToSend);
                     return;
@@ -301,12 +301,12 @@ namespace OpenWorldServer
 
         public static void SendBarterRequestToPlayer(PlayerClient invoker, string data)
         {
-            string dataToSend = "BarterRequest│" + invoker.PlayerData.HomeTileId + "│" + data.Split('│')[2];
+            string dataToSend = "BarterRequest│" + invoker.Account.HomeTileId + "│" + data.Split('│')[2];
 
             PlayerClient[] clients = Networking.connectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
-                if (sc.PlayerData.HomeTileId == data.Split('│')[1])
+                if (sc.Account.HomeTileId == data.Split('│')[1])
                 {
                     Networking.SendData(sc, dataToSend);
                     return;

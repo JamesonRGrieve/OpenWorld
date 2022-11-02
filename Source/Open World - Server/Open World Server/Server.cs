@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+using OpenWorld.Shared.Networking;
+using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
 
@@ -13,16 +19,9 @@ namespace OpenWorldServer
         private readonly PlayerHandler playerHandler;
         private readonly ModHandler modHandler;
 
-        public Server(ServerConfig serverConfig)
-        {
-            this.serverConfig = serverConfig;
+        public bool IsRunning { get; set; } = false;
 
-            // Setting up Server
-            this.modHandler = new ModHandler(serverConfig);
-            this.playerHandler = new PlayerHandler(serverConfig);
-
-            this.Run();
-        }
+        private TcpListener listener;
 
         //Meta
         public static bool exit = false;
@@ -41,13 +40,46 @@ namespace OpenWorldServer
 
         public static string latestClientVersion;
 
+        public Server(ServerConfig serverConfig)
+        {
+            this.serverConfig = serverConfig;
+
+            // Setting up Server
+            this.modHandler = new ModHandler(serverConfig);
+            this.playerHandler = new PlayerHandler(serverConfig);
+
+            this.SetupStaticProxy();
+
+            this.SetupListener();
+
+            this.Run();
+        }
+
+        private void SetupListener()
+        {
+            IPAddress ipAddress;
+            if (!IPAddress.TryParse(this.serverConfig.HostIP, out ipAddress))
+            {
+                ConsoleUtils.LogToConsole($"The IP [{this.serverConfig.HostIP}] is not a valid IP", ConsoleColor.Red);
+                return;
+            }
+
+            if (this.serverConfig.Port >= 65535 || this.serverConfig.Port <= 0)
+            {
+                ConsoleUtils.LogToConsole($"The Port [{this.serverConfig.Port}] needs to be between 0 and 65535", ConsoleColor.Red);
+                return;
+            }
+
+            this.listener = new TcpListener(ipAddress, this.serverConfig.Port);
+            this.listener.Start();
+        }
+
         public void Run()
         {
-            AdoptConfigToStaticVars(this.serverConfig);
-            this.SetupHandlerProxy();
+            this.IsRunning = true;
 
-            ServerUtils.CheckServerVersion();
-            ServerUtils.CheckClientVersionRequirement();
+            this.StartReadingDataFromClients();
+            this.StartAcceptingConnections();
 
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);
@@ -57,16 +89,126 @@ namespace OpenWorldServer
             while (!exit) ListenForCommands();
         }
 
-        private static void AdoptConfigToStaticVars(ServerConfig serverConfig)
+        private void StartAcceptingConnections()
         {
-            // This needs to be replaced with proper use of the server config in the classes
+            Task.Run(() =>
+            {
+                ConsoleUtils.LogToConsole($"Server ready to accept connections");
+                while (this.IsRunning)
+                {
+                    try
+                    {
+                        var newClient = this.listener.AcceptTcpClient();
+                        this.playerHandler.AddPlayer(newClient);
 
-            // Server Settings.txt
-            Networking.localAddress = IPAddress.Parse(serverConfig.HostIP);
-            Networking.serverPort = serverConfig.Port;
+                        // We actually dont need to delay the Thread here, since AcceptTcpClient is blocking
+                        // But we dont want to rush through many clients on a mass reconnect.
+                        // Modern CPUs shouldn't have problems, but a pi~
+                        Thread.Sleep(120);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (this.IsRunning)
+                        {
+                            ConsoleUtils.LogToConsole($"Exception while trying to accept new connection:", ConsoleColor.Red);
+                            ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
+                        }
+                    }
+                }
+            });
         }
 
-        public void SetupHandlerProxy()
+        private void StartReadingDataFromClients()
+        {
+            Task.Run(() =>
+            {
+                while (this.IsRunning)
+                {
+                    foreach (var client in this.playerHandler.ConnectedClients.ToList())
+                    {
+                        if (!client.IsConnected || client.IsDisconnecting)
+                        {
+                            this.playerHandler.RemovePlayer(client);
+                        }
+
+                        if (client.DataAvailable)
+                        {
+                            Task.Run(() =>
+                            {
+                                try
+                                {
+                                    this.ReadDataFromClient(client);
+                                }
+                                finally
+                                {
+                                }
+                            });
+
+                            Thread.Sleep(10);
+                        }
+                    }
+
+                    Thread.Sleep(30); // Let the CPU do some other things
+                }
+            });
+        }
+
+        private void ReadDataFromClient(PlayerClient client)
+        {
+            var data = client.ReceiveData();
+            if (data == null)
+            {
+                return;
+            }
+
+            Console.WriteLine(data);
+            if (data.StartsWith("Connect│"))
+            {
+                NetworkingHandler.ConnectHandle(client, PacketHandler.GetPacket<ConnectPacket>(data));
+            }
+            else if (data.StartsWith("ChatMessage│"))
+            {
+                NetworkingHandler.ChatMessageHandle(client, data);
+            }
+            else if (data.StartsWith("UserSettlement│"))
+            {
+                NetworkingHandler.UserSettlementHandle(client, data);
+            }
+            else if (data.StartsWith("ForceEvent│"))
+            {
+                NetworkingHandler.ForceEventHandle(client, data);
+            }
+            else if (data.StartsWith("SendGiftTo│"))
+            {
+                NetworkingHandler.SendGiftHandle(client, data);
+            }
+            else if (data.StartsWith("SendTradeTo│"))
+            {
+                NetworkingHandler.SendTradeHandle(client, data);
+            }
+            else if (data.StartsWith("SendBarterTo│"))
+            {
+                NetworkingHandler.SendBarterHandle(client, data);
+            }
+            else if (data.StartsWith("TradeStatus│"))
+            {
+                NetworkingHandler.TradeStatusHandle(client, data);
+            }
+            else if (data.StartsWith("BarterStatus│"))
+            {
+                NetworkingHandler.BarterStatusHandle(client, data);
+            }
+            else if (data.StartsWith("GetSpyInfo│"))
+            {
+                NetworkingHandler.SpyInfoHandle(client, data);
+            }
+            else if (data.StartsWith("FactionManagement│"))
+            {
+                NetworkingHandler.FactionManagementHandle(client, data);
+            }
+        }
+
+        public void SetupStaticProxy()
         {
             StaticProxy.serverConfig = this.serverConfig;
             StaticProxy.modHandler = this.modHandler;
@@ -140,7 +282,7 @@ namespace OpenWorldServer
                 else SimpleCommands.UnknownCommand(commandBase);
             }
 
-            catch 
+            catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 ConsoleUtils.WriteWithTime("Command Caught Exception");

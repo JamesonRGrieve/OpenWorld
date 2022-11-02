@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using OpenWorldServer.Data;
 
@@ -10,7 +11,7 @@ namespace OpenWorldServer
 
         public IPAddress IPAddress => ((IPEndPoint)this.tcpClient.Client.RemoteEndPoint).Address;
 
-        public NetworkStream ClientStream => this.tcpClient.GetStream();
+        public bool DataAvailable => this.tcpClient.GetStream().DataAvailable;
 
         public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
 
@@ -18,7 +19,7 @@ namespace OpenWorldServer
 
         public bool IsDisconnecting { get; set; } = false;
 
-        public PlayerData PlayerData { get; set; }
+        public PlayerData Account { get; set; }
 
         public bool IsEventProtected { get; set; } = false;
 
@@ -29,7 +30,43 @@ namespace OpenWorldServer
         public PlayerClient(TcpClient userSocket)
         {
             this.tcpClient = userSocket;
-            this.PlayerData = new PlayerData();
+            this.Account = new PlayerData();
+        }
+
+        public void SendData(string data)
+        {
+            var encryptedData = Encryption.EncryptString(data);
+            try
+            {
+                var sw = new StreamWriter(this.tcpClient.GetStream());
+                System.Console.WriteLine(encryptedData);
+                sw.WriteLine(encryptedData);
+                sw.Flush();
+            }
+            catch
+            {
+            }
+        }
+
+        public string ReceiveData()
+        {
+            string data = null;
+            if (this.IsConnected)
+            {
+                string encryptedData = null;
+                try
+                {
+                    var sr = new StreamReader(this.tcpClient.GetStream(), true);
+                    encryptedData = sr.ReadLine();
+                }
+                catch
+                {
+                }
+
+                data = Encryption.DecryptString(encryptedData);
+            }
+
+            return data;
         }
 
         public void Dispose()

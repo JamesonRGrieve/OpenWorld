@@ -70,7 +70,7 @@ namespace OpenWorldServer
         {
             string message = data.Split('│')[2];
 
-            string messageForConsole = "Chat - [" + client.PlayerData.Username + "] " + message;
+            string messageForConsole = "Chat - [" + client.Account.Username + "] " + message;
 
             ConsoleUtils.LogToConsole(messageForConsole);
 
@@ -111,7 +111,7 @@ namespace OpenWorldServer
                 {
                     if (sc == client) continue;
 
-                    else dataToSend += sc.PlayerData.Username + ":";
+                    else dataToSend += sc.Account.Username + ":";
                 }
 
                 dataToSend += "│" + Networking.connectedClients.Count();

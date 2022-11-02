@@ -32,13 +32,5 @@ namespace OpenWorldServer
 
             else return;
         }
-
-        public static void GenerateClientThread(PlayerClient client)
-        {
-            Thread ClientThread = new Thread(() => Networking.ListenToClient(client));
-            ClientThread.IsBackground = true;
-            ClientThread.Name = "User Thread " + client.PlayerData.Username;
-            ClientThread.Start();
-        }
     }
 }
