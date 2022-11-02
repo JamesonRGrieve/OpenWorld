@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 
@@ -152,34 +151,29 @@ namespace OpenWorldServer
 
             while (true)
             {
-                Thread.Sleep(100);
 
-                try
+                PlayerClient[] actualClients = connectedClients.ToArray();
+
+                List<PlayerClient> clientsToDisconnect = new List<PlayerClient>();
+
+                foreach (PlayerClient client in actualClients)
                 {
-                    PlayerClient[] actualClients = connectedClients.ToArray();
-
-                    List<PlayerClient> clientsToDisconnect = new List<PlayerClient>();
-
-                    foreach (PlayerClient client in actualClients)
-                    {
-                        if (client.IsDisconnecting)
-                            clientsToDisconnect.Add(client);
-                        else SendData(client, "Ping");
-                    }
-
-                    foreach (PlayerClient client in clientsToDisconnect)
-                    {
-                        KickClients(client);
-                    }
-
-                    if (clientsToDisconnect.Count > 0)
-                    {
-                        ConsoleUtils.UpdateTitle();
-                        ServerUtils.SendPlayerListToAll(null);
-                    }
+                    if (client.IsDisconnecting)
+                        clientsToDisconnect.Add(client);
+                    else
+                        SendData(client, "Ping");
                 }
 
-                catch { ConsoleUtils.WriteWithTime("CRITICAL ERROR"); }
+                foreach (PlayerClient client in clientsToDisconnect)
+                {
+                    KickClients(client);
+                }
+
+                if (clientsToDisconnect.Count > 0)
+                {
+                    ConsoleUtils.UpdateTitle();
+                    ServerUtils.SendPlayerListToAll(null);
+                }
             }
         }
     }
