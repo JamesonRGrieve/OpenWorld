@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using OpenWorldServer.Enums;
 
 namespace OpenWorldServer
 {
@@ -64,7 +63,7 @@ namespace OpenWorldServer
 
                     if (encryptedData == null)
                     {
-                        client.disconnectFlag = true;
+                        client.IsDisconnecting = true;
                         return;
                     }
 
@@ -154,15 +153,15 @@ namespace OpenWorldServer
                     sw.WriteLine(Encryption.EncryptString(data));
                     sw.Flush();
                 }
-                catch { client.disconnectFlag = true; }
+                catch { client.IsDisconnecting = true; }
             }
         }
 
-        public static void KickClients(ServerClient client)
+        public static void KickClients(PlayerClient client)
         {
             connectedClients.Remove(client);
 
-            client.tcp.Dispose();
+            client.Dispose();
 
             ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has Disconnected");
         }
