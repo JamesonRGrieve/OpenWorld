@@ -74,9 +74,8 @@ namespace OpenWorldServer
         private static void CheckForJoinMode(PlayerClient client, JoinMode joinMode)
         {
             if (joinMode == JoinMode.NewGame)
-            {
-                SendNewGameData(client);
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has reset game progress");
+			{
+                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has started a new game");
             }
             else if (joinMode == JoinMode.LoadGame)
             {
@@ -84,7 +83,7 @@ namespace OpenWorldServer
                 SendLoadGameData(client);
             }
 
-            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] " + "[" + client.IPAddress.ToString() + "] " + "has connected");
+            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has Connected");
         }
 
         private static void SendNewGameData(PlayerClient client)
@@ -229,7 +228,7 @@ namespace OpenWorldServer
             {
                 string giftsToSend = "";
 
-                foreach (string str in client.PlayerData.GiftString) giftsToSend += str + "│";
+                foreach (string str in client.PlayerData.GiftString) giftsToSend += str + "»";
 
                 dataToSend += giftsToSend;
 
@@ -249,7 +248,7 @@ namespace OpenWorldServer
             {
                 string tradesToSend = "";
 
-                foreach (string str in client.PlayerData.TradeString) tradesToSend += str + "│";
+                foreach (string str in client.PlayerData.TradeString) tradesToSend += str + "»";
 
                 dataToSend += tradesToSend;
 
@@ -327,19 +326,9 @@ namespace OpenWorldServer
 
         public static bool CompareConnectingClientVersion(PlayerClient client, string clientVersion)
         {
-            string latestVersion;
+            if (string.IsNullOrWhiteSpace(Server.latestClientVersion)) return true;
 
-            try
-            {
-                WebClient wc = new WebClient();
-                latestVersion = wc.DownloadString("https://raw.githubusercontent.com/TastyLollipop/OpenWorld/main/Latest%20Versions%20Cache");
-                latestVersion = latestVersion.Split('│')[2].Replace("- Latest Client Version: ", "");
-                latestVersion = latestVersion.Remove(0, 1);
-                latestVersion = latestVersion.Remove(latestVersion.Count() - 1, 1);
-            }
-            catch { return true; }
-
-            if (clientVersion == latestVersion) return true;
+            if (clientVersion == Server.latestClientVersion) return true;
             else
             {
                 Networking.SendData(client, "Disconnect│Version");

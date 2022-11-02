@@ -15,7 +15,7 @@ namespace OpenWorldServer
         {
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Version Check:");
+            ConsoleUtils.LogToConsole("Server Version Check:");
             Console.ForegroundColor = ConsoleColor.White;
 
             string latestVersion = "";

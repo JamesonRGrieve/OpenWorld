@@ -39,10 +39,15 @@ namespace OpenWorldServer
         public static List<string> chatCache = new List<string>();
         public static List<Faction> savedFactions = new List<Faction>();
 
+        public static string latestClientVersion;
+
         public void Run()
         {
             AdoptConfigToStaticVars(this.serverConfig);
             this.SetupHandlerProxy();
+
+            ServerUtils.CheckServerVersion();
+            ServerUtils.CheckClientVersionRequirement();
 
             FactionHandler.CheckFactions(true);
             PlayerUtils.CheckAllAvailablePlayers(false);

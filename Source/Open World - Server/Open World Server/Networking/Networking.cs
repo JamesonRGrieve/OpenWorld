@@ -61,6 +61,13 @@ namespace OpenWorldServer
                     if (client.IsDisconnecting) return;
 
                     string encryptedData = sr.ReadLine();
+
+                    if (encryptedData == null)
+                    {
+                        client.disconnectFlag = true;
+                        return;
+                    }
+
                     string data = Encryption.DecryptString(encryptedData);
                     //if (data != "Ping") Debug.WriteLine(data);
 
@@ -147,30 +154,17 @@ namespace OpenWorldServer
                     sw.WriteLine(Encryption.EncryptString(data));
                     sw.Flush();
                 }
-                catch { }
+                catch { client.disconnectFlag = true; }
             }
         }
 
-        public static void KickClients(PlayerClient client, KickMode kickMode)
+        public static void KickClients(ServerClient client)
         {
             connectedClients.Remove(client);
 
-            try
-            {
-                client.Dispose();
-            }
-            catch
-            {
-            }
+            client.tcp.Dispose();
 
-            if (kickMode == KickMode.Normal)
-            {
-                ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] Has Disconnected");
-            }
-
-            ServerUtils.SendPlayerListToAll(null);
-
-            ConsoleUtils.UpdateTitle();
+            ConsoleUtils.LogToConsole("Player [" + client.PlayerData.Username + "] has Disconnected");
         }
 
         public static void CheckClientsConnection()
@@ -179,7 +173,7 @@ namespace OpenWorldServer
 
             while (true)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
 
                 try
                 {
@@ -201,11 +195,17 @@ namespace OpenWorldServer
                     {
                         Thread.Sleep(1);
 
-                        KickClients(client, KickMode.Normal);
+                        KickClients(client);
+                    }
+
+                    if (clientsToDisconnect.Count > 0)
+                    {
+                        ConsoleUtils.UpdateTitle();
+                        ServerUtils.SendPlayerListToAll(null);
                     }
                 }
 
-                catch { continue; }
+                catch { ConsoleUtils.WriteWithTime("CRITICAL ERROR"); }
             }
         }
     }
