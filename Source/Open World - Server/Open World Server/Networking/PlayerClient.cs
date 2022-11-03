@@ -11,7 +11,7 @@ namespace OpenWorldServer
 
         public IPAddress IPAddress => ((IPEndPoint)this.tcpClient.Client.RemoteEndPoint).Address;
 
-        public bool DataAvailable => !this.isReceiving && (this.tcpClient.GetStream()?.DataAvailable ?? false);
+        public bool DataAvailable => !this.isReceiving && (this.tcpClient?.GetStream()?.DataAvailable ?? false);
 
         public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
 

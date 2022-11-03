@@ -87,7 +87,8 @@ namespace OpenWorldServer
 
             Networking.SendData(client, GetVariablesToSend(client));
 
-            ServerUtils.SendPlayerList(client);
+            //ServerUtils.SendPlayerList(client);
+            client.SendData("PlayerList││1");
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
 
