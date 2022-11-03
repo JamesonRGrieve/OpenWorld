@@ -11,7 +11,7 @@ namespace OpenWorldServer
 
         public IPAddress IPAddress => ((IPEndPoint)this.tcpClient.Client.RemoteEndPoint).Address;
 
-        public bool DataAvailable => this.tcpClient.GetStream().DataAvailable;
+        public bool DataAvailable => !this.isReceiving && this.tcpClient.GetStream().DataAvailable;
 
         public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
 
@@ -27,9 +27,15 @@ namespace OpenWorldServer
 
         public bool InRTSE { get; set; } = false;
 
+        private bool isReceiving = false;
+
         public PlayerClient(TcpClient userSocket)
         {
             this.tcpClient = userSocket;
+            if (this.tcpClient != null)
+            {
+                this.tcpClient.NoDelay = false;
+            }
             this.Account = new PlayerData();
         }
 
@@ -39,7 +45,6 @@ namespace OpenWorldServer
             try
             {
                 var sw = new StreamWriter(this.tcpClient.GetStream());
-                System.Console.WriteLine(encryptedData);
                 sw.WriteLine(encryptedData);
                 sw.Flush();
             }
@@ -50,23 +55,33 @@ namespace OpenWorldServer
 
         public string ReceiveData()
         {
-            string data = null;
-            if (this.IsConnected)
+            try
             {
-                string encryptedData = null;
-                try
+                this.isReceiving = true;
+
+                string data = null;
+                if (this.IsConnected)
                 {
-                    var sr = new StreamReader(this.tcpClient.GetStream(), true);
-                    encryptedData = sr.ReadLine();
-                }
-                catch
-                {
+                    string encryptedData = null;
+                    try
+                    {
+                        var sr = new StreamReader(this.tcpClient.GetStream(), true);
+                        encryptedData = sr.ReadLine();
+                    }
+                    catch
+                    {
+                    }
+
+                    data = Encryption.DecryptString(encryptedData);
                 }
 
-                data = Encryption.DecryptString(encryptedData);
+                return data;
             }
+            finally
+            {
 
-            return data;
+                this.isReceiving = false;
+            }
         }
 
         public void Dispose()

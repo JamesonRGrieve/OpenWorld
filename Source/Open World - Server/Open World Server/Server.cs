@@ -143,7 +143,6 @@ namespace OpenWorldServer
                                 {
                                 }
                             });
-
                             Thread.Sleep(10);
                         }
                     }
