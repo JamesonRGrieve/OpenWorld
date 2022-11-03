@@ -3,6 +3,7 @@
     public enum PacketType : byte
     {
         Unkown = 0,
-        Connect = 1,
+        Ping = 1,
+        Connect = 10,
     }
 }

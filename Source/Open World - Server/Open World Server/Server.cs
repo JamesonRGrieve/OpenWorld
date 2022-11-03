@@ -79,6 +79,7 @@ namespace OpenWorldServer
             this.IsRunning = true;
 
             this.StartReadingDataFromClients();
+            this.StartKeepAliveChecks();
             this.StartAcceptingConnections();
 
             FactionHandler.CheckFactions(true);
@@ -133,34 +134,59 @@ namespace OpenWorldServer
 
                         if (client.DataAvailable)
                         {
-                            Task.Run(() =>
-                            {
-                                try
-                                {
-                                    this.ReadDataFromClient(client);
-                                }
-                                finally
-                                {
-                                }
-                            });
-                            Thread.Sleep(10);
+                            Task.Run(() => this.ReadDataFromClient(client));
                         }
                     }
 
-                    Thread.Sleep(30); // Let the CPU do some other things
+                    Thread.Sleep(50); // Let the CPU do some other things
+                }
+            });
+        }
+
+        private void StartKeepAliveChecks()
+        {
+            Task.Run(() =>
+            {
+                var pingPacketData = new PingPacket().GetData();
+                while (this.IsRunning)
+                {
+                    var clients = this.playerHandler.ConnectedClients.ToList();
+
+                    if (clients.Count == 0)
+                    {
+                        Thread.Sleep(500);
+                        continue;
+                    }
+
+                    foreach (var client in clients)
+                    {
+                        if (!client.IsConnected || client.IsDisconnecting)
+                        {
+                            this.playerHandler.RemovePlayer(client);
+                        }
+
+                        Task.Run(() => client.SendData(pingPacketData));
+                    }
+
+                    Thread.Sleep(1000); // Let the CPU do some other things
                 }
             });
         }
 
         private void ReadDataFromClient(PlayerClient client)
         {
-            var data = client.ReceiveData();
-            if (data == null)
+            string data = null;
+            try
+            {
+                data = client.ReceiveData();
+            }
+            catch { }
+
+            if (string.IsNullOrEmpty(data))
             {
                 return;
             }
 
-            Console.WriteLine(data);
             if (data.StartsWith("Connect│"))
             {
                 NetworkingHandler.ConnectHandle(client, PacketHandler.GetPacket<ConnectPacket>(data));

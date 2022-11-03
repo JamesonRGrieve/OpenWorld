@@ -11,7 +11,7 @@ namespace OpenWorldServer
 
         public IPAddress IPAddress => ((IPEndPoint)this.tcpClient.Client.RemoteEndPoint).Address;
 
-        public bool DataAvailable => !this.isReceiving && this.tcpClient.GetStream().DataAvailable;
+        public bool DataAvailable => !this.isReceiving && (this.tcpClient.GetStream()?.DataAvailable ?? false);
 
         public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
 
@@ -86,7 +86,18 @@ namespace OpenWorldServer
 
         public void Dispose()
         {
-            this.tcpClient?.Dispose();
+            if (this.tcpClient?.Connected ?? false)
+            {
+                try
+                {
+                    this.tcpClient.Close();
+                }
+                catch
+                {
+                }
+
+                this.tcpClient.Dispose();
+            }
         }
     }
 }
