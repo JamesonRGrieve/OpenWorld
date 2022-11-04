@@ -1,4 +1,4 @@
-﻿namespace OpenWorldServer
+﻿namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionBuildingHandler
     {

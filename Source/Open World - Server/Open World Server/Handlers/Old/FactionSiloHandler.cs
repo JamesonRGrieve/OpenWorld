@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace OpenWorldServer
+namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionSiloHandler
     {

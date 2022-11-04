@@ -30,7 +30,10 @@ namespace OpenWorldServer
 
                 if (!string.IsNullOrWhiteSpace(playerToLoad.Account.HomeTileId))
                 {
-                    try { Server.savedSettlements.Add(playerToLoad.Account.HomeTileId, new List<string>() { playerToLoad.Account.Username }); }
+                    try
+                    {
+                        Server.savedSettlements.Add(playerToLoad.Account.HomeTileId, new List<string>() { playerToLoad.Account.Username });
+                    }
                     catch
                     {
                         playerToLoad.Account.HomeTileId = null;

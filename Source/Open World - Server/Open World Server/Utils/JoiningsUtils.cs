@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Enums;
+using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {

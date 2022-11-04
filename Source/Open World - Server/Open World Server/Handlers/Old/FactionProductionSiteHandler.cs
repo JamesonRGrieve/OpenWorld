@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace OpenWorldServer
+namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionProductionSiteHandler
     {

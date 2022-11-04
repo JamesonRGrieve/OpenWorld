@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using OpenWorldServer.Services;
 
-namespace OpenWorldServer
+namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionHandler
     {

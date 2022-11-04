@@ -9,6 +9,7 @@ using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
+using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {
