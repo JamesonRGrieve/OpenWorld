@@ -22,23 +22,23 @@ namespace OpenWorldServer
 
         public static void SetPaths()
         {
-            Server.mainFolderPath = AppDomain.CurrentDomain.BaseDirectory;
+            OpenWorldServer.mainFolderPath = AppDomain.CurrentDomain.BaseDirectory;
 
-            Server.logFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Logs";
-            Server.serverSettingsPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Server Settings.txt";
-            Server.worldSettingsPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "World Settings.txt";
-            Server.playersFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Players";
-            Server.factionsFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Factions";
-            Server.enforcedModsFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Enforced Mods";
-            Server.whitelistedModsFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Whitelisted Mods";
-            Server.blacklistedModsFolderPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Blacklisted Mods";
-            Server.whitelistedUsersPath = Server.mainFolderPath + Path.DirectorySeparatorChar + "Whitelisted Players.txt";
+            OpenWorldServer.logFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Logs";
+            OpenWorldServer.serverSettingsPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Server Settings.txt";
+            OpenWorldServer.worldSettingsPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "World Settings.txt";
+            OpenWorldServer.playersFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Players";
+            OpenWorldServer.factionsFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Factions";
+            OpenWorldServer.enforcedModsFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Enforced Mods";
+            OpenWorldServer.whitelistedModsFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Whitelisted Mods";
+            OpenWorldServer.blacklistedModsFolderPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Blacklisted Mods";
+            OpenWorldServer.whitelistedUsersPath = OpenWorldServer.mainFolderPath + Path.DirectorySeparatorChar + "Whitelisted Players.txt";
 
             Console.ForegroundColor = ConsoleColor.Green;
             ConsoleUtils.LogToConsole("Server Startup:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.LogToConsole("Base Directory At: [" + Server.mainFolderPath + "]");
+            ConsoleUtils.LogToConsole("Base Directory At: [" + OpenWorldServer.mainFolderPath + "]");
         }
 
         public static void CheckServerVersion()
@@ -66,7 +66,7 @@ namespace OpenWorldServer
                 Console.ForegroundColor = ConsoleColor.White;
             }
 
-            if (Server.serverVersion == latestVersion) ConsoleUtils.LogToConsole("Running Latest Version");
+            if (OpenWorldServer.serverVersion == latestVersion) ConsoleUtils.LogToConsole("Running Latest Version");
             else ConsoleUtils.LogToConsole("Running Outdated Or Unstable version. Please Update From Github At Earliest Convenience To Prevent Errors");
             Console.ForegroundColor = ConsoleColor.White;
         }
@@ -88,9 +88,9 @@ namespace OpenWorldServer
                 version = version.Remove(0, 1);
                 version = version.Remove(version.Count() - 1, 1);
 
-                Server.latestClientVersion = version;
+                OpenWorldServer.latestClientVersion = version;
 
-                ConsoleUtils.LogToConsole("Listening For Version [" + Server.latestClientVersion + "]");
+                ConsoleUtils.LogToConsole("Listening For Version [" + OpenWorldServer.latestClientVersion + "]");
             }
 
             catch
@@ -108,23 +108,23 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("Settings Check:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (File.Exists(Server.serverSettingsPath))
+            if (File.Exists(OpenWorldServer.serverSettingsPath))
             {
-                string[] settings = File.ReadAllLines(Server.serverSettingsPath);
+                string[] settings = File.ReadAllLines(OpenWorldServer.serverSettingsPath);
 
                 foreach(string setting in settings)
                 {
                     if (setting.StartsWith("Server Name: "))
                     {
                         string splitString = setting.Replace("Server Name: ", "");
-                        Server.serverName = splitString;
+                        OpenWorldServer.serverName = splitString;
                         continue;
                     }
 
                     else if (setting.StartsWith("Server Description: "))
                     {
                         string splitString = setting.Replace("Server Description: ", "");
-                        Server.serverDescription = splitString;
+                        OpenWorldServer.serverDescription = splitString;
                         continue;
                     }
 
@@ -145,7 +145,7 @@ namespace OpenWorldServer
                     else if (setting.StartsWith("Max Players: "))
                     {
                         string splitString = setting.Replace("Max Players: ", "");
-                        Server.maxPlayers = int.Parse(splitString);
+                        OpenWorldServer.maxPlayers = int.Parse(splitString);
                         continue;
                     }
 
@@ -153,7 +153,7 @@ namespace OpenWorldServer
                     {
                         string splitString = setting.Replace("Allow Dev Mode: ", "");
 
-                        if (splitString == "True") Server.allowDevMode = true;
+                        if (splitString == "True") OpenWorldServer.allowDevMode = true;
 
                         continue;
                     }
@@ -162,7 +162,7 @@ namespace OpenWorldServer
                     {
                         string splitString = setting.Replace("Use Whitelist: ", "");
 
-                        if (splitString == "True") Server.usingWhitelist = true;
+                        if (splitString == "True") OpenWorldServer.usingWhitelist = true;
 
                         continue;
                     }
@@ -171,7 +171,7 @@ namespace OpenWorldServer
                     {
                         string splitString = setting.Replace("Use Enforced Difficulty: ", "");
 
-                        if (splitString == "True") Server.usingEnforcedDifficulty = true;
+                        if (splitString == "True") OpenWorldServer.usingEnforcedDifficulty = true;
 
                         continue;
                     }
@@ -179,14 +179,14 @@ namespace OpenWorldServer
                     else if (setting.StartsWith("Wealth Warning Threshold: "))
                     {
                         string splitString = setting.Replace("Wealth Warning Threshold: ", "");
-                        Server.warningWealthThreshold = int.Parse(splitString);
+                        OpenWorldServer.warningWealthThreshold = int.Parse(splitString);
                         continue;
                     }
 
                     else if (setting.StartsWith("Wealth Ban Threshold: "))
                     {
                         string splitString = setting.Replace("Wealth Ban Threshold: ", "");
-                        Server.banWealthThreshold = int.Parse(splitString);
+                        OpenWorldServer.banWealthThreshold = int.Parse(splitString);
                         continue;
                     }
 
@@ -195,11 +195,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Wealth System: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingWealthSystem = true;
+                            OpenWorldServer.usingWealthSystem = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingWealthSystem = false;
+                            OpenWorldServer.usingWealthSystem = false;
                         }
                         continue;
                     }
@@ -209,11 +209,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Idle System: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingIdleTimer = true;
+                            OpenWorldServer.usingIdleTimer = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingIdleTimer = false;
+                            OpenWorldServer.usingIdleTimer = false;
                         }
                         continue;
                     }
@@ -221,7 +221,7 @@ namespace OpenWorldServer
                     else if (setting.StartsWith("Idle Threshold (days): "))
                     {
                         string splitString = setting.Replace("Idle Threshold (days): ", "");
-                        Server.idleTimer = int.Parse(splitString);
+                        OpenWorldServer.idleTimer = int.Parse(splitString);
                         continue;
                     }
 
@@ -230,11 +230,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Road System: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingRoadSystem = true;
+                            OpenWorldServer.usingRoadSystem = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingRoadSystem = false;
+                            OpenWorldServer.usingRoadSystem = false;
                         }
                         continue;
                     }
@@ -244,11 +244,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Aggressive Road Mode (WIP): ", "");
                         if (splitString == "True")
                         {
-                            Server.aggressiveRoadMode = true;
+                            OpenWorldServer.aggressiveRoadMode = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.aggressiveRoadMode = false;
+                            OpenWorldServer.aggressiveRoadMode = false;
                         }
                         continue;
                     }
@@ -258,11 +258,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Modlist Match: ", "");
                         if (splitString == "True")
                         {
-                            Server.forceModlist = true;
+                            OpenWorldServer.forceModlist = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.forceModlist = false;
+                            OpenWorldServer.forceModlist = false;
                         }
                         continue;
                     }
@@ -272,11 +272,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Modlist Config Match (WIP): ", "");
                         if (splitString == "True")
                         {
-                            Server.forceModlistConfigs = true;
+                            OpenWorldServer.forceModlistConfigs = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.forceModlistConfigs = false;
+                            OpenWorldServer.forceModlistConfigs = false;
                         }
                         continue;
                     }
@@ -286,11 +286,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Mod Verification: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingModVerification = true;
+                            OpenWorldServer.usingModVerification = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingModVerification = false;
+                            OpenWorldServer.usingModVerification = false;
                         }
                         continue;
                     }
@@ -300,11 +300,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Chat: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingChat = true;
+                            OpenWorldServer.usingChat = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingChat = false;
+                            OpenWorldServer.usingChat = false;
                         }
                         continue;
                     }
@@ -314,11 +314,11 @@ namespace OpenWorldServer
                         string splitString = setting.Replace("Use Profanity filter: ", "");
                         if (splitString == "True")
                         {
-                            Server.usingProfanityFilter = true;
+                            OpenWorldServer.usingProfanityFilter = true;
                         }
                         else if (splitString == "False")
                         {
-                            Server.usingProfanityFilter = false;
+                            OpenWorldServer.usingProfanityFilter = false;
                         }
                         continue;
                     }
@@ -364,7 +364,7 @@ namespace OpenWorldServer
                     "Aggressive Road Mode (WIP): False",
                 };
 
-                File.WriteAllLines(Server.serverSettingsPath, settingsPreset);
+                File.WriteAllLines(OpenWorldServer.serverSettingsPath, settingsPreset);
 
                 ConsoleUtils.LogToConsole("Generating Settings File");
 
@@ -380,7 +380,7 @@ namespace OpenWorldServer
 
             ConsoleUtils.LogToConsole(messageForConsole);
 
-            Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
+            OpenWorldServer.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
             ServerClient[] allConnectedClients = Networking.connectedClients.ToArray();
             foreach (ServerClient sc in allConnectedClients)

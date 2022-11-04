@@ -12,7 +12,7 @@ namespace OpenWorldServer
 
             int factionValue = 0;
 
-            Faction[] factions = Server.savedFactions.ToArray();
+            Faction[] factions = OpenWorldServer.savedFactions.ToArray();
             foreach (Faction faction in factions)
             {
                 if (client.faction == null) factionValue = 0;
@@ -91,7 +91,7 @@ namespace OpenWorldServer
 
         public static bool CheckForGlobalStructureCap(int structureType)
         {
-            Faction[] serverFactions = Server.savedFactions.ToArray();
+            Faction[] serverFactions = OpenWorldServer.savedFactions.ToArray();
 
             if (structureType != 3) return true;
             else foreach (Faction serverFaction in serverFactions)

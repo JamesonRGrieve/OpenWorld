@@ -200,7 +200,7 @@ namespace OpenWorldServer
 
                 if (string.IsNullOrWhiteSpace(factionName)) return;
 
-                Faction factionToFetch = Server.savedFactions.Find(fetch => fetch.name == factionName);
+                Faction factionToFetch = OpenWorldServer.savedFactions.Find(fetch => fetch.name == factionName);
                 if (factionToFetch == null) FactionHandler.CreateFaction(factionName, client);
                 else Networking.SendData(client, "FactionManagement│NameInUse");
             }
@@ -230,7 +230,7 @@ namespace OpenWorldServer
             {
                 string factionString = data.Split('│')[2];
 
-                Faction factionToJoin = Server.savedFactions.Find(fetch => fetch.name == factionString);
+                Faction factionToJoin = OpenWorldServer.savedFactions.Find(fetch => fetch.name == factionString);
 
                 if (factionToJoin == null) return;
                 else FactionHandler.AddMember(factionToJoin, client);
@@ -275,8 +275,8 @@ namespace OpenWorldServer
 
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
-                    Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.faction.name);
-                    ServerClient memberToRemove = Server.savedClients.Find(fetch => fetch.homeTileID == tileID);
+                    Faction factionToCheck = OpenWorldServer.savedFactions.Find(fetch => fetch.name == client.faction.name);
+                    ServerClient memberToRemove = OpenWorldServer.savedClients.Find(fetch => fetch.homeTileID == tileID);
 
                     if (memberToRemove.faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToRemove.faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -309,8 +309,8 @@ namespace OpenWorldServer
 
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
-                    Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.faction.name);
-                    ServerClient memberToPromote = Server.savedClients.Find(fetch => fetch.homeTileID == tileID);
+                    Faction factionToCheck = OpenWorldServer.savedFactions.Find(fetch => fetch.name == client.faction.name);
+                    ServerClient memberToPromote = OpenWorldServer.savedClients.Find(fetch => fetch.homeTileID == tileID);
 
                     if (memberToPromote.faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToPromote.faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -343,8 +343,8 @@ namespace OpenWorldServer
 
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
-                    Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.faction.name);
-                    ServerClient memberToDemote = Server.savedClients.Find(fetch => fetch.homeTileID == tileID);
+                    Faction factionToCheck = OpenWorldServer.savedFactions.Find(fetch => fetch.name == client.faction.name);
+                    ServerClient memberToDemote = OpenWorldServer.savedClients.Find(fetch => fetch.homeTileID == tileID);
 
                     if (memberToDemote.faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToDemote.faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");

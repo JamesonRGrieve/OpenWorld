@@ -14,44 +14,44 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("World Check:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (File.Exists(Server.worldSettingsPath))
+            if (File.Exists(OpenWorldServer.worldSettingsPath))
             {
-                string[] settings = File.ReadAllLines(Server.worldSettingsPath);
+                string[] settings = File.ReadAllLines(OpenWorldServer.worldSettingsPath);
 
                 foreach (string setting in settings)
                 {
                     if (setting.StartsWith("Globe Coverage (0.3, 0.5, 1.0): "))
                     {
                         string splitString = setting.Replace("Globe Coverage (0.3, 0.5, 1.0): ", "");
-                        Server.globeCoverage = float.Parse(splitString);
+                        OpenWorldServer.globeCoverage = float.Parse(splitString);
                         continue;
                     }
 
                     else if (setting.StartsWith("Seed: "))
                     {
                         string splitString = setting.Replace("Seed: ", "");
-                        Server.seed = splitString;
+                        OpenWorldServer.seed = splitString;
                         continue;
                     }
 
                     else if (setting.StartsWith("Overall Rainfall (0-6): "))
                     {
                         string splitString = setting.Replace("Overall Rainfall (0-6): ", "");
-                        Server.overallRainfall = int.Parse(splitString);
+                        OpenWorldServer.overallRainfall = int.Parse(splitString);
                         continue;
                     }
 
                     else if (setting.StartsWith("Overall Temperature (0-6): "))
                     {
                         string splitString = setting.Replace("Overall Temperature (0-6): ", "");
-                        Server.overallTemperature = int.Parse(splitString);
+                        OpenWorldServer.overallTemperature = int.Parse(splitString);
                         continue;
                     }
 
                     else if (setting.StartsWith("Overall Population (0-6): "))
                     {
                         string splitString = setting.Replace("Overall Population (0-6): ", "");
-                        Server.overallPopulation = int.Parse(splitString);
+                        OpenWorldServer.overallPopulation = int.Parse(splitString);
                         continue;
                     }
                 }
@@ -72,7 +72,7 @@ namespace OpenWorldServer
                     "Overall Population (0-6): 3"
                 };
 
-                File.WriteAllLines(Server.worldSettingsPath, settingsPreset);
+                File.WriteAllLines(OpenWorldServer.worldSettingsPath, settingsPreset);
 
                 ConsoleUtils.LogToConsole("Generating World File");
 

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using OpenWorldServer.Web;
 
 namespace OpenWorldServer
 {
@@ -30,6 +31,14 @@ namespace OpenWorldServer
                 CheckThread.Start();
             }
 
+
+            else if (threadID == 3)
+            {
+                Thread WebThread = new Thread(() => WebServer.Start());
+                WebThread.IsBackground = true;
+                WebThread.Name = "Web Listener Thread";
+                WebThread.Start();
+            }
             else return;
         }
 

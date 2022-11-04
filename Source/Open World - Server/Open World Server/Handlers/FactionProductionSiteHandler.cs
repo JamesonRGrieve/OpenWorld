@@ -15,7 +15,7 @@ namespace OpenWorldServer
             {
                 Thread.Sleep(600000);
 
-                Faction[] allFactions = Server.savedFactions.ToArray();
+                Faction[] allFactions = OpenWorldServer.savedFactions.ToArray();
                 foreach (Faction faction in allFactions)
                 {
                     foreach (FactionStructure structure in faction.factionStructures)

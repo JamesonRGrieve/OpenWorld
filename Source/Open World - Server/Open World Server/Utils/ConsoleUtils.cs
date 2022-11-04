@@ -9,7 +9,7 @@ namespace OpenWorldServer
     {
         public static void UpdateTitle()
         {
-            Console.Title = Server.serverName + " " + Server.serverVersion + " / " + Networking.localAddress.ToString() + " / " + Networking.connectedClients.Count + " Of " + Server.maxPlayers + " Connected Players";
+            Console.Title = OpenWorldServer.serverName + " " + OpenWorldServer.serverVersion + " / " + Networking.localAddress.ToString() + " / " + Networking.connectedClients.Count + " Of " + OpenWorldServer.maxPlayers + " Connected Players";
         }
 
         public static void LogToConsole(string data)
@@ -52,7 +52,7 @@ namespace OpenWorldServer
         public static void WriteToLog(string data, LogMode mode = LogMode.General)
         {
             // Year-Month-Day is always superior because chronological=alphabetical.
-            string pathToday = Server.logFolderPath + Path.DirectorySeparatorChar + DateTime.Today.Year + "-" + DateTime.Today.Month + "-" + DateTime.Today.Day;
+            string pathToday = OpenWorldServer.logFolderPath + Path.DirectorySeparatorChar + DateTime.Today.Year + "-" + DateTime.Today.Month + "-" + DateTime.Today.Day;
             if (!Directory.Exists(pathToday)) Directory.CreateDirectory(pathToday);
 
             Dictionary<LogMode, string> files = new Dictionary<LogMode, string>()

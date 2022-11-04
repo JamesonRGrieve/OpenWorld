@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using OpenWorldServer.Web;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
-    public static class Server
+    public static class OpenWorldServer
     {
         //Meta
         public static bool exit = false;
@@ -70,6 +71,8 @@ namespace OpenWorldServer
         public static int overallPopulation;
         public static string latestClientVersion;
 
+
+
         static void Main()
         {
             ServerUtils.SetPaths();
@@ -85,6 +88,8 @@ namespace OpenWorldServer
             PlayerUtils.CheckAllAvailablePlayers(false);
 
             Threading.GenerateThreads(0);
+            Threading.GenerateThreads(3);
+
 
             while (!exit) ListenForCommands();
         }

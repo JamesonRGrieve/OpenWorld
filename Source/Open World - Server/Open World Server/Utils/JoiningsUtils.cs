@@ -89,7 +89,7 @@ namespace OpenWorldServer
 
         private static bool CheckIfUserExisted(ServerClient client)
         {
-            ServerClient clientToFetch = Server.savedClients.Find(fetch => fetch.username == client.username);
+            ServerClient clientToFetch = OpenWorldServer.savedClients.Find(fetch => fetch.username == client.username);
 
             if (clientToFetch == null) return false;
             else return true;
@@ -97,7 +97,7 @@ namespace OpenWorldServer
 
         private static bool CheckForPassword(ServerClient client)
         {
-            ServerClient clientToFetch = Server.savedClients.Find(fetch => fetch.username == client.username);
+            ServerClient clientToFetch = OpenWorldServer.savedClients.Find(fetch => fetch.username == client.username);
 
             client.username = clientToFetch.username;
 
@@ -119,11 +119,11 @@ namespace OpenWorldServer
         {
             string dataToSend = "Planet│";
 
-            float mmGC = Server.globeCoverage;
-            string mmS = Server.seed;
-            int mmOR = Server.overallRainfall;
-            int mmOT = Server.overallTemperature;
-            int mmOP = Server.overallPopulation;
+            float mmGC = OpenWorldServer.globeCoverage;
+            string mmS = OpenWorldServer.seed;
+            int mmOR = OpenWorldServer.overallRainfall;
+            int mmOT = OpenWorldServer.overallTemperature;
+            int mmOP = OpenWorldServer.overallPopulation;
 
             return dataToSend + mmGC + "│" + mmS + "│" + mmOR + "│" + mmOT + "│" + mmOP;
         }
@@ -132,18 +132,18 @@ namespace OpenWorldServer
         {
             string dataToSend = "Settlements│";
 
-            if (Server.savedSettlements.Count == 0) return dataToSend;
+            if (OpenWorldServer.savedSettlements.Count == 0) return dataToSend;
 
             else
             {
-                Dictionary<string, List<string>> settlements = Server.savedSettlements;
+                Dictionary<string, List<string>> settlements = OpenWorldServer.savedSettlements;
                 foreach (KeyValuePair<string, List<string>> pair in settlements)
                 {
                     if (pair.Value[0] == client.username) continue;
 
                     int factionValue = 0;
 
-                    ServerClient clientToCompare = Server.savedClients.Find(fetch => fetch.username == pair.Value[0]);
+                    ServerClient clientToCompare = OpenWorldServer.savedClients.Find(fetch => fetch.username == pair.Value[0]);
                     if (client.faction == null) factionValue = 0;
                     if (clientToCompare.faction == null) factionValue = 0;
                     else if (client.faction != null && clientToCompare.faction != null)
@@ -163,29 +163,29 @@ namespace OpenWorldServer
         {
             string dataToSend = "Variables│";
 
-            if (Server.savedClients.Find(fetch => fetch.username == client.username) != null)
+            if (OpenWorldServer.savedClients.Find(fetch => fetch.username == client.username) != null)
             {
-                client.isAdmin = Server.savedClients.Find(fetch => fetch.username == client.username).isAdmin;
+                client.isAdmin = OpenWorldServer.savedClients.Find(fetch => fetch.username == client.username).isAdmin;
             }
             else client.isAdmin = false;
 
-            int devInt = client.isAdmin || Server.allowDevMode ? 1 : 0;
+            int devInt = client.isAdmin || OpenWorldServer.allowDevMode ? 1 : 0;
 
             int wipeInt = client.toWipe ? 1 : 0;
 
             int roadInt = 0;
-            if (Server.usingRoadSystem) roadInt = 1;
-            if (Server.usingRoadSystem && Server.aggressiveRoadMode) roadInt = 2;
+            if (OpenWorldServer.usingRoadSystem) roadInt = 1;
+            if (OpenWorldServer.usingRoadSystem && OpenWorldServer.aggressiveRoadMode) roadInt = 2;
 
-            int chatInt = Server.usingChat ? 1 : 0;
+            int chatInt = OpenWorldServer.usingChat ? 1 : 0;
 
-            int profanityInt = Server.usingProfanityFilter ? 1 : 0;
+            int profanityInt = OpenWorldServer.usingProfanityFilter ? 1 : 0;
 
-            int modVerifyInt = Server.usingModVerification ? 1 : 0;
+            int modVerifyInt = OpenWorldServer.usingModVerification ? 1 : 0;
 
-            int enforcedDifficultyInt = Server.usingEnforcedDifficulty ? 1 : 0;
+            int enforcedDifficultyInt = OpenWorldServer.usingEnforcedDifficulty ? 1 : 0;
 
-            string name = Server.serverName;
+            string name = OpenWorldServer.serverName;
 
             return dataToSend + devInt + "│" + wipeInt + "│" + roadInt + "│" + chatInt + "│" + profanityInt + "│" + modVerifyInt + "│" + enforcedDifficultyInt + "│" + name;
         }
@@ -233,7 +233,7 @@ namespace OpenWorldServer
         public static bool CompareModsWithClient(ServerClient client, string data)
         {
             if (client.isAdmin) return true;
-            if (!Server.forceModlist) return true;
+            if (!OpenWorldServer.forceModlist) return true;
 
             string[] clientMods = data.Split('»');
 
@@ -243,20 +243,20 @@ namespace OpenWorldServer
 
             foreach (string clientMod in clientMods)
             {
-                if (Server.whitelistedMods.Contains(clientMod)) continue;
-                else if (Server.blacklistedMods.Contains(clientMod))
+                if (OpenWorldServer.whitelistedMods.Contains(clientMod)) continue;
+                else if (OpenWorldServer.blacklistedMods.Contains(clientMod))
                 {
                     flagged = true;
                     flaggedMods += clientMod + "»";
                 }
-                else if (!Server.enforcedMods.Contains(clientMod))
+                else if (!OpenWorldServer.enforcedMods.Contains(clientMod))
                 {
                     flagged = true;
                     flaggedMods += clientMod + "»";
                 }
             }
 
-            foreach (string serverMod in Server.enforcedMods)
+            foreach (string serverMod in OpenWorldServer.enforcedMods)
             {
                 if (!clientMods.Contains(serverMod))
                 {
@@ -295,10 +295,10 @@ namespace OpenWorldServer
 
         public static bool CompareConnectingClientWithWhitelist(ServerClient client)
         {
-            if (!Server.usingWhitelist) return true;
+            if (!OpenWorldServer.usingWhitelist) return true;
             if (client.isAdmin) return true;
 
-            foreach (string str in Server.whitelistedUsernames)
+            foreach (string str in OpenWorldServer.whitelistedUsernames)
             {
                 if (str == client.username) return true;
             }
@@ -311,9 +311,9 @@ namespace OpenWorldServer
 
         public static bool CompareConnectingClientVersion(ServerClient client, string clientVersion)
         {
-            if (string.IsNullOrWhiteSpace(Server.latestClientVersion)) return true;
+            if (string.IsNullOrWhiteSpace(OpenWorldServer.latestClientVersion)) return true;
 
-            if (clientVersion == Server.latestClientVersion) return true;
+            if (clientVersion == OpenWorldServer.latestClientVersion) return true;
             else
             {
                 Networking.SendData(client, "Disconnect│Version");
@@ -325,7 +325,7 @@ namespace OpenWorldServer
 
         public static bool CompareClientIPWithBans(ServerClient client)
         {
-            Dictionary<string, string> bannedIPs = Server.bannedIPs;
+            Dictionary<string, string> bannedIPs = OpenWorldServer.bannedIPs;
             foreach (KeyValuePair<string, string> pair in bannedIPs)
             {
                 if (pair.Key == ((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address.ToString() || pair.Value == client.username)
@@ -344,7 +344,7 @@ namespace OpenWorldServer
         {
             if (client.isAdmin) return true;
 
-            if (Networking.connectedClients.Count() >= Server.maxPlayers + 1)
+            if (Networking.connectedClients.Count() >= OpenWorldServer.maxPlayers + 1)
             {
                 Networking.SendData(client, "Disconnect│ServerFull");
                 client.disconnectFlag = true;

@@ -23,15 +23,15 @@ namespace OpenWorldServer
 
         public static void CheckEnforcedMods()
         {
-            if (!Directory.Exists(Server.enforcedModsFolderPath))
+            if (!Directory.Exists(OpenWorldServer.enforcedModsFolderPath))
             {
-                Directory.CreateDirectory(Server.enforcedModsFolderPath);
+                Directory.CreateDirectory(OpenWorldServer.enforcedModsFolderPath);
                 ConsoleUtils.LogToConsole("No Enforced Mods Folder Found, Generating");
             }
 
             else
             {
-                string[] modFolders = Directory.GetDirectories(Server.enforcedModsFolderPath);
+                string[] modFolders = Directory.GetDirectories(OpenWorldServer.enforcedModsFolderPath);
 
                 if (modFolders.Length == 0)
                 {
@@ -45,15 +45,15 @@ namespace OpenWorldServer
 
         public static void CheckWhitelistedMods()
         {
-            if (!Directory.Exists(Server.whitelistedModsFolderPath))
+            if (!Directory.Exists(OpenWorldServer.whitelistedModsFolderPath))
             {
-                Directory.CreateDirectory(Server.whitelistedModsFolderPath);
+                Directory.CreateDirectory(OpenWorldServer.whitelistedModsFolderPath);
                 ConsoleUtils.LogToConsole("No Whitelisted Mods Folder Found, Generating");
             }
 
             else
             {
-                string[] modFolders = Directory.GetDirectories(Server.whitelistedModsFolderPath);
+                string[] modFolders = Directory.GetDirectories(OpenWorldServer.whitelistedModsFolderPath);
 
                 if (modFolders.Length == 0) ConsoleUtils.LogToConsole("No Whitelisted Mods Found, Ignoring");
 
@@ -63,15 +63,15 @@ namespace OpenWorldServer
 
         public static void CheckBlacklistedMods()
         {
-            if (!Directory.Exists(Server.blacklistedModsFolderPath))
+            if (!Directory.Exists(OpenWorldServer.blacklistedModsFolderPath))
             {
-                Directory.CreateDirectory(Server.blacklistedModsFolderPath);
+                Directory.CreateDirectory(OpenWorldServer.blacklistedModsFolderPath);
                 ConsoleUtils.LogToConsole("No Blacklisted Mods Folder Found, Generating");
             }
 
             else
             {
-                string[] modFolders = Directory.GetDirectories(Server.blacklistedModsFolderPath);
+                string[] modFolders = Directory.GetDirectories(OpenWorldServer.blacklistedModsFolderPath);
 
                 if (modFolders.Length == 0) ConsoleUtils.LogToConsole("No Blacklisted Mods Found, Ignoring");
 
@@ -84,9 +84,9 @@ namespace OpenWorldServer
             int failedToLoadMods = 0;
             List<string> modList = new List<string>();
 
-            if (modType == 0) Server.enforcedMods.Clear();
-            else if (modType == 1) Server.whitelistedMods.Clear();
-            else if (modType == 2) Server.blacklistedMods.Clear();
+            if (modType == 0) OpenWorldServer.enforcedMods.Clear();
+            else if (modType == 1) OpenWorldServer.whitelistedMods.Clear();
+            else if (modType == 2) OpenWorldServer.blacklistedMods.Clear();
 
             foreach (string modFolder in modFolders)
             {
@@ -123,18 +123,18 @@ namespace OpenWorldServer
             modList.Sort();
             if (modType == 0)
             {
-                Server.enforcedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.enforcedMods.Count() + "] Enforced Mods");
+                OpenWorldServer.enforcedMods = modList;
+                ConsoleUtils.LogToConsole("Loaded [" + OpenWorldServer.enforcedMods.Count() + "] Enforced Mods");
             }
             else if (modType == 1)
             {
-                Server.whitelistedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.whitelistedMods.Count() + "] Whitelisted Mods");
+                OpenWorldServer.whitelistedMods = modList;
+                ConsoleUtils.LogToConsole("Loaded [" + OpenWorldServer.whitelistedMods.Count() + "] Whitelisted Mods");
             }
             else if (modType == 2)
             {
-                Server.blacklistedMods = modList;
-                ConsoleUtils.LogToConsole("Loaded [" + Server.blacklistedMods.Count() + "] Blacklisted Mods");
+                OpenWorldServer.blacklistedMods = modList;
+                ConsoleUtils.LogToConsole("Loaded [" + OpenWorldServer.blacklistedMods.Count() + "] Blacklisted Mods");
             }
 
             if (failedToLoadMods > 0)

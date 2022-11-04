@@ -28,7 +28,7 @@ namespace OpenWorldServer
 
                 ConsoleUtils.LogToConsole(messageForConsole);
 
-                Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
+                OpenWorldServer.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
                 ServerClient[] clients = Networking.connectedClients.ToArray();
                 foreach (ServerClient sc in clients)
@@ -213,7 +213,7 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.isImmunized = true;
-                    Server.savedClients.Find(fetch => fetch.username == targetClient.username).isImmunized = true;
+                    OpenWorldServer.savedClients.Find(fetch => fetch.username == targetClient.username).isImmunized = true;
                     PlayerUtils.SavePlayer(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -250,7 +250,7 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.isImmunized = false;
-                    Server.savedClients.Find(fetch => fetch.username == targetClient.username).isImmunized = false;
+                    OpenWorldServer.savedClients.Find(fetch => fetch.username == targetClient.username).isImmunized = false;
                     PlayerUtils.SavePlayer(targetClient);
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -287,7 +287,7 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.eventShielded = true;
-                    Server.savedClients.Find(fetch => fetch.username == targetClient.username).eventShielded = true;
+                    OpenWorldServer.savedClients.Find(fetch => fetch.username == targetClient.username).eventShielded = true;
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Player [" + targetClient.username + "] Has Been Protected");
@@ -323,7 +323,7 @@ namespace OpenWorldServer
                 else
                 {
                     targetClient.eventShielded = false;
-                    Server.savedClients.Find(fetch => fetch.username == targetClient.username).eventShielded = false;
+                    OpenWorldServer.savedClients.Find(fetch => fetch.username == targetClient.username).eventShielded = false;
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.WriteWithTime("Player [" + targetClient.username + "] Has Been Deprotected");
@@ -437,7 +437,7 @@ namespace OpenWorldServer
                     else
                     {
                         targetClient.isAdmin = true;
-                        Server.savedClients.Find(fetch => fetch.username == clientID).isAdmin = true;
+                        OpenWorldServer.savedClients.Find(fetch => fetch.username == clientID).isAdmin = true;
                         PlayerUtils.SavePlayer(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Promote");
@@ -486,7 +486,7 @@ namespace OpenWorldServer
                     else
                     {
                         targetClient.isAdmin = false;
-                        Server.savedClients.Find(fetch => fetch.username == targetClient.username).isAdmin = false;
+                        OpenWorldServer.savedClients.Find(fetch => fetch.username == targetClient.username).isAdmin = false;
                         PlayerUtils.SavePlayer(targetClient);
 
                         Networking.SendData(targetClient, "Admin│Demote");
@@ -515,7 +515,7 @@ namespace OpenWorldServer
 
             else
             {
-                ServerClient targetClient = Server.savedClients.Find(fetch => fetch.username == clientID);
+                ServerClient targetClient = OpenWorldServer.savedClients.Find(fetch => fetch.username == clientID);
 
                 if (targetClient == null)
                 {
@@ -592,7 +592,7 @@ namespace OpenWorldServer
 
             else
             {
-                Faction factionToSearch = Server.savedFactions.Find(fetch => fetch.name == commandData);
+                Faction factionToSearch = OpenWorldServer.savedFactions.Find(fetch => fetch.name == commandData);
 
                 if (factionToSearch == null)
                 {
@@ -668,10 +668,10 @@ namespace OpenWorldServer
 
                 else
                 {
-                    Server.bannedIPs.Add(((IPEndPoint)targetClient.tcp.Client.RemoteEndPoint).Address.ToString(), targetClient.username);
+                    OpenWorldServer.bannedIPs.Add(((IPEndPoint)targetClient.tcp.Client.RemoteEndPoint).Address.ToString(), targetClient.username);
                     targetClient.disconnectFlag = true;
 
-                    SaveSystem.SaveBannedIPs(Server.bannedIPs);
+                    SaveSystem.SaveBannedIPs(OpenWorldServer.bannedIPs);
                     Console.ForegroundColor = ConsoleColor.Green;
                     ConsoleUtils.LogToConsole("Player [" + targetClient.username + "] Has Been Banned");
                     ConsoleUtils.LogToConsole(Environment.NewLine);
@@ -694,12 +694,12 @@ namespace OpenWorldServer
 
             else
             {
-                foreach (KeyValuePair<string, string> pair in Server.bannedIPs)
+                foreach (KeyValuePair<string, string> pair in OpenWorldServer.bannedIPs)
                 {
                     if (pair.Value == clientID)
                     {
-                        Server.bannedIPs.Remove(pair.Key);
-                        SaveSystem.SaveBannedIPs(Server.bannedIPs);
+                        OpenWorldServer.bannedIPs.Remove(pair.Key);
+                        SaveSystem.SaveBannedIPs(OpenWorldServer.bannedIPs);
                         Console.ForegroundColor = ConsoleColor.Green;
                         ConsoleUtils.LogToConsole("Player [" + pair.Value + "] Has Been Unbanned");
                         Console.ForegroundColor = ConsoleColor.White;

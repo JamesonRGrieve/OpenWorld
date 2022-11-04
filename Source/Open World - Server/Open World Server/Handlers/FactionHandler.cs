@@ -21,15 +21,15 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("Factions Check:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (!Directory.Exists(Server.factionsFolderPath))
+            if (!Directory.Exists(OpenWorldServer.factionsFolderPath))
             {
-                Directory.CreateDirectory(Server.factionsFolderPath);
+                Directory.CreateDirectory(OpenWorldServer.factionsFolderPath);
                 ConsoleUtils.LogToConsole("No Factions Folder Found, Generating");
             }
 
             else
             {
-                string[] factionFiles = Directory.GetFiles(Server.factionsFolderPath);
+                string[] factionFiles = Directory.GetFiles(OpenWorldServer.factionsFolderPath);
 
                 if (factionFiles.Length == 0)
                 {
@@ -50,7 +50,7 @@ namespace OpenWorldServer
 
             factionLeader.faction = newFaction;
 
-            ServerClient clientToSave = Server.savedClients.Find(fetch => fetch.username == factionLeader.username);
+            ServerClient clientToSave = OpenWorldServer.savedClients.Find(fetch => fetch.username == factionLeader.username);
             clientToSave.faction = newFaction;
             PlayerUtils.SavePlayer(clientToSave);
 
@@ -61,7 +61,7 @@ namespace OpenWorldServer
 
         public static void SaveFaction(Faction factionToSave)
         {
-            string factionSavePath = Server.factionsFolderPath + Path.DirectorySeparatorChar + factionToSave.name + ".bin";
+            string factionSavePath = OpenWorldServer.factionsFolderPath + Path.DirectorySeparatorChar + factionToSave.name + ".bin";
 
             if (factionToSave.members.Count() > 1)
             {
@@ -77,7 +77,7 @@ namespace OpenWorldServer
             s.Close();
             s.Dispose();
 
-            if (!Server.savedFactions.Contains(factionToSave)) Server.savedFactions.Add(factionToSave);
+            if (!OpenWorldServer.savedFactions.Contains(factionToSave)) OpenWorldServer.savedFactions.Add(factionToSave);
         }
 
         public static void LoadFactions(string[] factionFiles)
@@ -107,13 +107,13 @@ namespace OpenWorldServer
                         continue;
                     }
 
-                    Faction factionToFetch = Server.savedFactions.Find(fetch => fetch.name == factionToLoad.name);
-                    if (factionToFetch == null) Server.savedFactions.Add(factionToLoad);
+                    Faction factionToFetch = OpenWorldServer.savedFactions.Find(fetch => fetch.name == factionToLoad.name);
+                    if (factionToFetch == null) OpenWorldServer.savedFactions.Add(factionToLoad);
                 }
                 catch { failedToLoadFactions++; }
             }
 
-            ConsoleUtils.LogToConsole("Loaded [" + Server.savedFactions.Count() + "] Factions");
+            ConsoleUtils.LogToConsole("Loaded [" + OpenWorldServer.savedFactions.Count() + "] Factions");
 
             if (failedToLoadFactions > 0)
             {
@@ -125,9 +125,9 @@ namespace OpenWorldServer
 
         public static void DisbandFaction(Faction factionToDisband)
         {
-            Server.savedFactions.Remove(factionToDisband);
+            OpenWorldServer.savedFactions.Remove(factionToDisband);
 
-            string factionSavePath = Server.factionsFolderPath + Path.DirectorySeparatorChar + factionToDisband.name + ".bin";
+            string factionSavePath = OpenWorldServer.factionsFolderPath + Path.DirectorySeparatorChar + factionToDisband.name + ".bin";
             File.Delete(factionSavePath);
         }
 
@@ -139,7 +139,7 @@ namespace OpenWorldServer
 
             else
             {
-                Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.faction.name);
+                Faction factionToCheck = OpenWorldServer.savedFactions.Find(fetch => fetch.name == client.faction.name);
 
                 dataToSend += factionToCheck.name + "│";
 
@@ -166,7 +166,7 @@ namespace OpenWorldServer
                 //Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            ServerClient saved = Server.savedClients.Find(fetch => fetch.username == memberToAdd.username);
+            ServerClient saved = OpenWorldServer.savedClients.Find(fetch => fetch.username == memberToAdd.username);
             if (saved != null)
             {
                 saved.faction = faction;
@@ -194,7 +194,7 @@ namespace OpenWorldServer
                 Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            ServerClient saved = Server.savedClients.Find(fetch => fetch.username == memberToRemove.username);
+            ServerClient saved = OpenWorldServer.savedClients.Find(fetch => fetch.username == memberToRemove.username);
             if (saved != null)
             {
                 saved.faction = null;
@@ -222,7 +222,7 @@ namespace OpenWorldServer
                     Networking.SendData(connected, GetFactionDetails(connected));
                 }
 
-                ServerClient saved = Server.savedClients.Find(fetch => fetch.username == dummy.username);
+                ServerClient saved = OpenWorldServer.savedClients.Find(fetch => fetch.username == dummy.username);
                 if (saved != null)
                 {
                     saved.faction = null;
