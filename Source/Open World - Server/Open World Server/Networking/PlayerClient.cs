@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using OpenWorldServer.Data;
@@ -32,15 +33,17 @@ namespace OpenWorldServer
         public PlayerClient(TcpClient userSocket)
         {
             this.tcpClient = userSocket;
-            if (this.tcpClient != null)
-            {
-                this.tcpClient.NoDelay = false;
-            }
             this.Account = new PlayerData();
         }
 
         public void SendData(string data)
         {
+            if (!this.IsConnected)
+            {
+                ConsoleUtils.LogToConsole($"Can't send Data to [{this.Account.Username}] since Player is not connected", ConsoleColor.Yellow);
+                return;
+            }
+
             var encryptedData = Encryption.EncryptString(data);
             try
             {
@@ -48,8 +51,12 @@ namespace OpenWorldServer
                 sw.WriteLine(encryptedData);
                 sw.Flush();
             }
-            catch
+            catch (Exception ex)
             {
+                // depending on the error we could catch explicit exceptions and target client to disconnect
+                // for now we just log them
+                Console.WriteLine($"Error Sanding Data by Player [{this.Account.Username}]:", ConsoleColor.Red);
+                Console.WriteLine(ex.Message, ConsoleColor.Red);
             }
         }
 
@@ -62,20 +69,16 @@ namespace OpenWorldServer
                 string data = null;
                 if (this.IsConnected)
                 {
-                    string encryptedData = null;
-                    try
-                    {
-                        var sr = new StreamReader(this.tcpClient.GetStream(), true);
-                        encryptedData = sr.ReadLine();
-                    }
-                    catch
-                    {
-                    }
-
+                    var sr = new StreamReader(this.tcpClient.GetStream(), true);
+                    var encryptedData = sr.ReadLine();
                     data = Encryption.DecryptString(encryptedData);
                 }
 
                 return data;
+            }
+            catch
+            {
+                return null;
             }
             finally
             {
