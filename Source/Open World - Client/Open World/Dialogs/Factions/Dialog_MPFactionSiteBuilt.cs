@@ -86,7 +86,7 @@ namespace OpenWorld
                     else Main._ParametersCache.focusedSettlement = settlementToUse;
 
                     if (RimworldHandler.CheckIfAnySocialPawn(0)) Find.WindowStack.Add(new Dialog_MPFactionSiloDeposit());
-                    else Find.WindowStack.Add(new Dialog_MPNoSocialSkill());
+                    else Find.WindowStack.Add(new OW_ErrorDialog("Pawn does not have enough social to trade"));
                 }
             }
 
@@ -119,25 +119,25 @@ namespace OpenWorld
                 if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 5 - 40), new Vector2(buttonX * 2, buttonY)), "Receive Food"))
                 {
                     Main._ParametersCache.productionSiteProduct = 1;
-                    Find.WindowStack.Add(new Dialog_MPFactionProductionProductChanged());
+                    Find.WindowStack.Add(new OW_InfoDialog("This material has been temporarily increased"));
                 }
 
                 if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 4 - 30), new Vector2(buttonX * 2, buttonY)), "Receive Silver"))
                 {
                     Main._ParametersCache.productionSiteProduct = 2;
-                    Find.WindowStack.Add(new Dialog_MPFactionProductionProductChanged());
+                    Find.WindowStack.Add(new OW_InfoDialog("This material has been temporarily increased"));
                 }
 
                 if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 3 - 20), new Vector2(buttonX * 2, buttonY)), "Receive Components"))
                 {
                     Main._ParametersCache.productionSiteProduct = 3;
-                    Find.WindowStack.Add(new Dialog_MPFactionProductionProductChanged());
+                    Find.WindowStack.Add(new OW_InfoDialog("This material has been temporarily increased"));
                 }
 
                 if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 2 - 10), new Vector2(buttonX * 2, buttonY)), "Receive Fuel"))
                 {
                     Main._ParametersCache.productionSiteProduct = 4;
-                    Find.WindowStack.Add(new Dialog_MPFactionProductionProductChanged());
+                    Find.WindowStack.Add(new OW_InfoDialog("This material has been temporarily increased"));
                 }
             }
 
@@ -154,7 +154,58 @@ namespace OpenWorld
 
                 if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 2 - 10), new Vector2(buttonX * 2, buttonY)), "Utilize"))
                 {
-                    Find.WindowStack.Add(new Dialog_MPNotImplemented());
+                    Find.WindowStack.Add(new OW_ErrorDialog("This action is not implemented yet"));
+                }
+            }
+
+            else if (siteType == 4)
+            {
+                windowTitle = "Bank Management Menu";
+                windowDescription = "Generate passive wealth over time";
+
+                Text.Font = GameFont.Small;
+                Widgets.Label(new Rect(centeredX - Text.CalcSize(windowDescription).x / 2, windowDescriptionDif, Text.CalcSize(windowDescription).x, Text.CalcSize(windowDescription).y), windowDescription);
+                Text.Font = GameFont.Medium;
+
+                Widgets.DrawLineHorizontal(rect.x, descriptionLineDif, rect.width);
+
+                if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 2 - 10), new Vector2(buttonX * 2, buttonY)), "Utilize"))
+                {
+                    Find.WindowStack.Add(new OW_ErrorDialog("This action is not implemented yet"));
+                }
+            }
+
+            else if (siteType == 5)
+            {
+                windowTitle = "Stable Management Menu";
+                windowDescription = "Jump between stables from all the planet";
+
+                Text.Font = GameFont.Small;
+                Widgets.Label(new Rect(centeredX - Text.CalcSize(windowDescription).x / 2, windowDescriptionDif, Text.CalcSize(windowDescription).x, Text.CalcSize(windowDescription).y), windowDescription);
+                Text.Font = GameFont.Medium;
+
+                Widgets.DrawLineHorizontal(rect.x, descriptionLineDif, rect.width);
+
+                if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 2 - 10), new Vector2(buttonX * 2, buttonY)), "Utilize"))
+                {
+                    Find.WindowStack.Add(new OW_ErrorDialog("This action is not implemented yet"));
+                }
+            }
+
+            else if (siteType == 6)
+            {
+                windowTitle = "Courier Station Management Menu";
+                windowDescription = "Trade over unlimited distances with everyone";
+
+                Text.Font = GameFont.Small;
+                Widgets.Label(new Rect(centeredX - Text.CalcSize(windowDescription).x / 2, windowDescriptionDif, Text.CalcSize(windowDescription).x, Text.CalcSize(windowDescription).y), windowDescription);
+                Text.Font = GameFont.Medium;
+
+                Widgets.DrawLineHorizontal(rect.x, descriptionLineDif, rect.width);
+
+                if (Widgets.ButtonText(new Rect(new Vector2(centeredX - (buttonX / 2) * 2, rect.yMax - buttonY * 2 - 10), new Vector2(buttonX * 2, buttonY)), "Utilize"))
+                {
+                    Find.WindowStack.Add(new OW_ErrorDialog("This action is not implemented yet"));
                 }
             }
 
@@ -280,7 +331,7 @@ namespace OpenWorld
                             Main._ParametersCache.focusedTile = settlement.Tile;
 
                             if (RimworldHandler.CheckIfAnySocialPawn(0)) Find.WindowStack.Add(new Dialog_MPTrade());
-                            else Find.WindowStack.Add(new Dialog_MPNoSocialSkill());
+                            else Find.WindowStack.Add(new OW_ErrorDialog("Pawn does not have enough social to trade"));
                         }
                     }
                 }
@@ -291,7 +342,7 @@ namespace OpenWorld
                         if (settlement.Tile == pair.Key)
                         {
                             if (RimworldHandler.CheckIfAnySocialPawn(0)) Find.WindowStack.Add(new Dialog_MPBarter(false, null));
-                            else Find.WindowStack.Add(new Dialog_MPNoSocialSkill());
+                            else Find.WindowStack.Add(new OW_ErrorDialog("Pawn does not have enough social to trade"));
                         }
                     }
                 }
@@ -305,7 +356,7 @@ namespace OpenWorld
                             Main._ParametersCache.focusedTile = settlement.Tile;
 
                             if (RimworldHandler.CheckIfAnySocialPawn(0)) Find.WindowStack.Add(new Dialog_MPGift());
-                            else Find.WindowStack.Add(new Dialog_MPNoSocialSkill());
+                            else Find.WindowStack.Add(new OW_ErrorDialog("Pawn does not have enough social to trade"));
                         }
                     }
                 }

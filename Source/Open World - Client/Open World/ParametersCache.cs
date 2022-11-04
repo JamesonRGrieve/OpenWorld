@@ -30,6 +30,9 @@ namespace OpenWorld
         public bool secretFlag;
         public bool spyWarnFlag;
         public bool hasLoadedCorrectly;
+        public bool isLoadingExistingGame;
+        public bool isGeneratingNewOnlineGame;
+        public bool isPlayingOnline;
 
         //Planet Factions
         public List<Faction> allFactions = new List<Faction>();
@@ -93,7 +96,6 @@ namespace OpenWorld
 
         //General Purpose
         public string gameSavePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow") + Path.DirectorySeparatorChar + "Ludeon Studios" + Path.DirectorySeparatorChar + "RimWorld by Ludeon Studios" + Path.DirectorySeparatorChar + "Saves";
-        public Dialog_MPDisconnected __MPDisconnected;
 
         //Dialog_MPParameters
         public string ipText;
@@ -105,9 +107,6 @@ namespace OpenWorld
         public string onlineFileSaveName = "Open World Save";
         public string modIdentifier = "OpenWorld";
         public string connectedServerIdentifier = "";
-        public bool isLoadingExistingGame = false;
-        public bool isGeneratingNewOnlineGame = false;
-        public bool isPlayingOnline = false;
         public bool isAdmin = false;
 
         //Letters
