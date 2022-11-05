@@ -19,6 +19,7 @@ namespace OpenWorldServer
         private readonly ServerConfig serverConfig;
         private readonly PlayerHandler playerHandler;
         private readonly ModHandler modHandler;
+        private readonly WorldMapHandler worldMapHandler;
 
         public bool IsRunning { get; set; } = false;
 
@@ -47,6 +48,7 @@ namespace OpenWorldServer
             // Setting up Server
             this.modHandler = new ModHandler(serverConfig);
             this.playerHandler = new PlayerHandler(serverConfig);
+            this.worldMapHandler = new WorldMapHandler(this.playerHandler);
 
             this.SetupStaticProxy();
 
@@ -238,6 +240,7 @@ namespace OpenWorldServer
             StaticProxy.serverConfig = this.serverConfig;
             StaticProxy.modHandler = this.modHandler;
             StaticProxy.playerHandler = this.playerHandler;
+            StaticProxy.worldMapHandler = this.worldMapHandler;
         }
 
         public static void ListenForCommands()

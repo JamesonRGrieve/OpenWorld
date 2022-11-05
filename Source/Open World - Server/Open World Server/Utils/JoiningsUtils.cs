@@ -88,8 +88,8 @@ namespace OpenWorldServer
 
             Networking.SendData(client, GetVariablesToSend(client));
 
-            //ServerUtils.SendPlayerList(client);
-            client.SendData("PlayerList││1");
+            var usernames = StaticProxy.playerHandler.ConnectedClients.Select(c => c.Account?.Username);
+            client.SendData(new PlayerListPacket(usernames.ToArray()));
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
 
@@ -104,7 +104,8 @@ namespace OpenWorldServer
 
             Networking.SendData(client, GetVariablesToSend(client));
 
-            ServerUtils.SendPlayerList(client);
+            var usernames = StaticProxy.playerHandler.ConnectedClients.Select(c => c.Account?.Username);
+            client.SendData(new PlayerListPacket(usernames.ToArray()));
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
 

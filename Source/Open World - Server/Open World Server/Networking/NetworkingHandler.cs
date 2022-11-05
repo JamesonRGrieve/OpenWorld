@@ -28,9 +28,8 @@ namespace OpenWorldServer
                 }
                 catch { }
 
-                WorldUtils.CheckForTileDisponibility(client, data.Split('│')[2]);
+                StaticProxy.worldMapHandler.TryToClaimTile(client, data.Split('│')[2]);
             }
-
             else if (data.StartsWith("UserSettlement│AbandonSettlementID│"))
             {
                 if (client.Account.HomeTileId != data.Split('│')[2] || string.IsNullOrWhiteSpace(client.Account.HomeTileId))
@@ -38,7 +37,6 @@ namespace OpenWorldServer
                 else
                     StaticProxy.worldMapHandler.NotifySettlementRemoved(data.Split('│')[2]);
             }
-
             else if (data == "UserSettlement│NoSettlementInLoad")
             {
                 if (string.IsNullOrWhiteSpace(client.Account.HomeTileId))

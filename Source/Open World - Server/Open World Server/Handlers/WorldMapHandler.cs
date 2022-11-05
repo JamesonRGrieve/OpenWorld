@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenWorld.Shared.Networking.Packets;
@@ -21,6 +22,58 @@ namespace OpenWorldServer.Handlers
         public bool IsTileAvailable(string tileID) => this.GetAccountFromTile(tileID) != null;
 
         public PlayerData GetAccountFromTile(string tileID) => this.GetAccountsWithSettlements.FirstOrDefault(a => a.HomeTileId == tileID);
+
+        public void TryToClaimTile(PlayerClient client, string tileID)
+        {
+            var playerDataFromTile = StaticProxy.worldMapHandler.GetAccountFromTile(tileID);
+            if (playerDataFromTile != null &&
+                playerDataFromTile.Username != client.Account.Username)
+            {
+                Networking.SendData(client, "Disconnect│Corrupted");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleColor.Red);
+                return;
+            }
+
+            this.AddSettlement(client, tileID);
+        }
+
+        private void AddSettlement(PlayerClient client, string tileId)
+        {
+            client.Account.HomeTileId = tileId;
+            StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+
+            int factionValue = 0;
+            foreach (var connectedClient in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            {
+                if (connectedClient.Account.Username == connectedClient.Account.Username)
+                {
+                    continue;
+                }
+
+                if (client.Account.Faction == null ||
+                    connectedClient.Account.Faction == null)
+                {
+                    factionValue = 0;
+                }
+                else if (client.Account.Faction != null && connectedClient.Account.Faction != null)
+                {
+                    if (client.Account.Faction.name == connectedClient.Account.Faction.name)
+                    {
+                        factionValue = 1;
+                    }
+                    else
+                    {
+                        factionValue = 2;
+                    }
+                }
+
+                var packet = new SettlementBuilderPacket(tileId, client.Account.Username, factionValue);
+                connectedClient.SendData(packet);
+                this.NotifySettlementAdded(tileId, client.Account.Username, factionValue);
+            }
+
+            ConsoleUtils.LogToConsole("Settlement with ID [" + tileId + "] and Owner [" + client.Account.Username + "] has been Added");
+        }
 
         public void NotifySettlementAdded(string tileId, string username, int factionValue)
         {

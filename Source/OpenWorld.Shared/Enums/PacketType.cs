@@ -6,6 +6,8 @@
         Ping = 1,
 
         Connect = 10,
+        Disconnect = 11,
+        PlayerList = 12,
 
         SettlementBuilder = 20,
     }

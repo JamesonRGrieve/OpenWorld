@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using OpenWorld.Shared.Networking.Packets;
 
 namespace OpenWorldServer
 {
@@ -85,38 +86,13 @@ namespace OpenWorldServer
 
         public static void SendPlayerListToAll(PlayerClient client)
         {
-            foreach (PlayerClient sc in Networking.connectedClients)
+            var clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
+            foreach (var sc in clients)
             {
                 if (sc == client) continue;
 
-                SendPlayerList(sc);
-            }
-        }
-
-        public static void SendPlayerList(PlayerClient client)
-        {
-            string playersToSend = GetPlayersToSend(client);
-            Networking.SendData(client, playersToSend);
-        }
-
-        public static string GetPlayersToSend(PlayerClient client)
-        {
-            string dataToSend = "PlayerList│";
-
-            if (Networking.connectedClients.Count == 0) return dataToSend;
-
-            else
-            {
-                foreach (PlayerClient sc in Networking.connectedClients)
-                {
-                    if (sc == client) continue;
-
-                    else dataToSend += sc.Account.Username + ":";
-                }
-
-                dataToSend += "│" + Networking.connectedClients.Count();
-
-                return dataToSend;
+                var usernames = clients.Select(c => c.Account?.Username);
+                client.SendData(new PlayerListPacket(usernames.ToArray()));
             }
         }
     }

@@ -13,7 +13,7 @@ namespace OpenWorldServer
 
         public IPAddress IPAddress => ((IPEndPoint)this.tcpClient.Client.RemoteEndPoint).Address;
 
-        public bool DataAvailable => !this.isReceiving && (this.tcpClient?.GetStream()?.DataAvailable ?? false);
+        public bool DataAvailable => !this.isReceiving && this.IsConnected && (this.tcpClient?.GetStream()?.DataAvailable ?? false);
 
         public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
 
@@ -58,8 +58,9 @@ namespace OpenWorldServer
             {
                 // depending on the error we could catch explicit exceptions and target client to disconnect
                 // for now we just log them
-                Console.WriteLine($"Error Sanding Data by Player [{this.Account.Username}]:", ConsoleColor.Red);
-                Console.WriteLine(ex.Message, ConsoleColor.Red);
+                ConsoleUtils.LogToConsole($"Error sending Data to Player [{this.Account.Username}] ({ex.GetType().Name}):", ConsoleColor.Red);
+                ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
+                this.IsDisconnecting = true;
             }
         }
 
@@ -70,7 +71,7 @@ namespace OpenWorldServer
                 this.isReceiving = true;
 
                 string data = null;
-                if (this.IsConnected)
+                if (this.IsConnected && !this.IsDisconnecting)
                 {
                     var sr = new StreamReader(this.tcpClient.GetStream(), true);
                     var encryptedData = sr.ReadLine();
