@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 
 namespace OpenWorldServer.Handlers.Old
@@ -35,7 +31,7 @@ namespace OpenWorldServer.Handlers.Old
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, "FactionManagement│ProductionSite│Tick");

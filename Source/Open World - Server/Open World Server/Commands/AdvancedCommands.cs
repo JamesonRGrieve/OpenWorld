@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
@@ -27,7 +28,7 @@ namespace OpenWorldServer
 
                 Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
-                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
                 foreach (PlayerClient sc in clients)
                 {
                     Networking.SendData(sc, "ChatMessage│SERVER│" + commandData);
@@ -46,7 +47,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
                 foreach (PlayerClient sc in clients)
                 {
                     Networking.SendData(sc, "Notification│" + commandData);
@@ -77,7 +78,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -125,7 +126,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -169,7 +170,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
                 foreach (PlayerClient client in clients)
                 {
                     Networking.SendData(client, "GiftedItems│" + itemID + "┼" + itemQuantity + "┼" + itemQuality + "┼");
@@ -198,7 +199,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -235,7 +236,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -272,7 +273,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -308,7 +309,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -352,7 +353,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -385,7 +386,7 @@ namespace OpenWorldServer
                 Console.WriteLine();
             }
 
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
                 Networking.SendData(client, "ForcedEvent│" + eventID);
@@ -413,7 +414,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -462,7 +463,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -526,9 +527,9 @@ namespace OpenWorldServer
                     bool isConnected = false;
                     string ip = "None";
 
-                    if (Networking.connectedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username) != null)
+                    if (StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == targetClient.Account.Username) != null)
                     {
-                        clientToInvestigate = Networking.connectedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username);
+                        clientToInvestigate = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == targetClient.Account.Username);
                         isConnected = true;
                         ip = clientToInvestigate.IPAddress.ToString();
                     }
@@ -655,7 +656,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {
@@ -714,7 +715,7 @@ namespace OpenWorldServer
 
             else
             {
-                PlayerClient targetClient = Networking.connectedClients.Find(fetch => fetch.Account.Username == clientID);
+                PlayerClient targetClient = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == clientID);
 
                 if (targetClient == null)
                 {

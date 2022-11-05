@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace OpenWorldServer
@@ -7,8 +8,6 @@ namespace OpenWorldServer
     {
         public static IPAddress localAddress;
         public static int serverPort = 0;
-
-        public static List<PlayerClient> connectedClients = new List<PlayerClient>();
 
         public static void ReadyServer()
         {
@@ -32,7 +31,7 @@ namespace OpenWorldServer
 
         public static void KickClients(PlayerClient client)
         {
-            connectedClients.Remove(client);
+            StaticProxy.playerHandler.RemovePlayer(client);
 
             client.Dispose();
 
@@ -46,7 +45,7 @@ namespace OpenWorldServer
             while (true)
             {
 
-                PlayerClient[] actualClients = connectedClients.ToArray();
+                PlayerClient[] actualClients = StaticProxy.playerHandler.ConnectedClients.ToArray();
 
                 List<PlayerClient> clientsToDisconnect = new List<PlayerClient>();
 

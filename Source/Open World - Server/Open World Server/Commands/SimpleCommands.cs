@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
@@ -139,7 +140,7 @@ namespace OpenWorldServer
 
         public static void ExitCommand()
         {
-            PlayerClient[] clientsToKick = Networking.connectedClients.ToArray();
+            PlayerClient[] clientsToKick = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clientsToKick)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
@@ -195,7 +196,7 @@ namespace OpenWorldServer
             ConsoleUtils.WriteWithTime("Players:");
             Console.ForegroundColor = ConsoleColor.White;
 
-            ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
+            ConsoleUtils.WriteWithTime("Connected Players: " + StaticProxy.playerHandler.ConnectedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Settlements: " + StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count);
             ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
@@ -328,7 +329,7 @@ namespace OpenWorldServer
 
             if (response == "Y")
             {
-                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
                 foreach (PlayerClient client in clients)
                 {
                     client.IsDisconnecting = true;
@@ -358,14 +359,14 @@ namespace OpenWorldServer
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
+            ConsoleUtils.WriteWithTime("Connected Players: " + StaticProxy.playerHandler.ConnectedClients.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Networking.connectedClients.Count == 0)
+            if (StaticProxy.playerHandler.ConnectedClients.Count == 0)
                 ConsoleUtils.WriteWithTime("No Players Connected");
             else
             {
-                PlayerClient[] clients = Networking.connectedClients.ToArray();
+                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
                 foreach (PlayerClient client in clients)
                 {
                     try

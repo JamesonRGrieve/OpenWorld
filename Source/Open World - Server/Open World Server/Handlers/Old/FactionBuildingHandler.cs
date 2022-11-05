@@ -1,4 +1,6 @@
-﻿namespace OpenWorldServer.Handlers.Old
+﻿using System.Linq;
+
+namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionBuildingHandler
     {
@@ -57,7 +59,7 @@
             FactionHandler.SaveFaction(faction);
 
             int factionValue = 0;
-            foreach (PlayerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
             {
                 if (client.Account.Faction == null) factionValue = 0;
                 if (client.Account.Faction != null)
@@ -83,7 +85,7 @@
 
             FactionHandler.SaveFaction(faction);
 
-            foreach (PlayerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
             {
                 Networking.SendData(client, "FactionStructureBuilder│RemoveStructure" + "│" + structureTile);
             }

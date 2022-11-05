@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading;
 using OpenWorldServer.Services;
 
 namespace OpenWorldServer.Handlers.Old
@@ -157,7 +156,7 @@ namespace OpenWorldServer.Handlers.Old
             faction.members.Add(memberToAdd, MemberRank.Member);
             SaveFaction(faction);
 
-            PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == memberToAdd.Account.Username);
+            PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToAdd.Account.Username);
             if (connected != null)
             {
                 connected.Account.Faction = faction;
@@ -186,7 +185,7 @@ namespace OpenWorldServer.Handlers.Old
                 }
             }
 
-            PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == memberToRemove.Account.Username);
+            PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToRemove.Account.Username);
             if (connected != null)
             {
                 connected.Account.Faction = null;
@@ -214,7 +213,7 @@ namespace OpenWorldServer.Handlers.Old
 
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     connected.Account.Faction = null;
@@ -288,7 +287,7 @@ namespace OpenWorldServer.Handlers.Old
 
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = Networking.connectedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetFactionDetails(connected));

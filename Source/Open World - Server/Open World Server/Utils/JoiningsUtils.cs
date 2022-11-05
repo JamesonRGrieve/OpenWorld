@@ -295,7 +295,7 @@ namespace OpenWorldServer
 
         public static void CompareConnectingClientWithConnecteds(PlayerClient client)
         {
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.Username == client.Account.Username)
@@ -342,7 +342,7 @@ namespace OpenWorldServer
         {
             if (client.Account.IsAdmin) return true;
 
-            if (Networking.connectedClients.Count() >= StaticProxy.serverConfig.MaxPlayers + 1)
+            if (StaticProxy.playerHandler.ConnectedClients.Count >= StaticProxy.serverConfig.MaxPlayers + 1)
             {
                 Networking.SendData(client, "Disconnect│ServerFull");
                 client.IsDisconnecting = true;

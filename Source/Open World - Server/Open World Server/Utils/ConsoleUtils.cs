@@ -9,7 +9,7 @@ namespace OpenWorldServer
     {
         public static void UpdateTitle()
         {
-            Console.Title = StaticProxy.serverConfig.ServerName + " " + Server.serverVersion + " / " + Networking.connectedClients.Count + " Of " + StaticProxy.serverConfig.MaxPlayers + " Connected Players";
+            Console.Title = StaticProxy.serverConfig.ServerName + " " + Server.serverVersion + " / " + StaticProxy.playerHandler.ConnectedClients.Count + " Of " + StaticProxy.serverConfig.MaxPlayers + " Connected Players";
         }
 
         public static void LogTitleToConsole(string title)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using OpenWorldServer.Services;
 
 namespace OpenWorldServer
@@ -168,7 +169,7 @@ namespace OpenWorldServer
 
         public static bool CheckForConnectedPlayers(string tileID)
         {
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID) return true;
@@ -179,12 +180,12 @@ namespace OpenWorldServer
 
         public static PlayerClient GetPlayerFromTile(string tileID)
         {
-            return Networking.connectedClients.Find(fetch => fetch.Account.HomeTileId == tileID);
+            return StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
         }
 
         public static bool CheckForPlayerShield(string tileID)
         {
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID && !client.IsEventProtected && !client.Account.IsImmunized)
@@ -199,7 +200,7 @@ namespace OpenWorldServer
 
         public static bool CheckForPvpAvailability(string tileID)
         {
-            foreach (PlayerClient client in Networking.connectedClients)
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
             {
                 if (client.Account.HomeTileId == tileID && !client.InRTSE && !client.Account.IsImmunized)
                 {
@@ -213,7 +214,7 @@ namespace OpenWorldServer
 
         public static string GetSpyData(string tileID, PlayerClient origin)
         {
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID)
@@ -243,7 +244,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "ForcedEvent│" + data.Split('│')[1];
 
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[2])
@@ -260,7 +261,7 @@ namespace OpenWorldServer
             string tileToSend = data.Split('│')[1];
             string dataToSend = "GiftedItems│" + data.Split('│')[2];
 
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == tileToSend)
@@ -290,7 +291,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "TradeRequest│" + invoker.Account.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
 
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[1])
@@ -305,7 +306,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "BarterRequest│" + invoker.Account.HomeTileId + "│" + data.Split('│')[2];
 
-            PlayerClient[] clients = Networking.connectedClients.ToArray();
+            PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[1])

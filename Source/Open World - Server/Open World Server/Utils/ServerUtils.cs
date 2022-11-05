@@ -77,7 +77,7 @@ namespace OpenWorldServer
 
             Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
-            foreach (PlayerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
             {
                 if (sc == client) continue;
                 else Networking.SendData(sc, data);
