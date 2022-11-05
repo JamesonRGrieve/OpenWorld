@@ -8,7 +8,6 @@ namespace OpenWorldServer
     {
         internal static void ConnectHandle(PlayerClient client, ConnectPacket packet)
         {
-            JoiningsUtils.LoginProcedures(client, packet);
         }
 
         public static void ChatMessageHandle(PlayerClient client, string data)
