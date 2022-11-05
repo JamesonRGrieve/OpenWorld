@@ -4,6 +4,9 @@
     {
         Unkown = 0,
         Ping = 1,
+
         Connect = 10,
+
+        SettlementBuilder = 20,
     }
 }

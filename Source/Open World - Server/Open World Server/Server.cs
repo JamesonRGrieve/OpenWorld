@@ -29,7 +29,6 @@ namespace OpenWorldServer
 
         //Player Parameters
         public static List<PlayerClient> savedClients = new List<PlayerClient>();
-        public static Dictionary<string, List<string>> savedSettlements = new Dictionary<string, List<string>>();
 
         //Server Details
         public static string serverVersion = "v1.4.1";
@@ -126,7 +125,7 @@ namespace OpenWorldServer
             {
                 while (this.IsRunning)
                 {
-                    foreach (var client in this.playerHandler.ConnectedClients.ToList())
+                    foreach (var client in this.playerHandler.ConnectedClients.ToArray())
                     {
                         if (!client.IsConnected || client.IsDisconnecting)
                         {
@@ -151,9 +150,9 @@ namespace OpenWorldServer
                 var pingPacketData = new PingPacket().GetData();
                 while (this.IsRunning)
                 {
-                    var clients = this.playerHandler.ConnectedClients.ToList();
+                    var clients = this.playerHandler.ConnectedClients.ToArray();
 
-                    if (clients.Count == 0)
+                    if (clients.Length == 0)
                     {
                         Thread.Sleep(500);
                         continue;

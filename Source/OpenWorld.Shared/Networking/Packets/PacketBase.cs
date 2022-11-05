@@ -1,4 +1,5 @@
-﻿using OpenWorld.Shared.Enums;
+﻿using System.Collections.Generic;
+using OpenWorld.Shared.Enums;
 
 namespace OpenWorld.Shared.Networking.Packets
 {
@@ -14,5 +15,12 @@ namespace OpenWorld.Shared.Networking.Packets
         }
 
         public abstract string GetData();
+
+        protected string[] SplitData(string data) => data.Split(PacketHandler.PacketDataSplitter);
+
+        // we don't overload this method so we don't have to convert the list into an array first. Its not a huge save 
+        protected string BuildData(List<string> splits) => string.Join(PacketHandler.PacketDataSplitter, splits);
+
+        protected string BuildData(params string[] splits) => string.Join(PacketHandler.PacketDataSplitter, splits);
     }
 }

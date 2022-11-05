@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 
 namespace OpenWorldServer
@@ -35,6 +36,8 @@ namespace OpenWorldServer
             this.tcpClient = userSocket;
             this.Account = new PlayerData();
         }
+
+        public void SendData(IPacket packet) => this.SendData(packet.GetData());
 
         public void SendData(string data)
         {

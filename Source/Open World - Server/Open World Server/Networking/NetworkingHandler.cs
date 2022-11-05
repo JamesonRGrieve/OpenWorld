@@ -33,14 +33,18 @@ namespace OpenWorldServer
 
             else if (data.StartsWith("UserSettlement│AbandonSettlementID│"))
             {
-                if (client.Account.HomeTileId != data.Split('│')[2] || string.IsNullOrWhiteSpace(client.Account.HomeTileId)) return;
-                else WorldUtils.RemoveSettlement(client, data.Split('│')[2]);
+                if (client.Account.HomeTileId != data.Split('│')[2] || string.IsNullOrWhiteSpace(client.Account.HomeTileId))
+                    return;
+                else
+                    StaticProxy.worldMapHandler.NotifySettlementRemoved(data.Split('│')[2]);
             }
 
             else if (data == "UserSettlement│NoSettlementInLoad")
             {
-                if (string.IsNullOrWhiteSpace(client.Account.HomeTileId)) return;
-                else WorldUtils.RemoveSettlement(client, client.Account.HomeTileId);
+                if (string.IsNullOrWhiteSpace(client.Account.HomeTileId))
+                    return;
+                else
+                    StaticProxy.worldMapHandler.NotifySettlementRemoved(client.Account.HomeTileId);
             }
         }
 

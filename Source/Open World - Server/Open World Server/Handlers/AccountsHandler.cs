@@ -79,9 +79,6 @@ namespace OpenWorldServer.Handlers
                 Password = account.Password,
             };
 
-            // ToDo: Cleanup Settlement BUT NOT LIKE THIS
-            WorldUtils.RemoveSettlement(null, null);
-
             if (saveGiftsAndTrades)
             {
                 newPlayerData.TradeString = account.TradeString;

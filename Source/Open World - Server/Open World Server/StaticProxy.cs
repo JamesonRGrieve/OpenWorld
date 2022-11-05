@@ -9,5 +9,6 @@ namespace OpenWorldServer
         public static ServerConfig serverConfig;
         public static PlayerHandler playerHandler;
         public static ModHandler modHandler;
+        public static WorldMapHandler worldMapHandler;
     }
 }

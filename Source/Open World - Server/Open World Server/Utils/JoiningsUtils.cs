@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Enums;
@@ -80,6 +79,7 @@ namespace OpenWorldServer
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
+            StaticProxy.worldMapHandler.NotifySettlementRemoved(client.Account.HomeTileId);
             StaticProxy.playerHandler.AccountsHandler.ResetAccount(client, true);
 
             Networking.SendData(client, GetPlanetToSend());
@@ -134,29 +134,38 @@ namespace OpenWorldServer
         {
             string dataToSend = "Settlements│";
 
-            if (Server.savedSettlements.Count == 0) return dataToSend;
-
+            var settlementAccounts = StaticProxy.worldMapHandler.GetAccountsWithSettlements;
+            if (settlementAccounts.Count == 0)
+            {
+                return dataToSend;
+            }
             else
             {
-                Dictionary<string, List<string>> settlements = Server.savedSettlements;
-                foreach (KeyValuePair<string, List<string>> pair in settlements)
+                foreach (var settlementAccount in settlementAccounts)
                 {
-                    if (pair.Value[0] == client.Account.Username) continue;
-
-                    int factionValue = 0;
-
-                    PlayerClient clientToCompare = Server.savedClients.Find(fetch => fetch.Account.Username == pair.Value[0]);
-                    if (client.Account.Faction == null)
-                        factionValue = 0;
-                    if (clientToCompare.Account.Faction == null)
-                        factionValue = 0;
-                    else if (client.Account.Faction != null && clientToCompare.Account.Faction != null)
+                    if (settlementAccount == client.Account)
                     {
-                        if (client.Account.Faction.name == clientToCompare.Account.Faction.name) factionValue = 1;
-                        else factionValue = 2;
+                        continue;
                     }
 
-                    dataToSend += pair.Key + ":" + pair.Value[0] + ":" + factionValue + "│";
+                    int factionValue = 0;
+                    if (client.Account.Faction == null)
+                        factionValue = 0;
+                    if (settlementAccount.Faction == null)
+                        factionValue = 0;
+                    else if (client.Account.Faction != null && settlementAccount.Faction != null)
+                    {
+                        if (client.Account.Faction.name == settlementAccount.Faction.name)
+                        {
+                            factionValue = 1;
+                        }
+                        else
+                        {
+                            factionValue = 2;
+                        }
+                    }
+
+                    dataToSend += settlementAccount.HomeTileId + ":" + settlementAccount.Username + ":" + factionValue + "│";
                 }
 
                 return dataToSend;

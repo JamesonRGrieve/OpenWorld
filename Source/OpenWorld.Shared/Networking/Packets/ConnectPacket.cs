@@ -20,13 +20,14 @@ namespace OpenWorld.Shared.Networking.Packets
 
         public override string GetData()
         {
+            // Needs implementation when refactoring client stuff
             throw new NotImplementedException();
         }
 
         public override void SetPacket(string data)
         {
             base.SetPacket(data);
-            var splits = data.Split(PacketHandler.PacketDataSplitter);
+            var splits = this.SplitData(data);
 
             this.Username = splits[1].ToLower();
             this.Password = splits[2];

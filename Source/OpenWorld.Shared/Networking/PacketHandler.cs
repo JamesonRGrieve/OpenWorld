@@ -31,6 +31,8 @@ namespace OpenWorld.Shared.Networking
             {
                 case "Connect":
                     return SetupPacket<ConnectPacket>(data);
+                case "SettlementBuilder":
+                    return SetupPacket<SettlementBuilderPacket>(data);
                 case "ChatMessage":
                 case "UserSettlement":
                 case "ForceEvent":

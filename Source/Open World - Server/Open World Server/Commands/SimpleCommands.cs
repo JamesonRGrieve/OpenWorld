@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using OpenWorldServer.Handlers.Old;
 
@@ -198,7 +197,7 @@ namespace OpenWorldServer
 
             ConsoleUtils.WriteWithTime("Connected Players: " + Networking.connectedClients.Count);
             ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
-            ConsoleUtils.WriteWithTime("Saved Settlements: " + Server.savedSettlements.Count);
+            ConsoleUtils.WriteWithTime("Saved Settlements: " + StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count);
             ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
             ConsoleUtils.WriteWithTime("Max Players: " + StaticProxy.serverConfig.MaxPlayers);
             Console.WriteLine("");
@@ -429,17 +428,20 @@ namespace OpenWorldServer
         {
             Console.Clear();
 
+            var settlementAccounts = StaticProxy.worldMapHandler.GetAccountsWithSettlements;
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Settlements: " + Server.savedSettlements.Count);
+            ConsoleUtils.WriteWithTime("Server Settlements: " + settlementAccounts.Count);
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (Server.savedSettlements.Count == 0) ConsoleUtils.WriteWithTime("No Active Settlements");
+            if (settlementAccounts.Count == 0)
+            {
+                ConsoleUtils.WriteWithTime("No Active Settlements");
+            }
             else
             {
-                Dictionary<string, List<string>> settlements = Server.savedSettlements;
-                foreach (KeyValuePair<string, List<string>> pair in settlements)
+                foreach (var accounts in settlementAccounts)
                 {
-                    ConsoleUtils.WriteWithTime("[" + pair.Key + "] - [" + pair.Value[0] + "]");
+                    ConsoleUtils.WriteWithTime("[" + accounts.Username + "] @ [" + accounts.HomeTileId + "]");
                 }
             }
 

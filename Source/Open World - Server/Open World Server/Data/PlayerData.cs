@@ -12,6 +12,8 @@ namespace OpenWorldServer.Data
 
         public bool ToWipe { get; set; } = false;
 
+        public bool HasSettlement => !string.IsNullOrEmpty(this.HomeTileId);
+
         public string HomeTileId { get; set; }
 
         public List<string> GiftString { get; set; } = new List<string>();

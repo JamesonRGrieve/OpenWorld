@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using OpenWorldServer.Services;
 
@@ -32,7 +31,7 @@ namespace OpenWorldServer
                 {
                     try
                     {
-                        Server.savedSettlements.Add(playerToLoad.Account.HomeTileId, new List<string>() { playerToLoad.Account.Username });
+                        //Server.savedSettlements.Add(playerToLoad.Account.HomeTileId, new List<string>() { playerToLoad.Account.Username });
                     }
                     catch
                     {
