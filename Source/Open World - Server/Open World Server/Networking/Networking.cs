@@ -29,15 +29,6 @@ namespace OpenWorldServer
             }
         }
 
-        public static void KickClients(PlayerClient client)
-        {
-            StaticProxy.playerHandler.RemovePlayer(client);
-
-            client.Dispose();
-
-            ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Disconnected");
-        }
-
         public static void CheckClientsConnection()
         {
             ConsoleUtils.DisplayNetworkStatus();
@@ -51,21 +42,8 @@ namespace OpenWorldServer
 
                 foreach (PlayerClient client in actualClients)
                 {
-                    if (client.IsDisconnecting)
-                        clientsToDisconnect.Add(client);
-                    else
+                    if (client != null && !client.IsDisconnecting)
                         SendData(client, "Ping");
-                }
-
-                foreach (PlayerClient client in clientsToDisconnect)
-                {
-                    KickClients(client);
-                }
-
-                if (clientsToDisconnect.Count > 0)
-                {
-                    ConsoleUtils.UpdateTitle();
-                    ServerUtils.SendPlayerListToAll(null);
                 }
             }
         }

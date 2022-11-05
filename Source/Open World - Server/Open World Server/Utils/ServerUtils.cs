@@ -87,12 +87,12 @@ namespace OpenWorldServer
         public static void SendPlayerListToAll(PlayerClient client)
         {
             var clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
+            var usernames = clients.Select(c => c.Account?.Username);
             foreach (var sc in clients)
             {
-                if (sc == client) continue;
+                if (client != null && sc == client) continue;
 
-                var usernames = clients.Select(c => c.Account?.Username);
-                client.SendData(new PlayerListPacket(usernames.ToArray()));
+                sc.SendData(new PlayerListPacket(usernames.ToArray()));
             }
         }
     }

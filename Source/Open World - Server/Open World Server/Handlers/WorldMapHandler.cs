@@ -69,13 +69,15 @@ namespace OpenWorldServer.Handlers
 
                 var packet = new SettlementBuilderPacket(tileId, client.Account.Username, factionValue);
                 connectedClient.SendData(packet);
-                this.NotifySettlementAdded(tileId, client.Account.Username, factionValue);
             }
 
             ConsoleUtils.LogToConsole("Settlement with ID [" + tileId + "] and Owner [" + client.Account.Username + "] has been Added");
         }
 
-        public void NotifySettlementAdded(string tileId, string username, int factionValue)
+        public void NotifySettlementAdded(PlayerClient client, int factionValue)
+            => this.NotifySettlementAdded(client.Account?.HomeTileId, client.Account?.Username, factionValue);
+
+        public void NotifySettlementAdded(string tileId, string username, int factionValue, PlayerClient executer = null)
         {
             if (string.IsNullOrEmpty(tileId))
             {
@@ -83,10 +85,13 @@ namespace OpenWorldServer.Handlers
             }
 
             ConsoleUtils.LogToConsole($"Notifying addition of Settlement TileId [{username}]@[{tileId}]");
-            this.NotifySettlementChange(new SettlementBuilderPacket(tileId, username, factionValue));
+            this.NotifySettlementChange(new SettlementBuilderPacket(tileId, username, factionValue), executer);
         }
 
-        public void NotifySettlementRemoved(string tileId)
+        public void NotifySettlementRemoved(PlayerClient client)
+            => this.NotifySettlementRemoved(client.Account?.HomeTileId, client);
+
+        public void NotifySettlementRemoved(string tileId, PlayerClient executer = null)
         {
             if (string.IsNullOrEmpty(tileId))
             {
@@ -94,10 +99,18 @@ namespace OpenWorldServer.Handlers
             }
 
             ConsoleUtils.LogToConsole($"Notifying removal of Settlement TileId [{tileId}]");
-            this.NotifySettlementChange(new SettlementBuilderPacket(tileId));
+            this.NotifySettlementChange(new SettlementBuilderPacket(tileId), executer);
         }
 
-        private void NotifySettlementChange(SettlementBuilderPacket packet)
-            => Parallel.ForEach(this.playerHandler.ConnectedClients.ToArray(), client => client.SendData(packet));
+        private void NotifySettlementChange(SettlementBuilderPacket packet, PlayerClient executer = null)
+        {
+            Parallel.ForEach(this.playerHandler.ConnectedClients.ToArray(), target =>
+            {
+                if (executer?.Account?.Username != target.Account?.Username)
+                {
+                    target.SendData(packet);
+                }
+            });
+        }
     }
 }

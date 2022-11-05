@@ -46,6 +46,7 @@ namespace OpenWorldServer.Handlers
             if (this.players.Contains(client))
             {
                 this.AccountsHandler.SaveAccount(client);
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Disconnected");
 
                 try
                 {

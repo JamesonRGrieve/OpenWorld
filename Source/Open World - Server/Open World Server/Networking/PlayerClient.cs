@@ -15,7 +15,7 @@ namespace OpenWorldServer
 
         public bool DataAvailable => !this.isReceiving && this.IsConnected && (this.tcpClient?.GetStream()?.DataAvailable ?? false);
 
-        public bool IsConnected => this.tcpClient != null && this.tcpClient.Connected;
+        public bool IsConnected => this.CheckConnection();
 
         public bool IsLoggedIn { get; set; } = false;
 
@@ -43,7 +43,7 @@ namespace OpenWorldServer
         {
             if (!this.IsConnected)
             {
-                ConsoleUtils.LogToConsole($"Can't send Data to [{this.Account.Username}] since Player is not connected", ConsoleColor.Yellow);
+                this.IsDisconnecting = true;
                 return;
             }
 
@@ -54,13 +54,15 @@ namespace OpenWorldServer
                 sw.WriteLine(encryptedData);
                 sw.Flush();
             }
+            catch (IOException)
+            {
+                // IOException means the client probably lost connection
+                this.IsDisconnecting = true;
+            }
             catch (Exception ex)
             {
-                // depending on the error we could catch explicit exceptions and target client to disconnect
-                // for now we just log them
                 ConsoleUtils.LogToConsole($"Error sending Data to Player [{this.Account.Username}] ({ex.GetType().Name}):", ConsoleColor.Red);
                 ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
-                this.IsDisconnecting = true;
             }
         }
 
@@ -105,6 +107,30 @@ namespace OpenWorldServer
 
                 this.tcpClient.Dispose();
             }
+        }
+
+        private bool CheckConnection()
+        {
+            try
+            {
+                if (this.tcpClient != null && this.tcpClient.Client != null && this.tcpClient.Client.Connected)
+                {
+                    if (this.tcpClient.Client.Poll(0, SelectMode.SelectRead))
+                    {
+                        byte[] buff = new byte[1];
+                        if (this.tcpClient.Client.Receive(buff, SocketFlags.Peek) == 0)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+            catch
+            {
+            }
+            return false;
         }
     }
 }

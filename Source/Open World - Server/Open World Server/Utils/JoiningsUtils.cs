@@ -72,6 +72,7 @@ namespace OpenWorldServer
                 SendLoadGameData(client);
             }
 
+            client.IsLoggedIn = true;
             ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Connected");
         }
 
@@ -79,7 +80,7 @@ namespace OpenWorldServer
         {
             //We give saved data back to return data that is not removed at new creation
             PlayerUtils.GiveSavedDataToPlayer(client);
-            StaticProxy.worldMapHandler.NotifySettlementRemoved(client.Account.HomeTileId);
+            StaticProxy.worldMapHandler.NotifySettlementRemoved(client);
             StaticProxy.playerHandler.AccountsHandler.ResetAccount(client, true);
 
             Networking.SendData(client, GetPlanetToSend());
@@ -144,7 +145,7 @@ namespace OpenWorldServer
             {
                 foreach (var settlementAccount in settlementAccounts)
                 {
-                    if (settlementAccount == client.Account)
+                    if (settlementAccount.Username == client.Account.Username)
                     {
                         continue;
                     }

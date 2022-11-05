@@ -125,6 +125,7 @@ namespace OpenWorldServer
         {
             Task.Run(() =>
             {
+                var needUpdate = false;
                 while (this.IsRunning)
                 {
                     foreach (var client in this.playerHandler.ConnectedClients.ToArray())
@@ -132,12 +133,21 @@ namespace OpenWorldServer
                         if (!client.IsConnected || client.IsDisconnecting)
                         {
                             this.playerHandler.RemovePlayer(client);
+                            needUpdate = true;
+                            continue;
                         }
 
                         if (client.DataAvailable)
                         {
                             Task.Run(() => this.ReadDataFromClient(client));
                         }
+                    }
+
+                    if (needUpdate)
+                    {
+                        ConsoleUtils.UpdateTitle();
+                        ServerUtils.SendPlayerListToAll(null);
+                        needUpdate = false;
                     }
 
                     Thread.Sleep(50); // Let the CPU do some other things
@@ -191,7 +201,7 @@ namespace OpenWorldServer
 
             if (data.StartsWith("Connect│"))
             {
-                NetworkingHandler.ConnectHandle(client, PacketHandler.GetPacket<ConnectPacket>(data));
+                JoiningsUtils.LoginProcedures(client, PacketHandler.GetPacket<ConnectPacket>(data));
             }
             else if (data.StartsWith("ChatMessage│"))
             {

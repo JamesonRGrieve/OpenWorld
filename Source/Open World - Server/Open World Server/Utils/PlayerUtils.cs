@@ -68,7 +68,7 @@ namespace OpenWorldServer
         public static void GiveSavedDataToPlayer(PlayerClient client)
         {
             var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(client);
-            if (playerData != null)
+            if (playerData == null)
             {
                 return;
             }
