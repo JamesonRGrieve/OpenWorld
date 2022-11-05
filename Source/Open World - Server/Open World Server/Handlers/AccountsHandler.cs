@@ -54,12 +54,14 @@ namespace OpenWorldServer.Handlers
             var playerFile = this.GetAccountFromFilePath(account.Username);
             try
             {
+                ConsoleUtils.LogToConsole($"Saving [{account.Username}]", ConsoleColor.DarkGreen);
                 JsonDataHelper.Save(account, playerFile);
                 if (!this.Accounts.Contains(account))
                 {
                     this.Accounts.Add(account);
                     Server.savedClients.Add(new PlayerClient(null) { Account = account });
                 }
+
                 return true;
             }
             catch
