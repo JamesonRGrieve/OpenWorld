@@ -401,7 +401,7 @@ namespace OpenWorldServer
             {
                 if (client.Account.Faction == null) return;
 
-                FactionSilo siloToFind = client.faction.factionStructures.Find(fetch => fetch is FactionSilo) as FactionSilo;
+                FactionSilo siloToFind = client.Account.Faction.factionStructures.Find(fetch => fetch is FactionSilo) as FactionSilo;
                 if (siloToFind == null) return;
 
                 string siloID = data.Split('│')[3];
@@ -438,14 +438,14 @@ namespace OpenWorldServer
 
             else if (data.StartsWith("FactionManagement│Bank"))
             {
-                if (client.faction == null) return;
+                if (client.Account.Faction == null) return;
 
-                FactionBank bankToFind = client.faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
+                FactionBank bankToFind = client.Account.Faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
                 if (bankToFind == null) return;
 
                 if (data.StartsWith("FactionManagement│Bank│Refresh"))
                 {
-                    FactionBankHandler.RefreshMembersBankDetails(client.faction);
+                    FactionBankHandler.RefreshMembersBankDetails(client.Account.Faction);
                 }
 
                 else if (data.StartsWith("FactionManagement│Bank│Deposit"))
@@ -454,7 +454,7 @@ namespace OpenWorldServer
 
                     if (quantity == 0) return;
 
-                    FactionBankHandler.DepositMoney(client.faction, quantity);
+                    FactionBankHandler.DepositMoney(client.Account.Faction, quantity);
                 }
 
                 else if (data.StartsWith("FactionManagement│Bank│Withdraw"))
@@ -463,7 +463,7 @@ namespace OpenWorldServer
 
                     if (quantity == 0) return;
 
-                    FactionBankHandler.WithdrawMoney(client.faction, quantity, client);
+                    FactionBankHandler.WithdrawMoney(client.Account.Faction, quantity, client);
                 }
             }
         }

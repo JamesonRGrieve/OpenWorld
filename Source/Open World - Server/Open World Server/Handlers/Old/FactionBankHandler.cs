@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 
-namespace OpenWorldServer
+namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionBankHandler
     {
@@ -44,7 +41,7 @@ namespace OpenWorldServer
             RefreshMembersBankDetails(faction);
         }
 
-        public static void WithdrawMoney(Faction faction, int quantity, ServerClient client)
+        public static void WithdrawMoney(Faction faction, int quantity, PlayerClient client)
         {
             FactionBank bankToFind = faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
 
@@ -66,10 +63,10 @@ namespace OpenWorldServer
 
             if (bankToFind == null) return;
 
-            ServerClient[] dummyFactionMembers = faction.members.Keys.ToArray();
-            foreach(ServerClient dummy in dummyFactionMembers)
+            var dummyFactionMembers = faction.members.Keys.ToArray();
+            foreach (var dummy in dummyFactionMembers)
             {
-                ServerClient connected = Networking.connectedClients.Find(fetch => fetch.username == dummy.username);
+                var connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, "FactionManagement│Bank│Refresh│" + bankToFind.depositedSilver);
