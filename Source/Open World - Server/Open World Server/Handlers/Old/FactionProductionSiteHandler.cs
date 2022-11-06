@@ -14,27 +14,26 @@ namespace OpenWorldServer.Handlers.Old
                 Faction[] allFactions = Server.savedFactions.ToArray();
                 foreach (Faction faction in allFactions)
                 {
-                    foreach (FactionStructure structure in faction.factionStructures)
-                    {
-                        if (structure is FactionProductionSite)
-                        {
-                            SendProductionToMembers(faction);
-                            break;
-                        }
-                    }
+                    FactionStructure productionSiteToFind = faction.factionStructures.Find(fetch => fetch is FactionProductionSite);
+
+                    if (productionSiteToFind == null) continue;
+                    else SendProductionToMembers(faction);
                 }
+
+                ConsoleUtils.LogToConsole("[Factions Production Site Tick]");
             }
         }
 
         public static void SendProductionToMembers(Faction faction)
         {
-            PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
-            foreach (PlayerClient dummy in dummyfactionMembers)
+            var dummyfactionMembers = faction.members.Keys.ToArray();
+            int productionSitesInFaction = faction.factionStructures.FindAll(fetch => fetch is FactionProductionSite).Count();
+            foreach (var dummy in dummyfactionMembers)
             {
                 PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
-                    Networking.SendData(connected, "FactionManagement│ProductionSite│Tick");
+                    Networking.SendData(connected, "FactionManagement│ProductionSite│Tick" + "│" + productionSitesInFaction);
                 }
             }
         }

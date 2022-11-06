@@ -32,7 +32,7 @@ namespace OpenWorldServer
         public static List<PlayerClient> savedClients = new List<PlayerClient>();
 
         //Server Details
-        public static string serverVersion = "v1.4.1";
+        public static string serverVersion = "v1.4.2";
 
         //Server Lists
         public static List<string> adminList = new List<string>();

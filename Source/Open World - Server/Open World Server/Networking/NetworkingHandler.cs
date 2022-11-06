@@ -364,7 +364,7 @@ namespace OpenWorldServer
             {
                 if (client.Account.Faction == null) return;
 
-                if (FactionHandler.GetMemberPowers(client.Account.Faction, client) != FactionHandler.MemberRank.Leader)
+                if (FactionHandler.GetMemberPowers(client.Account.Faction, client) == FactionHandler.MemberRank.Member)
                 {
                     Networking.SendData(client, "FactionManagement│NoPowers");
                     return;
@@ -384,7 +384,7 @@ namespace OpenWorldServer
             {
                 if (client.Account.Faction == null) return;
 
-                if (FactionHandler.GetMemberPowers(client.Account.Faction, client) != FactionHandler.MemberRank.Leader)
+                if (FactionHandler.GetMemberPowers(client.Account.Faction, client) == FactionHandler.MemberRank.Member)
                 {
                     Networking.SendData(client, "FactionManagement│NoPowers");
                     return;
@@ -400,6 +400,9 @@ namespace OpenWorldServer
             else if (data.StartsWith("FactionManagement│Silo"))
             {
                 if (client.Account.Faction == null) return;
+
+                FactionSilo siloToFind = client.faction.factionStructures.Find(fetch => fetch is FactionSilo) as FactionSilo;
+                if (siloToFind == null) return;
 
                 string siloID = data.Split('│')[3];
 
@@ -430,6 +433,37 @@ namespace OpenWorldServer
                     if (string.IsNullOrWhiteSpace(itemID)) return;
 
                     FactionSiloHandler.WithdrawFromSilo(client.Account.Faction, siloID, itemID, client);
+                }
+            }
+
+            else if (data.StartsWith("FactionManagement│Bank"))
+            {
+                if (client.faction == null) return;
+
+                FactionBank bankToFind = client.faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
+                if (bankToFind == null) return;
+
+                if (data.StartsWith("FactionManagement│Bank│Refresh"))
+                {
+                    FactionBankHandler.RefreshMembersBankDetails(client.faction);
+                }
+
+                else if (data.StartsWith("FactionManagement│Bank│Deposit"))
+                {
+                    int quantity = int.Parse(data.Split('│')[3]);
+
+                    if (quantity == 0) return;
+
+                    FactionBankHandler.DepositMoney(client.faction, quantity);
+                }
+
+                else if (data.StartsWith("FactionManagement│Bank│Withdraw"))
+                {
+                    int quantity = int.Parse(data.Split('│')[3]);
+
+                    if (quantity == 0) return;
+
+                    FactionBankHandler.WithdrawMoney(client.faction, quantity, client);
                 }
             }
         }
