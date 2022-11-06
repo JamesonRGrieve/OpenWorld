@@ -15,14 +15,6 @@ namespace OpenWorldServer
                 NetworkingThread.Start();
             }
 
-            else if (threadID == 1)
-            {
-                Thread CheckThread = new Thread(() => Networking.CheckClientsConnection());
-                CheckThread.IsBackground = true;
-                CheckThread.Name = "Check Thread";
-                CheckThread.Start();
-            }
-
             else if (threadID == 2)
             {
                 Thread CheckThread = new Thread(() => FactionProductionSiteHandler.TickProduction());

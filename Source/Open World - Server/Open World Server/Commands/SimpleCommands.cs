@@ -82,8 +82,8 @@ namespace OpenWorldServer
 
             ConsoleUtils.WriteWithTime("Server Name: " + StaticProxy.serverConfig.ServerName);
             ConsoleUtils.WriteWithTime("Server Description: " + StaticProxy.serverConfig.Description);
-            ConsoleUtils.WriteWithTime("Server Local IP: " + Networking.localAddress);
-            ConsoleUtils.WriteWithTime("Server Port: " + Networking.serverPort);
+            ConsoleUtils.WriteWithTime("Server Local IP: " + StaticProxy.serverConfig.HostIP);
+            ConsoleUtils.WriteWithTime("Server Port: " + StaticProxy.serverConfig.Port);
             Console.WriteLine("");
 
             Console.ForegroundColor = ConsoleColor.Green;
