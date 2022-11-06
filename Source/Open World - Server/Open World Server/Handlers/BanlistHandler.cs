@@ -32,7 +32,7 @@ namespace OpenWorldServer.Handlers
                 this.SaveBannedPlayers();
             }
 
-            this.banlist = JsonDataHelper.LoadList<BanInfo>(PathProvider.PlayerWhitelistFile);
+            this.banlist = JsonDataHelper.LoadList<BanInfo>(PathProvider.BannedPlayersFile);
             ConsoleUtils.LogToConsole($"Loaded Banlist - {this.banlist.Count} Entries", ConsoleColor.Green);
         }
 
