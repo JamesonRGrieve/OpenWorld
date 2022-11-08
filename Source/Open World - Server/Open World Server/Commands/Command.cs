@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace OpenWorldServer
 {
@@ -14,7 +13,7 @@ namespace OpenWorldServer
         }
         public static readonly Dictionary<Rule, Func<string, bool>> Validation = new Dictionary<Rule, Func<string, bool>>()
         {
-            {Rule.PlayerOnline, (arg) => Networking.connectedClients.Any(x => x.username == arg) },
+            {Rule.PlayerOnline, (arg) => StaticProxy.playerHandler.ConnectedClients.Any(x => x.Account.Username == arg) },
             {Rule.ValidEvent, (arg) => SimpleCommands.EventList.Contains(arg) }
             // TODO: ValidFaction, ValidItem, ValidItemQuantity, ValidItemQuality, PlayerBanned, PlayerAdmin
         };
@@ -23,7 +22,7 @@ namespace OpenWorldServer
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public HashSet<ParameterValidation.Rule> Rules { get; set; } 
+        public HashSet<ParameterValidation.Rule> Rules { get; set; }
     }
     public class Command
     {
@@ -41,7 +40,7 @@ namespace OpenWorldServer
         private Action _simpleCommand;
         public Action SimpleCommand
         {
-            get => _simpleCommand; 
+            get => _simpleCommand;
             set
             {
                 _advancedCommand = null;
@@ -49,7 +48,7 @@ namespace OpenWorldServer
             }
         }
         private Action<string[]> _advancedCommand;
-        
+
         public Action<string[]> AdvancedCommand
         {
             get => _advancedCommand;
@@ -65,7 +64,7 @@ namespace OpenWorldServer
         {
             // TODO: Itemized error messages.
             if (SimpleCommand != null) SimpleCommand();
-            else if (AdvancedCommand != null && arguments.Length == Parameters.Count && Parameters.SelectMany((x, i) => x.Rules.Select(y => ParameterValidation.Validation[y](arguments[i]))).All(x=>x)) AdvancedCommand(arguments);
+            else if (AdvancedCommand != null && arguments.Length == Parameters.Count && Parameters.SelectMany((x, i) => x.Rules.Select(y => ParameterValidation.Validation[y](arguments[i]))).All(x => x)) AdvancedCommand(arguments);
             else throw new Exception($"The execution of {Word} failed due to an invalid command structure. Ensure a command method is mapped, and that the correct number of arguments are provided if required. Expected {Parameters.Count} parameters and recieved {arguments.Length}. If the correct number of arguments were sent, ensure they are valid for the context.");
         }
 

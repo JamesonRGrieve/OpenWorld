@@ -28,12 +28,12 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogTitleToConsole("Reloading Banned Players");
             if (!File.Exists(PathProvider.BannedPlayersFile))
             {
-                ConsoleUtils.LogToConsole($"Generating new Banlist file..", ConsoleColor.Yellow);
+                ConsoleUtils.LogToConsole($"Generating new Banlist file..", ConsoleUtils.ConsoleLogMode.Warning);
                 this.SaveBannedPlayers();
             }
 
             this.banlist = JsonDataHelper.LoadList<BanInfo>(PathProvider.BannedPlayersFile);
-            ConsoleUtils.LogToConsole($"Loaded Banlist - {this.banlist.Count} Entries", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded Banlist - {this.banlist.Count} Entries", ConsoleUtils.ConsoleLogMode.Info);
         }
 
         private void SaveBannedPlayers() => JsonDataHelper.Save(this.banlist.ToList(), PathProvider.BannedPlayersFile);
@@ -51,7 +51,7 @@ namespace OpenWorldServer.Handlers
             });
 
             this.SaveBannedPlayers();
-            ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has been Banned", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has been Banned", ConsoleUtils.ConsoleLogMode.Info);
         }
 
         internal BanInfo GetBanInfo(string username) => this.banlist.Find(b => b.Username == username);
@@ -61,7 +61,7 @@ namespace OpenWorldServer.Handlers
             var banInfo = this.GetBanInfo(username);
             if (banInfo == null)
             {
-                ConsoleUtils.LogToConsole("Player [" + username + "] is not banned", ConsoleColor.Yellow);
+                ConsoleUtils.LogToConsole("Player [" + username + "] is not banned", ConsoleUtils.ConsoleLogMode.Warning);
             }
 
             this.UnbanPlayer(banInfo);
@@ -71,7 +71,7 @@ namespace OpenWorldServer.Handlers
         {
             this.banlist.Remove(banInfo);
             this.SaveBannedPlayers();
-            ConsoleUtils.LogToConsole("Player [" + banInfo.Username + "] has been Unbanned", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole("Player [" + banInfo.Username + "] has been Unbanned", ConsoleUtils.ConsoleLogMode.Info);
         }
     }
 }

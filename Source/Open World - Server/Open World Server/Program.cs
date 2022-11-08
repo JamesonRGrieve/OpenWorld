@@ -50,7 +50,7 @@ namespace OpenWorldServer
             var config = new ServerConfig();
 
             Console.WriteLine();
-            ConsoleUtils.LogToConsole("Loading Server Settings", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole("Loading Server Settings", ConsoleUtils.ConsoleLogMode.Info);
 
             if (File.Exists(filePath))
             {
@@ -61,15 +61,15 @@ namespace OpenWorldServer
                 catch (Exception ex)
                 {
                     // Possible error would be incorrect data
-                    ConsoleUtils.LogToConsole("Error while loading Server Settings:", ConsoleColor.Red);
-                    ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
+                    ConsoleUtils.LogToConsole("Error while loading Server Settings:", ConsoleUtils.ConsoleLogMode.Error);
+                    ConsoleUtils.LogToConsole(ex.Message, ConsoleUtils.ConsoleLogMode.Error);
 
                     return null;
                 }
             }
             else
             {
-                ConsoleUtils.LogToConsole("No Server Settings File found, generating new one", ConsoleColor.Yellow);
+                ConsoleUtils.LogToConsole("No Server Settings File found, generating new one", ConsoleUtils.ConsoleLogMode.Warning);
                 JsonDataHelper.Save(config, filePath);
             }
 

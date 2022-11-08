@@ -39,10 +39,10 @@ namespace OpenWorldServer.Handlers.Old
         public static void CreateFaction(string factionName, PlayerClient factionLeader)
         {
             Faction newFaction = new Faction()
-            { 
+            {
                 name = factionName,
                 wealth = 0,
-                members = new Dictionary<ServerClient, MemberRank>() { { factionLeader, MemberRank.Leader } }
+                members = new Dictionary<PlayerClient, MemberRank>() { { factionLeader, MemberRank.Leader } }
             };
             SaveFaction(newFaction);
 

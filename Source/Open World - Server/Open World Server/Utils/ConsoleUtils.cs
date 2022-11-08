@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
     public static class ConsoleUtils
     {
-        public static void UpdateTitle() => Console.Title = $"OpenWorld {Server.serverVersion} - {Server.serverName} | {Networking.localAddress}:{Networking.serverPort} | {Networking.connectedClients.Count} of {Server.maxPlayers} Players";
+        public static void UpdateTitle() => Console.Title = $"OpenWorld {Server.serverVersion} - {StaticProxy.serverConfig.ServerName} | {StaticProxy.playerHandler.ConnectedClients.Count} / {StaticProxy.serverConfig.MaxPlayers} Players";
 
         public enum ConsoleLogMode
         {
@@ -17,16 +17,31 @@ namespace OpenWorldServer
             Normal,
             Info,
             Warning,
-            Error
+            Error,
+            Done
         }
+
         private static readonly Dictionary<ConsoleLogMode, ConsoleColor> ConsoleLogColors = new Dictionary<ConsoleLogMode, ConsoleColor>()
         {
             { ConsoleLogMode.Heading, ConsoleColor.White},
             { ConsoleLogMode.Normal, ConsoleColor.Gray},
             { ConsoleLogMode.Info, ConsoleColor.Blue},
             { ConsoleLogMode.Warning, ConsoleColor.Yellow},
-            { ConsoleLogMode.Error, ConsoleColor.Red}
+            { ConsoleLogMode.Error, ConsoleColor.Red},
+            { ConsoleLogMode.Done, ConsoleColor.DarkGreen}
         };
+
+
+        public static void LogTitleToConsole(string title)
+            => ConsoleUtils.LogToConsole($"== {title} ==", ConsoleColor.Cyan);
+
+        private static void LogToConsole(string data, ConsoleColor textColor)
+        {
+            Console.ForegroundColor = textColor;
+            ConsoleUtils.LogToConsole(data);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
         public static void LogToConsole(string data, ConsoleLogMode mode = ConsoleLogMode.Normal)
         {
             if (!string.IsNullOrWhiteSpace(data))
@@ -58,6 +73,7 @@ namespace OpenWorldServer
                 Console.Write("Command> ");
             }
         }
+
         public enum FileLogMode
         {
             Chat,
@@ -88,10 +104,10 @@ namespace OpenWorldServer
                 { FileLogMode.WarningError, "warning_error.log" }
             };
             try { File.AppendAllText(pathToday + Path.DirectorySeparatorChar + files[mode], $"{data}\n"); }
-            catch 
-            { 
+            catch
+            {
                 // This can't use LogToConsole as it will cause an infinite loop, potentially.
-                Console.ForegroundColor = ConsoleColor.Red; 
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"ERROR WRITING LOG FILE: {pathToday + Path.DirectorySeparatorChar + files[mode]}");
                 Console.ForegroundColor = ConsoleColor.Gray;
             }

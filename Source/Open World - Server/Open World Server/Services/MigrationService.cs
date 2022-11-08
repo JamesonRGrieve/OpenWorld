@@ -36,12 +36,12 @@ namespace OpenWorldServer.Services
             => Directory.CreateDirectory(this.fileBackupPath);
 
         private void LogMigratingData(string data)
-            => ConsoleUtils.LogToConsole($"Migrating {data}", ConsoleColor.Yellow);
+            => ConsoleUtils.LogToConsole($"Migrating {data}", ConsoleUtils.ConsoleLogMode.Warning);
 
         private void LogMigratedData(string data, bool successfully, string reason = "")
         {
             var state = successfully ? "successfully" : "failed";
-            var color = successfully ? ConsoleColor.Green : ConsoleColor.Red;
+            var color = successfully ? ConsoleUtils.ConsoleLogMode.Info : ConsoleUtils.ConsoleLogMode.Error;
             reason = successfully ? string.Empty : $" ({reason})";
             ConsoleUtils.LogToConsole($"Migrated {data} {state}{reason}", color);
         }

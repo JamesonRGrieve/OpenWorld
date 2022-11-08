@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenWorld.Shared.Networking.Packets;
@@ -30,7 +29,7 @@ namespace OpenWorldServer.Handlers
                 playerDataFromTile.Username != client.Account.Username)
             {
                 Networking.SendData(client, "Disconnect│Corrupted");
-                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleColor.Red);
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleUtils.ConsoleLogMode.Error);
                 return;
             }
 

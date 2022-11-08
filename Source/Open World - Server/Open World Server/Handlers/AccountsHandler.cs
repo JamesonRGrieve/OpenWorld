@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
@@ -29,7 +28,7 @@ namespace OpenWorldServer.Handlers
                 this.Accounts.Add(JsonDataHelper.Load<PlayerData>(playerFile));
             }
 
-            ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleUtils.ConsoleLogMode.Done);
         }
 
         public PlayerData GetAccount(PlayerClient client)
@@ -54,7 +53,7 @@ namespace OpenWorldServer.Handlers
             var playerFile = this.GetAccountFromFilePath(account.Username);
             try
             {
-                ConsoleUtils.LogToConsole($"Saving [{account.Username}]", ConsoleColor.DarkGreen);
+                ConsoleUtils.LogToConsole($"Saving [{account.Username}]", ConsoleUtils.ConsoleLogMode.Done);
                 JsonDataHelper.Save(account, playerFile);
                 if (!this.Accounts.Contains(account))
                 {
@@ -109,6 +108,12 @@ namespace OpenWorldServer.Handlers
             {
                 File.Delete(file);
             }
+        }
+
+        internal void ReloadAccounts()
+        {
+            this.Accounts.Clear();
+            this.LoadAccounts();
         }
 
         public PlayerData ReloadAccount(string username)

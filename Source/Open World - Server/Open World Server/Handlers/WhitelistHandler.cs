@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using OpenWorldServer.Data;
@@ -29,12 +28,12 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogTitleToConsole("Reloading Whitelist");
             if (!File.Exists(PathProvider.PlayerWhitelistFile))
             {
-                ConsoleUtils.LogToConsole($"Generating new Whitelist file..", ConsoleColor.Yellow);
+                ConsoleUtils.LogToConsole($"Generating new Whitelist file..", ConsoleUtils.ConsoleLogMode.Info);
                 JsonDataHelper.Save(this.whitelist, PathProvider.PlayerWhitelistFile);
             }
 
             this.whitelist = JsonDataHelper.LoadList<string>(PathProvider.PlayerWhitelistFile);
-            ConsoleUtils.LogToConsole($"Loaded whitelist - {this.whitelist.Count} Entries", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded whitelist - {this.whitelist.Count} Entries", ConsoleUtils.ConsoleLogMode.Info);
         }
 
         internal bool IsWhitelisted(PlayerClient client)

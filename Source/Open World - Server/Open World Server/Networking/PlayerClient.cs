@@ -61,8 +61,8 @@ namespace OpenWorldServer
             }
             catch (Exception ex)
             {
-                ConsoleUtils.LogToConsole($"Error sending Data to Player [{this.Account.Username}] ({ex.GetType().Name}):", ConsoleColor.Red);
-                ConsoleUtils.LogToConsole(ex.Message, ConsoleColor.Red);
+                ConsoleUtils.LogToConsole($"Error sending Data to Player [{this.Account.Username}] ({ex.GetType().Name}):", ConsoleUtils.ConsoleLogMode.Error);
+                ConsoleUtils.LogToConsole(ex.Message, ConsoleUtils.ConsoleLogMode.Error);
             }
         }
 

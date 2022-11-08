@@ -14,7 +14,7 @@ namespace OpenWorldServer
                 //BinaryFormatter formatter = new BinaryFormatter();
                 //FileStream s = File.Open(path, FileMode.Open);
                 //object obj = formatter.Deserialize(s);
-                //ServerClient playerToLoad = (ServerClient)obj;
+                //PlayerClient playerToLoad = (PlayerClient)obj;
 
                 //s.Flush();
                 //s.Close();

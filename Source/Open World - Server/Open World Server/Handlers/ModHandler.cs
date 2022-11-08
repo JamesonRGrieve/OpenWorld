@@ -37,9 +37,9 @@ namespace OpenWorldServer.Handlers
             this.requiredMods = this.GetMods(PathProvider.RequiredModsFolderPath);
             this.whitelistedMods = this.GetMods(PathProvider.WhitelistedModsFolderPath);
             this.blacklistedMods = this.GetMods(PathProvider.BlacklistedModsFolderPath);
-            ConsoleUtils.LogToConsole($"Loaded {this.requiredMods.Length} Required Mods", ConsoleColor.Green);
-            ConsoleUtils.LogToConsole($"Loaded {this.whitelistedMods.Length} Whitelisted Mods", ConsoleColor.Green);
-            ConsoleUtils.LogToConsole($"Loaded {this.blacklistedMods.Length} Blacklisted Mods", ConsoleColor.Green);
+            ConsoleUtils.LogToConsole($"Loaded {this.requiredMods.Length} Required Mods", ConsoleUtils.ConsoleLogMode.Info);
+            ConsoleUtils.LogToConsole($"Loaded {this.whitelistedMods.Length} Whitelisted Mods", ConsoleUtils.ConsoleLogMode.Info);
+            ConsoleUtils.LogToConsole($"Loaded {this.blacklistedMods.Length} Blacklisted Mods", ConsoleUtils.ConsoleLogMode.Info);
         }
 
         public bool IsModEnforced(string modName) => this.requiredMods.Any(mmd => mmd.Name == modName);
@@ -63,7 +63,7 @@ namespace OpenWorldServer.Handlers
                 if (foundAboutFiles.Length > 1)
                 {
                     // This could be mean someone wanted to hide a mod
-                    ConsoleUtils.LogToConsole($"!! WARNING !! Found more than one '{aboutFileName}' in '{aboutDir}'. Skipping...", ConsoleColor.Red);
+                    ConsoleUtils.LogToConsole($"!! WARNING !! Found more than one '{aboutFileName}' in '{aboutDir}'. Skipping...", ConsoleUtils.ConsoleLogMode.Warning);
                 }
                 else if (foundAboutFiles.Length == 1)
                 {
@@ -77,7 +77,7 @@ namespace OpenWorldServer.Handlers
                     }
                     catch (Exception ex)
                     {
-                        ConsoleUtils.LogToConsole($"Error reading Mod '{folder}'. Reason: {ex.Message}", ConsoleColor.Red);
+                        ConsoleUtils.LogToConsole($"Error reading Mod '{folder}'. Reason: {ex.Message}", ConsoleUtils.ConsoleLogMode.Error);
                     }
                 }
             }

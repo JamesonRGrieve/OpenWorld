@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
+using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {
@@ -14,7 +14,7 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("List of Available Commands", ConsoleUtils.ConsoleLogMode.Heading);
             foreach (string category in Enum.GetNames(typeof(Command.CommandCategory)))
             {
-                ConsoleUtils.LogToConsole(category.Replace('_',' '), ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(category.Replace('_', ' '), ConsoleUtils.ConsoleLogMode.Heading);
                 ConsoleUtils.LogToConsole(
                 string.Join('\n', Server.ServerCommands.Where(x => x.Category.ToString() == category).Select(x => $"{x.Word}: {x.Description}" +
                     (x.AdvancedCommand != null
@@ -23,31 +23,31 @@ namespace OpenWorldServer
                     )
                 )));
             }
-            
+
         }
         private static readonly Dictionary<string, Dictionary<string, string>> SETTINGS = new Dictionary<string, Dictionary<string, string>>()
         {
             { "Server Settings", new Dictionary<string, string>()
                 {
-                    {"Server Name", Server.serverName },
-                    {"Server Description", Server.serverDescription },
-                    {"Server Local IP", Networking.localAddress.ToString() },
-                    {"Server Port", Networking.serverPort.ToString() },
+                    {"Server Name", StaticProxy.serverConfig.ServerName },
+                    {"Server Description", StaticProxy.serverConfig.Description },
+                    {"Server Local IP", StaticProxy.serverConfig.HostIP },
+                    {"Server Port", StaticProxy.serverConfig.Port.ToString() },
                 }
             },
             { "World Settings", new Dictionary<string, string>()
                 {
-                    {"Globe Coverage", Server.globeCoverage.ToString() },
-                    {"Seed", Server.seed },
-                    {"Overall Rainfall", Server.overallRainfall.ToString() },
-                    {"Overall Temperature", Server.overallTemperature.ToString() },
-                    { "Overall Population", Server.overallPopulation.ToString()}
+                    {"Globe Coverage", StaticProxy.serverConfig.World.GlobeCoverage.ToString() },
+                    {"Seed", StaticProxy.serverConfig.World.Seed },
+                    {"Overall Rainfall", StaticProxy.serverConfig.World.OverallRainfall.ToString() },
+                    {"Overall Temperature", StaticProxy.serverConfig.World.OverallTemperature.ToString() },
+                    { "Overall Population", StaticProxy.serverConfig.World.OverallPopulation.ToString()}
                 }
             }
         };
         public static void SettingsCommand()
         {
-            foreach(KeyValuePair<string, Dictionary<string, string>> setting in SETTINGS) 
+            foreach (KeyValuePair<string, Dictionary<string, string>> setting in SETTINGS)
             {
                 ConsoleUtils.LogToConsole(setting.Key, ConsoleUtils.ConsoleLogMode.Heading);
                 ConsoleUtils.LogToConsole(string.Join('\n', setting.Value.Select(x => $"{x.Key}: {x.Value}")));
@@ -55,9 +55,9 @@ namespace OpenWorldServer
         }
         private static readonly Dictionary<string, List<string>> MOD_LIST = new Dictionary<string, List<string>>()
         {
-            { "Enforced Mods", Server.enforcedMods },
-            { "Whitelisted Mods", Server.whitelistedMods },
-            { "Server Blacklisted Mods", Server.blacklistedMods }
+            { "Enforced Mods", StaticProxy.modHandler.RequiredMods.ToArray().Select(m => m.Name).ToList() },
+            { "Whitelisted Mods", StaticProxy.modHandler.WhitelistedMods.ToArray().Select(m => m.Name).ToList() },
+            { "Blacklisted Mods", StaticProxy.modHandler.BlacklistedMods.ToArray().Select(m => m.Name).ToList() }
         };
         public static void ModListCommand()
         {
@@ -69,10 +69,10 @@ namespace OpenWorldServer
         }
         public static void ExitCommand()
         {
-            foreach (ServerClient sc in Networking.connectedClients)
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
             {
                 Networking.SendData(sc, "Disconnect│Closing");
-                sc.disconnectFlag = true;
+                sc.IsDisconnecting = true;
             }
             Server.exit = true;
         }
@@ -80,13 +80,15 @@ namespace OpenWorldServer
         {
             Console.Clear();
         }
+
         public static void ReloadCommand()
         {
-            ModHandler.CheckMods();
-            WorldHandler.CheckWorldFile();
+            StaticProxy.modHandler.ReloadModFolders();
+            StaticProxy.playerHandler.AccountsHandler.ReloadAccounts();
             FactionHandler.CheckFactions();
             PlayerUtils.CheckAllAvailablePlayers();
         }
+
         private static readonly Dictionary<string, Dictionary<string, string>> STATUSES_1 = new Dictionary<string, Dictionary<string, string>>()
         {
             { "Server Status", new Dictionary<string, string>()
@@ -98,9 +100,9 @@ namespace OpenWorldServer
             },
             {   "Mod List Status", new Dictionary<string, string>()
                 {
-                    {"Using Modlist Check", Server.forceModlist.ToString() },
-                    {"Using Modlist Config Check", Server.forceModlistConfigs.ToString() },
-                    {"Using Mod Verification", Server.usingModVerification.ToString() }
+                    {"Using Modlist Check", StaticProxy.serverConfig.ModsSystem.MatchModlist.ToString() },
+                    {"Using Modlist Config Check", StaticProxy.serverConfig.ModsSystem.ModlistConfigMatch.ToString() },
+                    {"Using Mod Verification", StaticProxy.serverConfig.ModsSystem.ToString() }
                 }
             }
         };
@@ -108,33 +110,33 @@ namespace OpenWorldServer
         {
             { "Chat", new Dictionary<string, string>()
                 {
-                    {"Using Chat", Server.usingChat.ToString() },
-                    {"Using Profanity Filter", Server.usingProfanityFilter.ToString() }
+                    {"Using Chat", StaticProxy.serverConfig.ChatSystem.IsActive.ToString() },
+                    {"Using Profanity Filter", StaticProxy.serverConfig.ChatSystem.UseProfanityFilter.ToString() }
                 }
             },
             {   "Wealth", new Dictionary<string, string>()
                 {
-                    {"Using Wealth System", Server.usingWealthSystem.ToString() },
-                    {"Warning Threshold", Server.warningWealthThreshold.ToString() },
-                    {"Ban Threshold", Server.banWealthThreshold.ToString() }
+                    {"Using Wealth System", StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive.ToString() },
+                    {"Warning Threshold", StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold.ToString() },
+                    {"Ban Threshold", StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold.ToString() }
                 }
             },
             {   "Idle", new Dictionary<string, string>()
                 {
-                    {"Using Idle System", Server.usingIdleTimer.ToString() },
-                    {"Idle Threshold", Server.idleTimer.ToString() }
+                    {"Using Idle System", StaticProxy.serverConfig.IdleSystem.IsActive.ToString() },
+                    {"Idle Threshold", StaticProxy.serverConfig.IdleSystem.IdleThresholdInDays.ToString() }
                 }
             },
             {   "Road", new Dictionary<string, string>()
                 {
-                    {"Using Road System", Server.usingRoadSystem.ToString() },
-                    {"Aggressive Road Mode", Server.aggressiveRoadMode.ToString() }
+                    {"Using Road System", StaticProxy.serverConfig.RoadSystem.IsActive.ToString() },
+                    {"Aggressive Road Mode", StaticProxy.serverConfig.RoadSystem.AggressiveRoadMode.ToString() }
                 }
             },
             {   "Miscellaneous", new Dictionary<string, string>()
                 {
-                    {"Using Enforced Difficulty", Server.usingEnforcedDifficulty.ToString() },
-                    {"Allow Dev Mode", Server.allowDevMode.ToString() }
+                    {"Using Enforced Difficulty", StaticProxy.serverConfig.ForceDifficulty.ToString() },
+                    {"Allow Dev Mode", StaticProxy.serverConfig.AllowDevMode.ToString() }
                 }
             }
         };
@@ -149,7 +151,7 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("Players", ConsoleUtils.ConsoleLogMode.Heading);
             ListCommand();
             SettlementsCommand();
-            ConsoleUtils.LogToConsole("Using Whitelist: " + Server.usingWhitelist);
+            ConsoleUtils.LogToConsole("Using Whitelist: " + StaticProxy.serverConfig.WhitelistMode);
             WhiteListCommand();
             BanListCommand();
             foreach (KeyValuePair<string, Dictionary<string, string>> status in STATUSES_2)
@@ -160,31 +162,31 @@ namespace OpenWorldServer
         }
         public static void WhiteListCommand()
         {
-            ConsoleUtils.LogToConsole("Whitelisted Players: " + Server.whitelistedUsernames.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.whitelistedUsernames.Count == 0 ? "No Whitelisted Players Found" : string.Join('\n', Server.whitelistedUsernames));
+            ConsoleUtils.LogToConsole("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count == 0 ? "No Whitelisted Players Found" : string.Join('\n', StaticProxy.playerHandler.WhitelistHandler.Whitelist.ToArray()));
         }
         public static void AdminListCommand()
-        {      
-            List<ServerClient> admins = Server.savedClients.Where(x => x.isAdmin).ToList();
+        {
+            List<PlayerClient> admins = Server.savedClients.Where(x => x.Account.IsAdmin).ToList();
             ConsoleUtils.LogToConsole("Server Administrators: " + admins.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(admins.Count == 0 ? "No Admins Found" : string.Join('\n', admins.Select(x => x.username)));
+            ConsoleUtils.LogToConsole(admins.Count == 0 ? "No Admins Found" : string.Join('\n', admins.Select(x => x.Account.Username)));
         }
         public static void BanListCommand()
         {
-            ConsoleUtils.LogToConsole($"Banned players: {Server.bannedIPs.Count}", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.bannedIPs.Count == 0 ? "No Banned Players" : string.Join('\n', Server.bannedIPs.Select(x => $"[{x.Value}] - [{x.Key}]")));
+            ConsoleUtils.LogToConsole($"Banned players: {StaticProxy.playerHandler.BanlistHandler.Banlist.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(StaticProxy.playerHandler.BanlistHandler.Banlist.Count == 0 ? "No Banned Players" : string.Join('\n', StaticProxy.playerHandler.BanlistHandler.Banlist.Select(x => $"[{x.Username}] - [{x.IPAddress}]")));
         }
         public static void WipeCommand()
         {
             ConsoleUtils.LogToConsole("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)", ConsoleUtils.ConsoleLogMode.Warning);
             if (Console.ReadLine().Trim().ToUpper() == "Y")
             {
-                foreach (ServerClient client in Networking.connectedClients) client.disconnectFlag = true;
-                foreach (ServerClient client in Server.savedClients)
+                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray()) client.IsDisconnecting = true;
+                foreach (PlayerClient client in Server.savedClients)
                 {
-                    client.wealth = 0;
-                    client.pawnCount = 0;
-                    PlayerUtils.SavePlayer(client);
+                    client.Account.Wealth = 0;
+                    client.Account.PawnCount = 0;
+                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
                 }
                 ConsoleUtils.LogToConsole("All Player Files Have Been Set To Wipe", ConsoleUtils.ConsoleLogMode.Info);
             }
@@ -192,19 +194,19 @@ namespace OpenWorldServer
         }
         public static void ListCommand()
         {
-            ConsoleUtils.LogToConsole($"Connected Players: {Networking.connectedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
-            if (Networking.connectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
+            ConsoleUtils.LogToConsole($"Connected Players: {StaticProxy.playerHandler.ConnectedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            if (StaticProxy.playerHandler.ConnectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
             else
             {
-                foreach (ServerClient client in Networking.connectedClients)
+                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
                 {
-                    try 
-                    { 
-                        ConsoleUtils.LogToConsole(client.username); 
+                    try
+                    {
+                        ConsoleUtils.LogToConsole(client.Account.Username);
                     }
                     catch
                     {
-                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address}", ConsoleUtils.ConsoleLogMode.Error);
+                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {client.IPAddress}", ConsoleUtils.ConsoleLogMode.Error);
                     }
                 }
             }
@@ -212,15 +214,15 @@ namespace OpenWorldServer
             if (Server.savedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Saved");
             else
             {
-                foreach (ServerClient savedClient in Server.savedClients)
+                foreach (PlayerClient savedClient in Server.savedClients)
                 {
-                    try 
-                    { 
-                        ConsoleUtils.LogToConsole(savedClient.username); 
+                    try
+                    {
+                        ConsoleUtils.LogToConsole(savedClient.Account.Username);
                     }
                     catch
                     {
-                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {((IPEndPoint)savedClient.tcp.Client.RemoteEndPoint).Address}", ConsoleUtils.ConsoleLogMode.Error);
+                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {savedClient.IPAddress}", ConsoleUtils.ConsoleLogMode.Error);
                     }
                 }
             }
@@ -229,8 +231,8 @@ namespace OpenWorldServer
         }
         public static void SettlementsCommand()
         {
-            ConsoleUtils.LogToConsole("Server Settlements: " + Server.savedSettlements.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Settlements Saved" : string.Join('\n', Server.savedSettlements.Select(x => $"[{x.Key}] - [{x.Value[0]}]")));
+            ConsoleUtils.LogToConsole("Server Settlements: " + StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Settlements Saved" : string.Join('\n', StaticProxy.worldMapHandler.GetAccountsWithSettlements.Select(x => $"[{x.Username}] @ [{x.HomeTileId}]")));
         }
         public static void ChatCommand()
         {
