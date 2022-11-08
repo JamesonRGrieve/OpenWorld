@@ -28,19 +28,9 @@ namespace OpenWorldServer
         //Meta
         public static bool exit = false;
 
-        //Player Parameters
         public static List<PlayerClient> savedClients = new List<PlayerClient>();
 
         //Server Details
-        public static string serverVersion = "v1.4.2";
-
-        //Server Lists
-        public static List<string> adminList = new List<string>();
-        public static List<string> chatCache = new List<string>();
-        public static List<Faction> savedFactions = new List<Faction>();
-
-        public static string latestClientVersion;
-
         public Server(ServerConfig serverConfig)
         {
             this.serverConfig = serverConfig;
@@ -85,7 +75,7 @@ namespace OpenWorldServer
             this.StartAcceptingConnections();
 
             FactionHandler.CheckFactions(true);
-            PlayerUtils.CheckAllAvailablePlayers(false);
+            PlayerUtils.CheckAllAvailablePlayers();
 
             Threading.GenerateThreads(0);
 
@@ -255,76 +245,34 @@ namespace OpenWorldServer
 
         public static void ListenForCommands()
         {
-            Console.ForegroundColor = ConsoleColor.White;
-
-            string fullCommand = Console.ReadLine();
-            string commandBase = fullCommand.Split(' ')[0].ToLower();
-
-            string commandArguments = "";
-            if (fullCommand.Contains(' ')) commandArguments = fullCommand.Replace(fullCommand.Split(' ')[0], "").Remove(0, 1);
-
-            Dictionary<string, Action> simpleCommands = new Dictionary<string, Action>()
+            string[] commandParts = Console.ReadLine().Trim().Split(" "), commandArgs = commandParts.TakeLast(commandParts.Length - 1).ToArray();
+            string commandWord = commandParts[0].ToLower();
+            if (string.Join(' ', commandArgs).Count(x => x == '"')%2 != 0) ConsoleUtils.LogToConsole("Uneven amount of quotation marks detected, aborting.", ConsoleUtils.ConsoleLogMode.Error);
+            else
             {
-                {"help", SimpleCommands.HelpCommand},
-                {"settings", SimpleCommands.SettingsCommand},
-                {"modlist", SimpleCommands.ModListCommand},
-                {"reload", SimpleCommands.ReloadCommand},
-                {"status", SimpleCommands.StatusCommand},
-                {"eventlist", SimpleCommands.EventListCommand},
-                {"chat", SimpleCommands.ChatCommand},
-                {"list", SimpleCommands.ListCommand},
-                {"settlements", SimpleCommands.SettlementsCommand},
-                {"banlist", SimpleCommands.BanListCommand},
-                {"adminlist", SimpleCommands.AdminListCommand},
-                {"whitelist", SimpleCommands.WhiteListCommand},
-                {"wipe", SimpleCommands.WipeCommand},
-                {"clear", SimpleCommands.ClearCommand},
-                {"exit", SimpleCommands.ExitCommand}
-            };
-
-            Dictionary<string, Action> advancedCommands = new Dictionary<string, Action>()
-            {
-                {"say", AdvancedCommands.SayCommand},
-                {"broadcast", AdvancedCommands.BroadcastCommand},
-                {"notify", AdvancedCommands.NotifyCommand},
-                {"invoke", AdvancedCommands.InvokeCommand},
-                {"plague", AdvancedCommands.PlagueCommand},
-                {"player", AdvancedCommands.PlayerDetailsCommand},
-                {"faction", AdvancedCommands.FactionDetailsCommand},
-                {"kick", AdvancedCommands.KickCommand},
-                {"ban", AdvancedCommands.BanCommand},
-                {"pardon", AdvancedCommands.PardonCommand},
-                {"promote", AdvancedCommands.PromoteCommand},
-                {"demote", AdvancedCommands.DemoteCommand},
-                {"giveitem", AdvancedCommands.GiveItemCommand},
-                {"giveitemall", AdvancedCommands.GiveItemAllCommand},
-                {"protect", AdvancedCommands.ProtectCommand},
-                {"deprotect", AdvancedCommands.DeprotectCommand},
-                {"immunize", AdvancedCommands.ImmunizeCommand},
-                {"deimmunize", AdvancedCommands.DeimmunizeCommand}
-            };
-
-            try
-            {
-                if (simpleCommands.ContainsKey(commandBase))
+                // TODO: The last IsNullOrWhiteSpace() is to deal with quotes at the end of command strings. Clean that up so it's not necessary.
+                /*
+                1. Recombine the commandArgs (split by spaces) to form the full entry string sans command word.
+                2. Split it by quotation marks. This will make a list, alternating non-quoted and quoted portions of the command.
+                3. Trim out the spaces left by splitting on quotation marks.
+                4. Select either:
+                    4a. If the item is even (non-quoted), split it by spaces into a new sub-array.
+                    4b. If the item is odd (quoted), form a new sub-array that consists of the string as-is.
+                5. Recombine the sub-lists to form a single list of split and quoted arguments.
+                6. Remove the blank item that's created if the arg list ends with a quoted arg (see TODO). 
+                7. Convert it to an array.
+                */
+                string[] processedCommandArgs = string.Join(' ', commandArgs).Split('"').Select(x => x.Trim()).Select((c, i) => i % 2 == 0 ? c.Split(' ') : new string[1] { c }).SelectMany(x => x).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                try
                 {
-                    simpleCommands[commandBase]();
+                    Command invoked = ServerCommands.Where(x => x.Word == commandWord).SingleOrDefault();
+                    if (invoked != null) invoked.Execute(processedCommandArgs);
+                    else SimpleCommands.UnknownCommand(commandWord);
                 }
-
-                else if (advancedCommands.ContainsKey(commandBase))
+                catch (Exception ex)
                 {
-                    AdvancedCommands.commandData = commandArguments;
-                    advancedCommands[commandBase]();
+                    ConsoleUtils.LogToConsole($"ERROR: {ex.Message}", ConsoleUtils.ConsoleLogMode.Error);
                 }
-
-                else SimpleCommands.UnknownCommand(commandBase);
-            }
-
-            catch
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                ConsoleUtils.WriteWithTime("Command Caught Exception");
-                Console.ForegroundColor = ConsoleColor.White;
             }
         }
     }

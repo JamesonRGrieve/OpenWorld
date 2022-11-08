@@ -11,12 +11,10 @@ namespace OpenWorldServer.Handlers.Old
     {
         public enum MemberRank { Member, Moderator, Leader }
 
-        public static void CheckFactions(bool newLine)
+        public static void CheckFactions()
         {
-            if (newLine) Console.WriteLine("");
-
             Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Factions Check:");
+            ConsoleUtils.LogToConsole("Factions Check", ConsoleUtils.ConsoleLogMode.Heading);
             Console.ForegroundColor = ConsoleColor.White;
 
             if (!Directory.Exists(PathProvider.FactionsFolderPath))
@@ -40,10 +38,12 @@ namespace OpenWorldServer.Handlers.Old
 
         public static void CreateFaction(string factionName, PlayerClient factionLeader)
         {
-            Faction newFaction = new Faction();
-            newFaction.name = factionName;
-            newFaction.wealth = 0;
-            newFaction.members.Add(factionLeader, MemberRank.Leader);
+            Faction newFaction = new Faction()
+            { 
+                name = factionName,
+                wealth = 0,
+                members = new Dictionary<ServerClient, MemberRank>() { { factionLeader, MemberRank.Leader } }
+            };
             SaveFaction(newFaction);
 
             factionLeader.Account.Faction = newFaction;
@@ -98,7 +98,7 @@ namespace OpenWorldServer.Handlers.Old
                     if (factionToLoad.members.Count == 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.WriteWithTime("Faction Had 0 Members, Removing");
+                        ConsoleUtils.LogToConsole("Faction Had 0 Members, Removing");
                         Console.ForegroundColor = ConsoleColor.White;
 
                         DisbandFaction(factionToLoad);

@@ -9,10 +9,7 @@ namespace OpenWorldServer
     {
         public static void CheckClientVersionRequirement()
         {
-            Console.WriteLine("");
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Client Version Check:");
-            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleUtils.LogToConsole("Client Version Check", ConsoleUtils.ConsoleLogMode.Heading);
 
             try
             {
@@ -31,18 +28,13 @@ namespace OpenWorldServer
 
             catch
             {
-                Console.ForegroundColor = ConsoleColor.White;
-                ConsoleUtils.LogToConsole("Version Check Failed. This Is Not Dangerous");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
+                ConsoleUtils.LogToConsole("Version Check Failed. This Is Not Dangerous", ConsoleUtils.ConsoleLogMode.Warning);
+           }
         }
 
         public static void CheckServerVersion()
         {
-            Console.WriteLine("");
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Server Version Check:");
-            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleUtils.LogToConsole("Settings Check", ConsoleUtils.ConsoleLogMode.Heading);
 
             string latestVersion = "";
 

@@ -1,507 +1,248 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using OpenWorldServer.Handlers.Old;
+using System.Net;
 
 namespace OpenWorldServer
 {
     public static class SimpleCommands
     {
-        //Miscellaneous
-
         public static void HelpCommand()
         {
             Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("List Of Available Commands:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Help - Displays Help Menu");
-            ConsoleUtils.WriteWithTime("Settings - Displays Settings Menu");
-            ConsoleUtils.WriteWithTime("Modlist - Displays Mods Menu");
-            ConsoleUtils.WriteWithTime("List - Displays Player List Menu");
-            ConsoleUtils.WriteWithTime("Whitelist - Shows All Whitelisted Players");
-            ConsoleUtils.WriteWithTime("Settlements - Displays Settlements Menu");
-            ConsoleUtils.WriteWithTime("Faction - Displays All Data About X Faction");
-            ConsoleUtils.WriteWithTime("Reload - Reloads All Available Settings Into The Server");
-            ConsoleUtils.WriteWithTime("Status - Shows A General Overview Menu");
-            ConsoleUtils.WriteWithTime("Clear - Clears The Console");
-            ConsoleUtils.WriteWithTime("Exit - Closes The Server");
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Communication:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Say - Send A Chat Message");
-            ConsoleUtils.WriteWithTime("Broadcast - Send A Letter To Every Player Connected");
-            ConsoleUtils.WriteWithTime("Notify - Send A Letter To X Player");
-            ConsoleUtils.WriteWithTime("Chat - Displays Chat Menu");
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Interaction:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Invoke - Invokes An Event To X Player");
-            ConsoleUtils.WriteWithTime("Plague - Invokes An Event To All Connected Players");
-            ConsoleUtils.WriteWithTime("Eventlist - Shows All Available Events");
-            ConsoleUtils.WriteWithTime("GiveItem - Gives An Item To X Player");
-            ConsoleUtils.WriteWithTime("GiveItemAll - Gives An Item To All Players");
-            ConsoleUtils.WriteWithTime("Protect - Protects A Player From Any Event Temporarily");
-            ConsoleUtils.WriteWithTime("Deprotect - Disables All Protections Given To X Player");
-            ConsoleUtils.WriteWithTime("Immunize - Protects A Player From Any Event Permanently");
-            ConsoleUtils.WriteWithTime("Deimmunize - Disables The Immunity Given To X Player");
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Admin Control:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Player - Displays All Data About X Player");
-            ConsoleUtils.WriteWithTime("Promote - Promotes X Player To Admin");
-            ConsoleUtils.WriteWithTime("Demote - Demotes X Player");
-            ConsoleUtils.WriteWithTime("Adminlist - Shows All Server Admins");
-            ConsoleUtils.WriteWithTime("Kick - Kicks X Player");
-            ConsoleUtils.WriteWithTime("Ban - Bans X Player");
-            ConsoleUtils.WriteWithTime("Pardon - Pardons X Player");
-            ConsoleUtils.WriteWithTime("Banlist - Shows All Banned Players");
-            ConsoleUtils.WriteWithTime("Wipe - Deletes Every Player Data In The Server");
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("List of Available Commands", ConsoleUtils.ConsoleLogMode.Heading);
+            foreach (string category in Enum.GetNames(typeof(Command.CommandCategory)))
+            {
+                ConsoleUtils.LogToConsole(category.Replace('_',' '), ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(
+                string.Join('\n', Server.ServerCommands.Where(x => x.Category.ToString() == category).Select(x => $"{x.Word}: {x.Description}" +
+                    (x.AdvancedCommand != null
+                        ? $"\n\tUsage: {x.Word} {string.Join(' ', x.Parameters.Select(y => $"[{y.Name.ToLower()}]"))}\n\tParameters:\n{string.Join('\n', x.Parameters.Select(y => $"\t\t-{y.Name}: {y.Description}"))}"
+                        : ""
+                    )
+                )));
+            }
+            
         }
-
+        private static readonly Dictionary<string, Dictionary<string, string>> SETTINGS = new Dictionary<string, Dictionary<string, string>>()
+        {
+            { "Server Settings", new Dictionary<string, string>()
+                {
+                    {"Server Name", Server.serverName },
+                    {"Server Description", Server.serverDescription },
+                    {"Server Local IP", Networking.localAddress.ToString() },
+                    {"Server Port", Networking.serverPort.ToString() },
+                }
+            },
+            { "World Settings", new Dictionary<string, string>()
+                {
+                    {"Globe Coverage", Server.globeCoverage.ToString() },
+                    {"Seed", Server.seed },
+                    {"Overall Rainfall", Server.overallRainfall.ToString() },
+                    {"Overall Temperature", Server.overallTemperature.ToString() },
+                    { "Overall Population", Server.overallPopulation.ToString()}
+                }
+            }
+        };
         public static void SettingsCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Server Name: " + StaticProxy.serverConfig.ServerName);
-            ConsoleUtils.WriteWithTime("Server Description: " + StaticProxy.serverConfig.Description);
-            ConsoleUtils.WriteWithTime("Server Local IP: " + StaticProxy.serverConfig.HostIP);
-            ConsoleUtils.WriteWithTime("Server Port: " + StaticProxy.serverConfig.Port);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("World Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Globe Coverage: " + StaticProxy.serverConfig.World.GlobeCoverage);
-            ConsoleUtils.WriteWithTime("Seed: " + StaticProxy.serverConfig.World.Seed);
-            ConsoleUtils.WriteWithTime("Overall Rainfall: " + StaticProxy.serverConfig.World.OverallRainfall);
-            ConsoleUtils.WriteWithTime("Overall Temperature: " + StaticProxy.serverConfig.World.OverallTemperature);
-            ConsoleUtils.WriteWithTime("Overall Population: " + StaticProxy.serverConfig.World.OverallPopulation);
-            Console.WriteLine("");
+            foreach(KeyValuePair<string, Dictionary<string, string>> setting in SETTINGS) 
+            {
+                ConsoleUtils.LogToConsole(setting.Key, ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(string.Join('\n', setting.Value.Select(x => $"{x.Key}: {x.Value}")));
+            }
         }
-
+        private static readonly Dictionary<string, List<string>> MOD_LIST = new Dictionary<string, List<string>>()
+        {
+            { "Enforced Mods", Server.enforcedMods },
+            { "Whitelisted Mods", Server.whitelistedMods },
+            { "Server Blacklisted Mods", Server.blacklistedMods }
+        };
         public static void ModListCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Enforced Mods: " + StaticProxy.modHandler.RequiredMods.Length);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.modHandler.RequiredMods.Length == 0)
-                ConsoleUtils.WriteWithTime("No Enforced Mods Found");
-            else
-                foreach (var modMetaData in StaticProxy.modHandler.RequiredMods)
-                    ConsoleUtils.WriteWithTime(modMetaData.Name);
-
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Whitelisted Mods: " + StaticProxy.modHandler.WhitelistedMods.Length);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.modHandler.WhitelistedMods.Length == 0)
-                ConsoleUtils.WriteWithTime("No Whitelisted Mods Found");
-            else
-                foreach (var modMetaData in StaticProxy.modHandler.WhitelistedMods)
-                    ConsoleUtils.WriteWithTime(modMetaData.Name);
-
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Blacklisted Mods: " + StaticProxy.modHandler.BlacklistedMods.Length);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.modHandler.BlacklistedMods.Length == 0)
-                ConsoleUtils.WriteWithTime("No Blacklisted Mods Found");
-            else
-                foreach (var modMetaData in StaticProxy.modHandler.BlacklistedMods)
-                    ConsoleUtils.WriteWithTime(modMetaData.Name);
-            Console.WriteLine("");
+            foreach (KeyValuePair<string, List<string>> subList in MOD_LIST)
+            {
+                ConsoleUtils.LogToConsole($"{subList.Key}: {subList.Value.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(subList.Value.Count == 0 ? $"No {subList.Key}" : string.Join('\n', subList.Value));
+            }
         }
-
         public static void ExitCommand()
         {
-            PlayerClient[] clientsToKick = StaticProxy.playerHandler.ConnectedClients.ToArray();
-            foreach (PlayerClient sc in clientsToKick)
+            foreach (ServerClient sc in Networking.connectedClients)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
-                sc.IsDisconnecting = true;
+                sc.disconnectFlag = true;
             }
-
             Server.exit = true;
         }
-
         public static void ClearCommand()
         {
             Console.Clear();
         }
-
         public static void ReloadCommand()
         {
-            Console.Clear();
-
-            StaticProxy.modHandler.ReloadModFolders();
-            Console.ForegroundColor = ConsoleColor.Green;
-
-            FactionHandler.CheckFactions(false);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("");
-
-            PlayerUtils.CheckAllAvailablePlayers(false);
-            Console.ForegroundColor = ConsoleColor.Green;
+            ModHandler.CheckMods();
+            WorldHandler.CheckWorldFile();
+            FactionHandler.CheckFactions();
+            PlayerUtils.CheckAllAvailablePlayers();
         }
-
+        private static readonly Dictionary<string, Dictionary<string, string>> STATUSES_1 = new Dictionary<string, Dictionary<string, string>>()
+        {
+            { "Server Status", new Dictionary<string, string>()
+                {
+                    {"Version", Server.serverVersion },
+                    {"Live", "True" },
+                    {"Uptime", (DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime()).ToString() }
+                }
+            },
+            {   "Mod List Status", new Dictionary<string, string>()
+                {
+                    {"Using Modlist Check", Server.forceModlist.ToString() },
+                    {"Using Modlist Config Check", Server.forceModlistConfigs.ToString() },
+                    {"Using Mod Verification", Server.usingModVerification.ToString() }
+                }
+            }
+        };
+        private static readonly Dictionary<string, Dictionary<string, string>> STATUSES_2 = new Dictionary<string, Dictionary<string, string>>()
+        {
+            { "Chat", new Dictionary<string, string>()
+                {
+                    {"Using Chat", Server.usingChat.ToString() },
+                    {"Using Profanity Filter", Server.usingProfanityFilter.ToString() }
+                }
+            },
+            {   "Wealth", new Dictionary<string, string>()
+                {
+                    {"Using Wealth System", Server.usingWealthSystem.ToString() },
+                    {"Warning Threshold", Server.warningWealthThreshold.ToString() },
+                    {"Ban Threshold", Server.banWealthThreshold.ToString() }
+                }
+            },
+            {   "Idle", new Dictionary<string, string>()
+                {
+                    {"Using Idle System", Server.usingIdleTimer.ToString() },
+                    {"Idle Threshold", Server.idleTimer.ToString() }
+                }
+            },
+            {   "Road", new Dictionary<string, string>()
+                {
+                    {"Using Road System", Server.usingRoadSystem.ToString() },
+                    {"Aggressive Road Mode", Server.aggressiveRoadMode.ToString() }
+                }
+            },
+            {   "Miscellaneous", new Dictionary<string, string>()
+                {
+                    {"Using Enforced Difficulty", Server.usingEnforcedDifficulty.ToString() },
+                    {"Allow Dev Mode", Server.allowDevMode.ToString() }
+                }
+            }
+        };
         public static void StatusCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Status");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Version: " + Server.serverVersion);
-            ConsoleUtils.WriteWithTime("Connection: Online");
-            ConsoleUtils.WriteWithTime("Uptime: " + (DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime()));
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Mods:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Enforced Mods: " + StaticProxy.modHandler.RequiredMods.Length);
-            ConsoleUtils.WriteWithTime("Whitelisted Mods: " + StaticProxy.modHandler.WhitelistedMods.Length);
-            ConsoleUtils.WriteWithTime("Blacklisted Mods: " + StaticProxy.modHandler.BlacklistedMods.Length);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Players:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Connected Players: " + StaticProxy.playerHandler.ConnectedClients.Count);
-            ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
-            ConsoleUtils.WriteWithTime("Saved Settlements: " + StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count);
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
-            ConsoleUtils.WriteWithTime("Max Players: " + StaticProxy.serverConfig.MaxPlayers);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Modlist Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Modlist Check: " + StaticProxy.serverConfig.ModsSystem.MatchModlist);
-            ConsoleUtils.WriteWithTime("Using Modlist Config Check: " + StaticProxy.serverConfig.ModsSystem.ModlistConfigMatch);
-            ConsoleUtils.WriteWithTime("Using Mod Verification: " + StaticProxy.serverConfig.ModsSystem.ForceModVerification);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Chat Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Chat: " + StaticProxy.serverConfig.ChatSystem.IsActive);
-            ConsoleUtils.WriteWithTime("Using Profanity Filter: " + StaticProxy.serverConfig.ChatSystem.UseProfanityFilter);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Wealth Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Wealth System: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive);
-            ConsoleUtils.WriteWithTime("Warning Threshold: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold);
-            ConsoleUtils.WriteWithTime("Ban Threshold: " + StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Idle Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Idle System: " + StaticProxy.serverConfig.IdleSystem.IsActive);
-            ConsoleUtils.WriteWithTime("Idle Threshold: " + StaticProxy.serverConfig.IdleSystem.IdleThresholdInDays);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Road Settings:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Road System: " + StaticProxy.serverConfig.RoadSystem.IsActive);
-            ConsoleUtils.WriteWithTime("Aggressive Road Mode: " + StaticProxy.serverConfig.RoadSystem.AggressiveRoadMode);
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Miscellaneous Settings");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            ConsoleUtils.WriteWithTime("Using Whitelist: " + StaticProxy.serverConfig.WhitelistMode);
-            ConsoleUtils.WriteWithTime("Using Enforced Difficulty: " + StaticProxy.serverConfig.ForceDifficulty);
-            ConsoleUtils.WriteWithTime("Allow Dev Mode: " + StaticProxy.serverConfig.AllowDevMode);
-
-            Console.WriteLine("");
+            foreach (KeyValuePair<string, Dictionary<string, string>> status in STATUSES_1)
+            {
+                ConsoleUtils.LogToConsole(status.Key, ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(string.Join('\n', status.Value.Select(x => $"{x.Key}: {x.Value}")));
+            }
+            ModListCommand();
+            ConsoleUtils.LogToConsole("Players", ConsoleUtils.ConsoleLogMode.Heading);
+            ListCommand();
+            SettlementsCommand();
+            ConsoleUtils.LogToConsole("Using Whitelist: " + Server.usingWhitelist);
+            WhiteListCommand();
+            BanListCommand();
+            foreach (KeyValuePair<string, Dictionary<string, string>> status in STATUSES_2)
+            {
+                ConsoleUtils.LogToConsole(status.Key, ConsoleUtils.ConsoleLogMode.Heading);
+                ConsoleUtils.LogToConsole(string.Join('\n', status.Value.Select(x => $"{x.Key}: {x.Value}")));
+            }
         }
-
-        //Administration
-
         public static void WhiteListCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count == 0) ConsoleUtils.WriteWithTime("No Whitelisted Players Found");
-            else foreach (string str in StaticProxy.playerHandler.WhitelistHandler.Whitelist) ConsoleUtils.WriteWithTime("" + str);
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("Whitelisted Players: " + Server.whitelistedUsernames.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.whitelistedUsernames.Count == 0 ? "No Whitelisted Players Found" : string.Join('\n', Server.whitelistedUsernames));
         }
-
-        //Check this one
         public static void AdminListCommand()
-        {
-            Console.Clear();
-
-            Server.adminList.Clear();
-
-            PlayerClient[] savedClients = Server.savedClients.ToArray();
-            foreach (PlayerClient client in savedClients)
-            {
-                if (client.Account.IsAdmin) Server.adminList.Add(client.Account.Username);
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Administrators: " + Server.adminList.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (Server.adminList.Count == 0) ConsoleUtils.WriteWithTime("No Administrators Found");
-            else foreach (string str in Server.adminList) ConsoleUtils.WriteWithTime("" + str);
-
-            Console.WriteLine("");
+        {      
+            List<ServerClient> admins = Server.savedClients.Where(x => x.isAdmin).ToList();
+            ConsoleUtils.LogToConsole("Server Administrators: " + admins.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(admins.Count == 0 ? "No Admins Found" : string.Join('\n', admins.Select(x => x.username)));
         }
-
         public static void BanListCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Banned players: " + StaticProxy.playerHandler.BanlistHandler.Banlist.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.playerHandler.BanlistHandler.Banlist.Count == 0)
-                ConsoleUtils.WriteWithTime("No Banned Players");
-            else
-            {
-                // ToDo: Use Copy of Dictionary
-                foreach (var ban in StaticProxy.playerHandler.BanlistHandler.Banlist)
-                {
-                    ConsoleUtils.WriteWithTime("[" + ban.Username + "] - [" + ban.IPAddress + "]");
-                }
-            }
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole($"Banned players: {Server.bannedIPs.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.bannedIPs.Count == 0 ? "No Banned Players" : string.Join('\n', Server.bannedIPs.Select(x => $"[{x.Value}] - [{x.Key}]")));
         }
-
         public static void WipeCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            ConsoleUtils.WriteWithTime("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            string response = Console.ReadLine();
-
-            if (response == "Y")
+            ConsoleUtils.LogToConsole("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)", ConsoleUtils.ConsoleLogMode.Warning);
+            if (Console.ReadLine().Trim().ToUpper() == "Y")
             {
-                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
-                foreach (PlayerClient client in clients)
+                foreach (ServerClient client in Networking.connectedClients) client.disconnectFlag = true;
+                foreach (ServerClient client in Server.savedClients)
                 {
-                    client.IsDisconnecting = true;
+                    client.wealth = 0;
+                    client.pawnCount = 0;
+                    PlayerUtils.SavePlayer(client);
                 }
-
-                PlayerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (PlayerClient client in savedClients)
-                {
-                    client.Account.Wealth = 0;
-                    client.Account.PawnCount = 0;
-                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
-                }
-
-                Console.Clear();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                ConsoleUtils.WriteWithTime("All Player Files Have Been Set To Wipe");
-                Console.ForegroundColor = ConsoleColor.White;
+                ConsoleUtils.LogToConsole("All Player Files Have Been Set To Wipe", ConsoleUtils.ConsoleLogMode.Info);
             }
-            else Console.Clear();
+            else ConsoleUtils.LogToConsole("Aborted Wipe Attempt", ConsoleUtils.ConsoleLogMode.Info);
         }
-
-        //Player Interaction
-
         public static void ListCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Connected Players: " + StaticProxy.playerHandler.ConnectedClients.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (StaticProxy.playerHandler.ConnectedClients.Count == 0)
-                ConsoleUtils.WriteWithTime("No Players Connected");
+            ConsoleUtils.LogToConsole($"Connected Players: {Networking.connectedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            if (Networking.connectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
             else
             {
-                PlayerClient[] clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
-                foreach (PlayerClient client in clients)
+                foreach (ServerClient client in Networking.connectedClients)
                 {
-                    try
-                    {
-                        ConsoleUtils.WriteWithTime("" + client.Account.Username);
+                    try 
+                    { 
+                        ConsoleUtils.LogToConsole(client.username); 
                     }
                     catch
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + client.IPAddress.ToString());
-                        Console.ForegroundColor = ConsoleColor.White;
+                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {((IPEndPoint)client.tcp.Client.RemoteEndPoint).Address}", ConsoleUtils.ConsoleLogMode.Error);
                     }
                 }
             }
-
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Saved Players: " + Server.savedClients.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (Server.savedClients.Count == 0)
-                ConsoleUtils.WriteWithTime("No Players Saved");
+            ConsoleUtils.LogToConsole($"Saved Players: {Server.savedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            if (Server.savedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Saved");
             else
             {
-                PlayerClient[] savedClients = Server.savedClients.ToArray();
-                foreach (PlayerClient savedClient in savedClients)
+                foreach (ServerClient savedClient in Server.savedClients)
                 {
-                    try { ConsoleUtils.WriteWithTime("" + savedClient.Account.Username); }
+                    try 
+                    { 
+                        ConsoleUtils.LogToConsole(savedClient.username); 
+                    }
                     catch
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        ConsoleUtils.WriteWithTime("Error Processing Player With IP " + savedClient.IPAddress.ToString());
-                        Console.ForegroundColor = ConsoleColor.White;
+                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {((IPEndPoint)savedClient.tcp.Client.RemoteEndPoint).Address}", ConsoleUtils.ConsoleLogMode.Error);
                     }
                 }
             }
-
-            Console.WriteLine("");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Saved Factions: " + Server.savedFactions.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (Server.savedFactions.Count == 0)
-                ConsoleUtils.WriteWithTime("No Factions Saved");
-            else
-            {
-                Faction[] factions = Server.savedFactions.ToArray();
-                foreach (Faction savedFaction in factions)
-                {
-                    ConsoleUtils.WriteWithTime(savedFaction.name);
-                }
-            }
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("Saved Factions: " + Server.savedFactions.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Factions Saved" : string.Join('\n', Server.savedFactions.Select(x => x.name)));
         }
-
         public static void SettlementsCommand()
         {
-            Console.Clear();
-
-            var settlementAccounts = StaticProxy.worldMapHandler.GetAccountsWithSettlements;
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Settlements: " + settlementAccounts.Count);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (settlementAccounts.Count == 0)
-            {
-                ConsoleUtils.WriteWithTime("No Active Settlements");
-            }
-            else
-            {
-                foreach (var accounts in settlementAccounts)
-                {
-                    ConsoleUtils.WriteWithTime("[" + accounts.Username + "] @ [" + accounts.HomeTileId + "]");
-                }
-            }
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("Server Settlements: " + Server.savedSettlements.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Settlements Saved" : string.Join('\n', Server.savedSettlements.Select(x => $"[{x.Key}] - [{x.Value[0]}]")));
         }
-
         public static void ChatCommand()
         {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Server Chat:");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            if (Server.chatCache.Count == 0) ConsoleUtils.WriteWithTime("No Chat Messages");
-            else
-            {
-                string[] chat = Server.chatCache.ToArray();
-                foreach (string message in chat)
-                {
-                    ConsoleUtils.WriteWithTime(message);
-                }
-            }
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("Server Chat", ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Chat Messages in History" : string.Join('\n', Server.chatCache));
         }
-
+        public static readonly string[] EventList = new string[] { "Raid", "Infestation", "MechCluster", "ToxicFallout", "Manhunter", "Wanderer", "FarmAnimals", "ShipChunk", "GiveQuest", "TraderCaravan" };
         public static void EventListCommand()
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("List Of Available Events:");
-
-            Console.ForegroundColor = ConsoleColor.White;
-            ConsoleUtils.WriteWithTime("Raid");
-            ConsoleUtils.WriteWithTime("Infestation");
-            ConsoleUtils.WriteWithTime("MechCluster");
-            ConsoleUtils.WriteWithTime("ToxicFallout");
-            ConsoleUtils.WriteWithTime("Manhunter");
-            ConsoleUtils.WriteWithTime("Wanderer");
-            ConsoleUtils.WriteWithTime("FarmAnimals");
-            ConsoleUtils.WriteWithTime("ShipChunk");
-            ConsoleUtils.WriteWithTime("GiveQuest");
-            ConsoleUtils.WriteWithTime("TraderCaravan");
-
-            Console.WriteLine("");
+            ConsoleUtils.LogToConsole("List Of Available Events", ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(string.Join('\n', EventList));
         }
-
-        //Unknown
-
-        public static void UnknownCommand(string command)
-        {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.WriteWithTime("Command [" + command + "] Not Found");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            Console.WriteLine("");
-        }
+        public static void UnknownCommand(string command) => ConsoleUtils.LogToConsole("Command [" + command + "] Not Found", ConsoleUtils.ConsoleLogMode.Warning);
     }
 }
