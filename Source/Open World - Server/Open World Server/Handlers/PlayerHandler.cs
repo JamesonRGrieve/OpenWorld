@@ -28,35 +28,33 @@ namespace OpenWorldServer.Handlers
             this.AccountsHandler = new AccountsHandler(this.serverConfig);
             this.WhitelistHandler = new WhitelistHandler(this.serverConfig);
             this.BanlistHandler = new BanlistHandler(this.serverConfig);
-
         }
 
         internal void AddPlayer(TcpClient newClient)
-        {
-            if (this.players.Count >= this.serverConfig.MaxPlayers)
-            {
-                // ToDo: Handle - Kick ServerFull
-            }
-
-            this.players.Add(new PlayerClient(newClient));
-        }
+            => this.players.Add(new PlayerClient(newClient));
 
         internal void RemovePlayer(PlayerClient client)
         {
             if (this.players.Contains(client))
             {
-                this.AccountsHandler.SaveAccount(client);
-                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Disconnected");
+                if (client.IsLoggedIn)
+                {
+                    this.AccountsHandler.SaveAccount(client);
+                    ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Disconnected");
+                }
+                else
+                {
+                    ConsoleUtils.LogToConsole("Client [" + client.IPAddress?.ToString() + "] has Disconnected");
+                }
 
                 try
                 {
                     client.Dispose();
+                    this.players.Remove(client);
                 }
                 catch
                 {
                 }
-
-                this.players.Remove(client);
             }
         }
     }
