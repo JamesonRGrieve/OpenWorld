@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 using OpenWorldServer.Utils;
@@ -55,6 +56,8 @@ namespace OpenWorldServer.Handlers
         }
 
         internal BanInfo GetBanInfo(string username) => this.banlist.Find(b => b.Username == username);
+
+        internal BanInfo[] GetBanInfo(IPAddress ip) => this.banlist.Where(b => b.IPAddress == ip.ToString()).ToArray();
 
         internal void UnbanPlayer(string username)
         {

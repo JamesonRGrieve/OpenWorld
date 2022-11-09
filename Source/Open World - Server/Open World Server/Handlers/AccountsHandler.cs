@@ -31,9 +31,9 @@ namespace OpenWorldServer.Handlers
             ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleUtils.ConsoleLogMode.Done);
         }
 
-        public PlayerData GetAccount(PlayerClient client)
+        public PlayerData GetAccount(PlayerClient client, bool ignoreLoggedIn = false)
         {
-            if (client.IsLoggedIn)
+            if (!ignoreLoggedIn && client.IsLoggedIn)
             {
                 // No need to access list. If player is already logged in, we mapped the PlayerData object to the Client
                 return client.Account;
@@ -43,7 +43,23 @@ namespace OpenWorldServer.Handlers
         }
 
         public PlayerData GetAccount(string username)
-            => this.Accounts.Find(pd => pd.Username == username);
+        {
+            var account = this.Accounts.Find(pd => pd.Username == username);
+            if (account != null && account.Faction != null)
+            {
+                var factionToGive = Server.savedFactions.Find(fetch => fetch.name == account.Faction.name);
+                if (factionToGive != null)
+                {
+                    account.Faction = factionToGive;
+                }
+                else
+                {
+                    account.Faction = null;
+                }
+            }
+
+            return account;
+        }
 
         public bool SaveAccount(PlayerClient client)
             => this.SaveAccount(client.Account);

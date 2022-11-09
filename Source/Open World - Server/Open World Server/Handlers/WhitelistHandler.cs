@@ -39,7 +39,7 @@ namespace OpenWorldServer.Handlers
         internal bool IsWhitelisted(PlayerClient client)
             => client.Account.IsAdmin || this.IsWhitelisted(client.Account.Username);
 
-        private bool IsWhitelisted(string username)
+        internal bool IsWhitelisted(string username)
             => !this.serverConfig.WhitelistMode || this.whitelist.Contains(username);
     }
 }

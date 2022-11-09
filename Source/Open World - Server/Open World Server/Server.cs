@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
@@ -19,6 +18,7 @@ namespace OpenWorldServer
         private readonly PlayerHandler playerHandler;
         private readonly ModHandler modHandler;
         private readonly WorldMapHandler worldMapHandler;
+        private readonly ConnectionHandler connectionHandler;
 
         public bool IsRunning { get; set; } = false;
 
@@ -50,6 +50,7 @@ namespace OpenWorldServer
             this.modHandler = new ModHandler(serverConfig);
             this.playerHandler = new PlayerHandler(serverConfig);
             this.worldMapHandler = new WorldMapHandler(this.playerHandler);
+            this.connectionHandler = new ConnectionHandler(this.serverConfig, this.playerHandler, this.modHandler, this.worldMapHandler);
 
             this.SetupStaticProxy();
 
@@ -140,7 +141,7 @@ namespace OpenWorldServer
 
                         if (client.DataAvailable)
                         {
-                            Task.Run(() => this.ReadDataFromClient(client));
+                            Task.Run(() => this.connectionHandler.ReadDataFromClient(client));
                         }
                     }
 
@@ -184,66 +185,6 @@ namespace OpenWorldServer
                     Thread.Sleep(1000); // Let the CPU do some other things
                 }
             });
-        }
-
-        private void ReadDataFromClient(PlayerClient client)
-        {
-            string data = null;
-            try
-            {
-                data = client.ReceiveData();
-            }
-            catch { }
-
-            if (string.IsNullOrEmpty(data))
-            {
-                return;
-            }
-
-            if (data.StartsWith("Connect│"))
-            {
-                JoiningsUtils.LoginProcedures(client, PacketHandler.GetPacket<ConnectPacket>(data));
-            }
-            else if (data.StartsWith("ChatMessage│"))
-            {
-                NetworkingHandler.ChatMessageHandle(client, data);
-            }
-            else if (data.StartsWith("UserSettlement│"))
-            {
-                NetworkingHandler.UserSettlementHandle(client, data);
-            }
-            else if (data.StartsWith("ForceEvent│"))
-            {
-                NetworkingHandler.ForceEventHandle(client, data);
-            }
-            else if (data.StartsWith("SendGiftTo│"))
-            {
-                NetworkingHandler.SendGiftHandle(client, data);
-            }
-            else if (data.StartsWith("SendTradeTo│"))
-            {
-                NetworkingHandler.SendTradeHandle(client, data);
-            }
-            else if (data.StartsWith("SendBarterTo│"))
-            {
-                NetworkingHandler.SendBarterHandle(client, data);
-            }
-            else if (data.StartsWith("TradeStatus│"))
-            {
-                NetworkingHandler.TradeStatusHandle(client, data);
-            }
-            else if (data.StartsWith("BarterStatus│"))
-            {
-                NetworkingHandler.BarterStatusHandle(client, data);
-            }
-            else if (data.StartsWith("GetSpyInfo│"))
-            {
-                NetworkingHandler.SpyInfoHandle(client, data);
-            }
-            else if (data.StartsWith("FactionManagement│"))
-            {
-                NetworkingHandler.FactionManagementHandle(client, data);
-            }
         }
 
         public void SetupStaticProxy()

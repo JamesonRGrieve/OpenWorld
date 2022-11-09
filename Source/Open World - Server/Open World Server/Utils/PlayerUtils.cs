@@ -65,23 +65,6 @@ namespace OpenWorldServer
             catch { }
         }
 
-        public static void GiveSavedDataToPlayer(PlayerClient client)
-        {
-            var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(client);
-            if (playerData == null)
-            {
-                return;
-            }
-
-            client.Account = playerData;
-            if (client.Account.Faction != null)
-            {
-                Faction factionToGive = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
-                if (factionToGive != null) client.Account.Faction = factionToGive;
-                else client.Account.Faction = null;
-            }
-        }
-
         public static void CheckAllAvailablePlayers()
         {
 
