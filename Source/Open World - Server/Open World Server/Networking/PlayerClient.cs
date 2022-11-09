@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 
@@ -91,6 +92,12 @@ namespace OpenWorldServer
 
                 this.isReceiving = false;
             }
+        }
+
+        public void Disconnect(DisconnectReason reason)
+        {
+            this.SendData(new DisconnectPacket(reason));
+            this.IsDisconnecting = true;
         }
 
         public void Dispose()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
@@ -89,40 +90,35 @@ namespace OpenWorldServer.Handlers
         {
             if (!this.IsValidUsername(packet.Username))
             {
-                Networking.SendData(client, "Disconnect│Corrupted");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.Corrupted);
                 ConsoleUtils.LogToConsole($"Player [{client.IPAddress?.ToString()}] tried to Join but had an invalid Username [{packet.Username ?? ""}]");
                 return;
             }
 
             if (this.IsBanned(client.IPAddress)) // We check here the ip, so we don't need to more checks if client is banned
             {
-                Networking.SendData(client, "Disconnect│Banned");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.Banned);
                 ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but is Banned (IP)");
                 return;
             }
 
             if (!this.IsClientVersionValid(packet.Version))
             {
-                Networking.SendData(client, "Disconnect│Version");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.VersionMismatch);
                 ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but is using wrong Version [{packet.Version}]");
                 return;
             }
 
             if (this.IsBanned(packet.Username)) // Since everything is valid, check if username is banned
             {
-                Networking.SendData(client, "Disconnect│Banned");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.Banned);
                 ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but is Banned (Username)");
                 return;
             }
 
             if (this.IsUserAlreadyConnected(packet.Username))
             {
-                Networking.SendData(client, "Disconnect│AnotherLogin");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.AlreadyLoggedIn);
                 ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but is already LoggedIn / Connected");
                 return;
             }
@@ -130,10 +126,9 @@ namespace OpenWorldServer.Handlers
             var account = this.playerHandler.AccountsHandler.GetAccount(packet.Username);
             if (account != null)
             {
-                if (account.Password != client.Account.Password)
+                if (account.Password != packet.Password)
                 {
-                    Networking.SendData(client, "Disconnect│WrongPassword");
-                    client.IsDisconnecting = true;
+                    client.Disconnect(DisconnectReason.WrongPassword);
                     ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but entered an invalid password");
                     return;
                 }
@@ -152,16 +147,14 @@ namespace OpenWorldServer.Handlers
 
             if (!client.Account.IsAdmin && this.IsServerFull())
             {
-                Networking.SendData(client, "Disconnect│ServerFull");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.ServerFull);
                 ConsoleUtils.LogToConsole($"Player [{client.Account.Username}] tried to Join but Server is full");
                 return;
             }
 
             if (!this.playerHandler.WhitelistHandler.IsWhitelisted(client.Account.Username))
             {
-                Networking.SendData(client, "Disconnect│Whitelist");
-                client.IsDisconnecting = true;
+                client.Disconnect(DisconnectReason.NotOnWhitelist);
                 ConsoleUtils.LogToConsole($"Player [{client.Account.Username}] tried to Join but is not Whitelisted");
                 return;
             }
@@ -169,14 +162,12 @@ namespace OpenWorldServer.Handlers
             if (this.serverConfig.ModsSystem.MatchModlist &&
                 !client.Account.IsAdmin)
             {
-                var flaggedMods = this.AreClientModsValid(packet.Mods);
-                if (flaggedMods != null)
+                var modsCheckResult = this.AreClientModsValid(packet.Mods);
+                if (modsCheckResult.InvalidMods != null || modsCheckResult.MissingMods != null)
                 {
-                    const string modSeperator = "»";
-                    var invalidMods = string.Join(modSeperator, flaggedMods);
-                    Networking.SendData(client, "Disconnect│WrongMods│" + invalidMods);
+                    client.SendData(new DisconnectForModsPacket(modsCheckResult.InvalidMods?.ToArray(), modsCheckResult.MissingMods?.ToArray()));
                     client.IsDisconnecting = true;
-                    ConsoleUtils.LogToConsole($"Player [{packet.Username}] has a Mod File Mismatch ({flaggedMods.Count} Mods mismatch)");
+                    ConsoleUtils.LogToConsole($"Player [{packet.Username}] has a Mod Files Mismatch ({modsCheckResult.InvalidMods?.Count ?? 0} Invalid, {modsCheckResult.MissingMods?.Count ?? 0} Missing)");
                     return;
                 }
             }
@@ -202,9 +193,10 @@ namespace OpenWorldServer.Handlers
         private bool IsUserAlreadyConnected(string username)
             => this.playerHandler.ConnectedClients.Any(c => username == c.Account.Username);
 
-        private List<string> AreClientModsValid(string[] mods)
+        private (List<string> InvalidMods, List<string> MissingMods) AreClientModsValid(string[] mods)
         {
             var flaggedMods = new List<string>();
+            var missingMods = new List<string>();
 
             foreach (string mod in mods)
             {
@@ -226,11 +218,11 @@ namespace OpenWorldServer.Handlers
             {
                 if (!mods.Contains(modMetaData.Name))
                 {
-                    flaggedMods.Add(modMetaData.Name);
+                    missingMods.Add(modMetaData.Name);
                 }
             }
 
-            return flaggedMods;
+            return (flaggedMods, missingMods);
         }
 
         private void JoinPlayer(PlayerClient client, JoinMode joinMode)

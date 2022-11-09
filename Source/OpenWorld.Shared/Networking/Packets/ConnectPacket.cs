@@ -44,7 +44,6 @@ namespace OpenWorld.Shared.Networking.Packets
         {
             // We cant use this since a typo could be a bigger problem.
             // When the protocol is changed to send a byte for the JoinMode, we can use it to parse by casting.
-            // return (JoinMode)Enum.Parse(typeof(JoinMode), joinMode);
 
             switch (joinMode)
             {
