@@ -4,6 +4,6 @@
     {
         public bool IsActive { get; set; } = true;
 
-        public uint IdleThresholdInDays { get; set; } = 7;
+        public uint IdleThresholdInDays { get; set; } = 14;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OpenWorldServer.Data
 {
@@ -11,6 +12,8 @@ namespace OpenWorldServer.Data
         public bool IsAdmin { get; set; } = false;
 
         public bool ToWipe { get; set; } = false;
+
+        public DateTime LastLogin { get; set; } = DateTime.Now;
 
         public bool HasSettlement => !string.IsNullOrEmpty(this.HomeTileId);
 

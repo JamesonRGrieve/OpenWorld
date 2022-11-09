@@ -138,7 +138,6 @@ namespace OpenWorldServer.Handlers
                 }
 
                 client.Account = account;
-                client.IsLoggedIn = true;
                 ConsoleUtils.LogToConsole($"Player [{client.Account.Username}] has logged in");
             }
             else
@@ -148,6 +147,9 @@ namespace OpenWorldServer.Handlers
                 this.playerHandler.AccountsHandler.SaveAccount(client);
                 ConsoleUtils.LogToConsole("New Player [" + client.Account.Username + "] has logged in");
             }
+
+            client.IsLoggedIn = true;
+            client.Account.LastLogin = DateTime.Now;
 
             if (!client.Account.IsAdmin && this.IsServerFull())
             {
