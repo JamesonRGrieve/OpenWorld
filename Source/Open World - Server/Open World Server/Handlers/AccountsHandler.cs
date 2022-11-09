@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
@@ -25,10 +26,42 @@ namespace OpenWorldServer.Handlers
 
             foreach (var playerFile in playerFiles)
             {
-                this.Accounts.Add(JsonDataHelper.Load<PlayerData>(playerFile));
+                this.LoadAccounts(playerFile);
             }
 
-            ConsoleUtils.LogToConsole($"Loaded Players - {playerFiles.Length} Entries", ConsoleUtils.ConsoleLogMode.Done);
+            ConsoleUtils.LogToConsole($"Loaded Players - {this.Accounts.Count} Entries", ConsoleUtils.ConsoleLogMode.Info);
+        }
+
+        private void LoadAccounts(string playerFile)
+        {
+            try
+            {
+                var account = JsonDataHelper.Load<PlayerData>(playerFile);
+
+                if (this.serverConfig.IdleSystem.IsActive)
+                {
+                    if (account.LastLogin == null)
+                    {
+                        account.LastLogin = DateTime.Now;
+                        this.SaveAccount(account);
+                    }
+
+                    var timespan = (DateTime.Now - (DateTime)account.LastLogin);
+                    if (timespan.Days > this.serverConfig.IdleSystem.IdleThresholdInDays)
+                    {
+                        ConsoleUtils.LogToConsole($"Deleting Player [{account.Username}] for Idling ({timespan.Days} Days)", ConsoleUtils.ConsoleLogMode.Warning);
+                        File.Delete(playerFile);
+                        return;
+                    }
+                }
+
+                this.Accounts.Add(account);
+            }
+            catch (Exception ex)
+            {
+                ConsoleUtils.LogToConsole($"Error loading Account from '{playerFile}'. Exception:", ConsoleUtils.ConsoleLogMode.Error);
+                ConsoleUtils.LogToConsole(ex.Message, ConsoleUtils.ConsoleLogMode.Error);
+            }
         }
 
         public PlayerData GetAccount(PlayerClient client, bool ignoreLoggedIn = false)
@@ -64,14 +97,14 @@ namespace OpenWorldServer.Handlers
         public bool SaveAccount(PlayerClient client)
             => this.SaveAccount(client.Account);
 
-        public bool SaveAccount(PlayerData account)
+        public bool SaveAccount(PlayerData account, bool saveOnly = false)
         {
-            var playerFile = this.GetAccountFromFilePath(account.Username);
+            var playerFile = this.GetAccountFilePath(account.Username);
             try
             {
                 ConsoleUtils.LogToConsole($"Saving [{account.Username}]", ConsoleUtils.ConsoleLogMode.Done);
                 JsonDataHelper.Save(account, playerFile);
-                if (!this.Accounts.Contains(account))
+                if (!saveOnly && !this.Accounts.Contains(account))
                 {
                     this.Accounts.Add(account);
                     Server.savedClients.Add(new PlayerClient(null) { Account = account });
@@ -119,7 +152,7 @@ namespace OpenWorldServer.Handlers
                 this.Accounts.Remove(oldData);
             }
 
-            var file = this.GetAccountFromFilePath(account.Username);
+            var file = this.GetAccountFilePath(account.Username);
             if (File.Exists(file))
             {
                 File.Delete(file);
@@ -134,7 +167,7 @@ namespace OpenWorldServer.Handlers
 
         public PlayerData ReloadAccount(string username)
         {
-            var playerFile = this.GetAccountFromFilePath(username);
+            var playerFile = this.GetAccountFilePath(username);
             if (File.Exists(playerFile))
             {
                 var data = JsonDataHelper.Load<PlayerData>(playerFile);
@@ -151,6 +184,6 @@ namespace OpenWorldServer.Handlers
             return null;
         }
 
-        private string GetAccountFromFilePath(string username) => Path.Combine(PathProvider.PlayersFolderPath, $"{username}.json");
+        private string GetAccountFilePath(string username) => Path.Combine(PathProvider.PlayersFolderPath, $"{username}.json");
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace OpenWorldServer.Data
 {
+    [DebuggerDisplay("{Username,nq}")]
     public class PlayerData
     {
         public string Username { get; set; }
@@ -13,7 +15,7 @@ namespace OpenWorldServer.Data
 
         public bool ToWipe { get; set; } = false;
 
-        public DateTime LastLogin { get; set; } = DateTime.Now;
+        public DateTime? LastLogin { get; set; }
 
         public bool HasSettlement => !string.IsNullOrEmpty(this.HomeTileId);
 

@@ -94,14 +94,6 @@ namespace OpenWorldServer
 
                 foreach (string file in playerFiles)
                 {
-                    if (StaticProxy.serverConfig.IdleSystem.IsActive)
-                    {
-                        FileInfo fi = new FileInfo(file);
-                        if (fi.LastAccessTime < DateTime.Now.AddDays(-StaticProxy.serverConfig.IdleSystem.IdleThresholdInDays))
-                        {
-                            fi.Delete();
-                        }
-                    }
 
                     LoadPlayer(file);
                 }
