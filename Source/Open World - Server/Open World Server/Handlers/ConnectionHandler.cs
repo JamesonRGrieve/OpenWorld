@@ -86,6 +86,10 @@ namespace OpenWorldServer.Handlers
             }
         }
 
+        // Check order wich made most sense
+        // Check Username -> IP Banned -> Check Version -> User Banned -> Already Connected --
+        //      --> Get / Create Account -> Check Server Full (IsAdmin?) -> Check Whitelisted (IsAdmin?) -> Check Mods (IsAdmin?)
+        // Many calls didn't need an extra Method, they are just for readability 
         private void HandleNewConnection(PlayerClient client, ConnectPacket packet)
         {
             if (!this.IsValidUsername(packet.Username))
@@ -109,7 +113,7 @@ namespace OpenWorldServer.Handlers
                 return;
             }
 
-            if (this.IsBanned(packet.Username)) // Since everything is valid, check if username is banned
+            if (this.IsBanned(packet.Username)) // Check if username is banned
             {
                 client.Disconnect(DisconnectReason.Banned);
                 ConsoleUtils.LogToConsole($"Player [{packet.Username}] tried to Join but is Banned (Username)");
