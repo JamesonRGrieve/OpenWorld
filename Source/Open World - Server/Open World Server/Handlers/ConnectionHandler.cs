@@ -179,8 +179,7 @@ namespace OpenWorldServer.Handlers
             }
 
             ConsoleUtils.UpdateTitle();
-            JoinPlayer(client, packet.JoinMode);
-            ServerUtils.SendPlayerListToAll(client);
+            JoinPlayer(client, packet.JoinMode); ;
         }
 
         private bool IsServerFull()
@@ -243,6 +242,7 @@ namespace OpenWorldServer.Handlers
                 this.SendLoadGameData(client);
             }
 
+            this.playerHandler.NotifyPlayerListChanged(client);
             ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] joined");
         }
 
@@ -251,8 +251,8 @@ namespace OpenWorldServer.Handlers
             Networking.SendData(client, JoiningsUtils.GetSettlementsToSend(client));
             Networking.SendData(client, JoiningsUtils.GetVariablesToSend(client));
 
-            var usernames = this.playerHandler.ConnectedClients.Select(c => c.Account?.Username);
-            client.SendData(new PlayerListPacket(usernames.ToArray()));
+            //var playerlistPacket = this.playerHandler.GetPlayerListPacket(client).Packet;
+            //client.SendData(playerlistPacket);
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
             Networking.SendData(client, FactionBuildingHandler.GetAllFactionStructures(client));

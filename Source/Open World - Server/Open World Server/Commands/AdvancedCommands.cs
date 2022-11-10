@@ -9,11 +9,11 @@ namespace OpenWorldServer
         {
             ConsoleUtils.LogToConsole($"Chat - [Console] {arguments[0]}");
             Server.chatCache.Add($"[{DateTime.Now}] │ {arguments[0]}");
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray()) Networking.SendData(sc, $"ChatMessage│SERVER│{arguments[0]}");
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients) Networking.SendData(sc, $"ChatMessage│SERVER│{arguments[0]}");
         }
         public static void BroadcastCommand(string[] arguments)
         {
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray()) Networking.SendData(sc, $"Notification│{arguments[0]}");
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients) Networking.SendData(sc, $"Notification│{arguments[0]}");
             ConsoleUtils.LogToConsole("Letter Sent To Every Connected Player", ConsoleUtils.ConsoleLogMode.Info);
         }
         public static void NotifyCommand(string[] arguments)
@@ -30,7 +30,7 @@ namespace OpenWorldServer
         }
         public static void GiveItemAllCommand(string[] arguments)
         {
-            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray()) Networking.SendData(client, $"GiftedItems│{arguments[0]}┼{arguments[1]}┼{arguments[2]}┼");
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients) Networking.SendData(client, $"GiftedItems│{arguments[0]}┼{arguments[1]}┼{arguments[2]}┼");
             ConsoleUtils.LogToConsole("Item Has Neen Gifted To All Players", ConsoleUtils.ConsoleLogMode.Info);
         }
         public static void ImmunizeCommand(string[] arguments)
@@ -73,7 +73,7 @@ namespace OpenWorldServer
         }
         public static void PlagueCommand(string[] arguments)
         {
-            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray()) Networking.SendData(client, "ForcedEvent│" + arguments[0]);
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients) Networking.SendData(client, "ForcedEvent│" + arguments[0]);
             ConsoleUtils.LogToConsole($"Sent Event {arguments[0]} To Every Player", ConsoleUtils.ConsoleLogMode.Info);
         }
         public static void PromoteCommand(string[] arguments)

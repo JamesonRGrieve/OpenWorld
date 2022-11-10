@@ -69,7 +69,7 @@ namespace OpenWorldServer
         }
         public static void ExitCommand()
         {
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
                 sc.IsDisconnecting = true;
@@ -181,7 +181,7 @@ namespace OpenWorldServer
             ConsoleUtils.LogToConsole("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)", ConsoleUtils.ConsoleLogMode.Warning);
             if (Console.ReadLine().Trim().ToUpper() == "Y")
             {
-                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray()) client.IsDisconnecting = true;
+                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients) client.IsDisconnecting = true;
                 foreach (PlayerClient client in Server.savedClients)
                 {
                     client.Account.Wealth = 0;
@@ -198,7 +198,7 @@ namespace OpenWorldServer
             if (StaticProxy.playerHandler.ConnectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
             else
             {
-                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
+                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients)
                 {
                     try
                     {

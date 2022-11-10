@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 
 namespace OpenWorldServer.Handlers
@@ -18,7 +21,10 @@ namespace OpenWorldServer.Handlers
 
         public BanlistHandler BanlistHandler { get; }
 
-        public ReadOnlyCollection<PlayerClient> ConnectedClients => this.players.AsReadOnly();
+        /// <summary>
+        /// Copy of connected clients as ReadOnlyCollection
+        /// </summary>
+        public ReadOnlyCollection<PlayerClient> ConnectedClients => this.players.ToList().AsReadOnly();
 
         private List<PlayerClient> players = new List<PlayerClient>();
 
@@ -56,6 +62,17 @@ namespace OpenWorldServer.Handlers
                 {
                 }
             }
+        }
+
+        internal void NotifyPlayerListChanged(PlayerClient newClient)
+        {
+            var clients = this.ConnectedClients;
+            var usernames = clients.Select(c => c.Account?.Username).ToArray();
+            var packet = new PlayerListPacket(usernames, clients.Count);
+            Parallel.ForEach(clients, targetClient =>
+            {
+                targetClient.SendData(packet);
+            });
         }
     }
 }

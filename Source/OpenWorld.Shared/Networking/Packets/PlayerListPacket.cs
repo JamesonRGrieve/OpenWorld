@@ -10,13 +10,16 @@ namespace OpenWorld.Shared.Networking.Packets
 
         public string[] Usernames { get; private set; }
 
+        public int PlayerCount { get; private set; }
+
         public PlayerListPacket()
         {
         }
 
-        public PlayerListPacket(string[] usernames)
+        public PlayerListPacket(string[] usernames, int playerCount)
         {
             this.Usernames = usernames;
+            this.PlayerCount = playerCount;
         }
 
         public override void SetPacket(string data)
@@ -36,7 +39,11 @@ namespace OpenWorld.Shared.Networking.Packets
             if ((this.Usernames?.Length ?? 0) > 0)
             {
                 var names = string.Join(usernameSeperator, this.Usernames);
-                result += this.BuildData(names, this.Usernames.Length.ToString());
+                result += this.BuildData(names, this.PlayerCount.ToString());
+            }
+            else
+            {
+                result += this.BuildData(string.Empty, this.PlayerCount.ToString());
             }
 
             return result;

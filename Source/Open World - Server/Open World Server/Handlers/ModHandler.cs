@@ -54,8 +54,7 @@ namespace OpenWorldServer.Handlers
             const string aboutDirName = "About";
 
             var mods = new List<ModMetaData>();
-            var foundModFolders = Directory.GetDirectories(path);
-            foreach (var folder in foundModFolders)
+            foreach (var folder in Directory.GetDirectories(path))
             {
                 var aboutDir = Path.Combine(folder, aboutDirName);
                 // we look it up here so we can give a proper warning if for example there are more About Files somewhere hidden in the folder

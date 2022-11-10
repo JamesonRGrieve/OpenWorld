@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using OpenWorld.Shared.Networking.Packets;
+﻿using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
@@ -106,7 +105,7 @@ namespace OpenWorldServer
             string username = data.Split('│')[2];
             PlayerClient target = null;
 
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
             {
                 if (sc.Account.Username == username)
                 {
@@ -135,7 +134,7 @@ namespace OpenWorldServer
             string user = data.Split('│')[2];
             PlayerClient target = null;
 
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
             {
                 if (sc.Account.Username == user)
                 {

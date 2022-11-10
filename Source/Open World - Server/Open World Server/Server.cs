@@ -130,7 +130,7 @@ namespace OpenWorldServer
                 var needUpdate = false;
                 while (this.IsRunning)
                 {
-                    foreach (var client in this.playerHandler.ConnectedClients.ToArray())
+                    foreach (var client in this.playerHandler.ConnectedClients)
                     {
                         if (!client.IsConnected || client.IsDisconnecting)
                         {
@@ -148,7 +148,7 @@ namespace OpenWorldServer
                     if (needUpdate)
                     {
                         ConsoleUtils.UpdateTitle();
-                        ServerUtils.SendPlayerListToAll(null);
+                        this.playerHandler.NotifyPlayerListChanged(null);
                         needUpdate = false;
                     }
 
@@ -164,9 +164,8 @@ namespace OpenWorldServer
                 var pingPacketData = new PingPacket().GetData();
                 while (this.IsRunning)
                 {
-                    var clients = this.playerHandler.ConnectedClients.ToArray();
-
-                    if (clients.Length == 0)
+                    var clients = this.playerHandler.ConnectedClients;
+                    if (clients.Count == 0)
                     {
                         Thread.Sleep(500);
                         continue;

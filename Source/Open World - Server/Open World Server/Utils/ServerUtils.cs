@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using OpenWorld.Shared.Networking.Packets;
 
 namespace OpenWorldServer
 {
@@ -29,7 +28,7 @@ namespace OpenWorldServer
             catch
             {
                 ConsoleUtils.LogToConsole("Version Check Failed. This Is Not Dangerous", ConsoleUtils.ConsoleLogMode.Warning);
-           }
+            }
         }
 
         public static void CheckServerVersion()
@@ -69,22 +68,10 @@ namespace OpenWorldServer
 
             Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
 
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
             {
                 if (sc == client) continue;
                 else Networking.SendData(sc, data);
-            }
-        }
-
-        public static void SendPlayerListToAll(PlayerClient client)
-        {
-            var clients = StaticProxy.playerHandler.ConnectedClients.ToArray();
-            var usernames = clients.Select(c => c.Account?.Username);
-            foreach (var sc in clients)
-            {
-                if (client != null && sc == client) continue;
-
-                sc.SendData(new PlayerListPacket(usernames.ToArray()));
             }
         }
     }

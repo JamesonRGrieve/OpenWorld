@@ -59,7 +59,7 @@ namespace OpenWorldServer.Handlers.Old
             FactionHandler.SaveFaction(faction);
 
             int factionValue = 0;
-            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients)
             {
                 if (client.Account.Faction == null) factionValue = 0;
                 if (client.Account.Faction != null)
@@ -85,7 +85,7 @@ namespace OpenWorldServer.Handlers.Old
 
             FactionHandler.SaveFaction(faction);
 
-            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients)
             {
                 Networking.SendData(client, "FactionStructureBuilder│RemoveStructure" + "│" + structureTile);
             }

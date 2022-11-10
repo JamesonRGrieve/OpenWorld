@@ -42,7 +42,7 @@ namespace OpenWorldServer.Handlers
             StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
 
             int factionValue = 0;
-            foreach (var connectedClient in StaticProxy.playerHandler.ConnectedClients.ToArray())
+            foreach (var connectedClient in this.playerHandler.ConnectedClients)
             {
                 if (connectedClient.Account.Username == connectedClient.Account.Username)
                 {
@@ -103,7 +103,7 @@ namespace OpenWorldServer.Handlers
 
         private void NotifySettlementChange(SettlementBuilderPacket packet, PlayerClient executer = null)
         {
-            Parallel.ForEach(this.playerHandler.ConnectedClients.ToArray(), target =>
+            Parallel.ForEach(this.playerHandler.ConnectedClients, target =>
             {
                 if (executer?.Account?.Username != target.Account?.Username)
                 {

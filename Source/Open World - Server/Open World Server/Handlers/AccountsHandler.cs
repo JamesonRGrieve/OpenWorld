@@ -22,9 +22,7 @@ namespace OpenWorldServer.Handlers
         private void LoadAccounts()
         {
             ConsoleUtils.LogTitleToConsole("Loading Players and Settlements");
-            var playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath, "*.json");
-
-            foreach (var playerFile in playerFiles)
+            foreach (var playerFile in Directory.GetFiles(PathProvider.PlayersFolderPath, "*.json"))
             {
                 this.LoadAccounts(playerFile);
             }
