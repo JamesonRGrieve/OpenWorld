@@ -37,11 +37,11 @@ namespace OpenWorldServer
             },
             { "World Settings", new Dictionary<string, string>()
                 {
-                    {"Globe Coverage", StaticProxy.serverConfig.World.GlobeCoverage.ToString() },
-                    {"Seed", StaticProxy.serverConfig.World.Seed },
-                    {"Overall Rainfall", StaticProxy.serverConfig.World.OverallRainfall.ToString() },
-                    {"Overall Temperature", StaticProxy.serverConfig.World.OverallTemperature.ToString() },
-                    { "Overall Population", StaticProxy.serverConfig.World.OverallPopulation.ToString()}
+                    {"Globe Coverage", StaticProxy.serverConfig.Planet.GlobeCoverage.ToString() },
+                    {"Seed", StaticProxy.serverConfig.Planet.Seed },
+                    {"Overall Rainfall", StaticProxy.serverConfig.Planet.OverallRainfall.ToString() },
+                    {"Overall Temperature", StaticProxy.serverConfig.Planet.OverallTemperature.ToString() },
+                    { "Overall Population", StaticProxy.serverConfig.Planet.OverallPopulation.ToString()}
                 }
             }
         };
@@ -179,7 +179,7 @@ namespace OpenWorldServer
         public static void WipeCommand()
         {
             ConsoleUtils.LogToConsole("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)", ConsoleUtils.ConsoleLogMode.Warning);
-            if (Console.ReadLine().Trim().ToUpper() == "Y")
+            if (string.Equals(Console.ReadLine().Trim(), "Y", StringComparison.OrdinalIgnoreCase))
             {
                 foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients) client.IsDisconnecting = true;
                 foreach (PlayerClient client in Server.savedClients)

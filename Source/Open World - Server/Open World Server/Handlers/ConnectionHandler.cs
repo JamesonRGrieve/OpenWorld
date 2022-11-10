@@ -6,7 +6,6 @@ using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
-using OpenWorldServer.Enums;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer.Handlers
@@ -248,7 +247,9 @@ namespace OpenWorldServer.Handlers
 
         private void SendWorldData(PlayerClient client)
         {
-            Networking.SendData(client, JoiningsUtils.GetSettlementsToSend(client));
+            var settlements = this.worldMapHandler.GetSettlements.Where(s => s.Owner != client.Account.Username);
+            client.SendData(new SettlementsPacket(settlements, client.Account.Faction?.name));
+            //Networking.SendData(client, JoiningsUtils.GetSettlementsToSend(client));
             Networking.SendData(client, JoiningsUtils.GetVariablesToSend(client));
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
@@ -260,11 +261,10 @@ namespace OpenWorldServer.Handlers
             this.worldMapHandler.NotifySettlementRemoved(client);
             this.playerHandler.AccountsHandler.ResetAccount(client, true);
 
-            Networking.SendData(client, JoiningsUtils.GetPlanetToSend());
-
+            client.SendData(new PlanetPacket(this.serverConfig.Planet));
             this.SendWorldData(client);
 
-            Networking.SendData(client, "NewGame│");
+            client.SendData(new NewGamePacket());
         }
 
         private void SendLoadGameData(PlayerClient client)
@@ -273,7 +273,7 @@ namespace OpenWorldServer.Handlers
 
             Networking.SendData(client, JoiningsUtils.GetGiftsToSend(client));
             Networking.SendData(client, JoiningsUtils.GetTradesToSend(client));
-            Networking.SendData(client, "LoadGame│");
+            client.SendData(new LoadGamePacket());
         }
     }
 }

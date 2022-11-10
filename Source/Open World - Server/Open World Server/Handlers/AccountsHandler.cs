@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using OpenWorldServer.Data;
 using OpenWorldServer.Services;
 using OpenWorldServer.Utils;
@@ -11,7 +13,12 @@ namespace OpenWorldServer.Handlers
     {
         private readonly ServerConfig serverConfig;
 
-        internal List<PlayerData> Accounts { get; set; } = new List<PlayerData>();
+        /// <summary>
+        /// Copy of Accounts as ReadOnlyCollection
+        /// </summary>
+        public ReadOnlyCollection<PlayerData> Accounts => this.accounts.ToList().AsReadOnly();
+
+        private List<PlayerData> accounts = new List<PlayerData>();
 
         public AccountsHandler(ServerConfig serverConfig)
         {
@@ -27,7 +34,7 @@ namespace OpenWorldServer.Handlers
                 this.LoadAccounts(playerFile);
             }
 
-            ConsoleUtils.LogToConsole($"Loaded Players - {this.Accounts.Count} Entries", ConsoleUtils.ConsoleLogMode.Info);
+            ConsoleUtils.LogToConsole($"Loaded Players - {this.accounts.Count} Entries", ConsoleUtils.ConsoleLogMode.Info);
         }
 
         private void LoadAccounts(string playerFile)
@@ -53,7 +60,7 @@ namespace OpenWorldServer.Handlers
                     }
                 }
 
-                this.Accounts.Add(account);
+                this.accounts.Add(account);
             }
             catch (Exception ex)
             {
@@ -75,7 +82,7 @@ namespace OpenWorldServer.Handlers
 
         public PlayerData GetAccount(string username)
         {
-            var account = this.Accounts.Find(pd => pd.Username == username);
+            var account = this.accounts.Find(pd => pd.Username == username);
             if (account != null && account.Faction != null)
             {
                 var factionToGive = Server.savedFactions.Find(fetch => fetch.name == account.Faction.name);
@@ -104,7 +111,7 @@ namespace OpenWorldServer.Handlers
                 JsonDataHelper.Save(account, playerFile);
                 if (!saveOnly && !this.Accounts.Contains(account))
                 {
-                    this.Accounts.Add(account);
+                    this.accounts.Add(account);
                     Server.savedClients.Add(new PlayerClient(null) { Account = account });
                 }
 
@@ -147,7 +154,7 @@ namespace OpenWorldServer.Handlers
             var oldData = this.GetAccount(account.Username);
             if (oldData != null)
             {
-                this.Accounts.Remove(oldData);
+                this.accounts.Remove(oldData);
             }
 
             var file = this.GetAccountFilePath(account.Username);
@@ -159,7 +166,7 @@ namespace OpenWorldServer.Handlers
 
         internal void ReloadAccounts()
         {
-            this.Accounts.Clear();
+            this.accounts.Clear();
             this.LoadAccounts();
         }
 
@@ -172,10 +179,10 @@ namespace OpenWorldServer.Handlers
                 var oldData = this.GetAccount(username);
                 if (oldData != null)
                 {
-                    this.Accounts.Remove(oldData);
+                    this.accounts.Remove(oldData);
                 }
 
-                this.Accounts.Add(data);
+                this.accounts.Add(data);
                 return data;
             }
 

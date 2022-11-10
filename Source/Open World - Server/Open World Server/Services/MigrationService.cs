@@ -197,23 +197,23 @@ namespace OpenWorldServer.Services
                     {
                         if (setting.StartsWith(globalCoveragePrefix))
                         {
-                            serverConfig.World.GlobeCoverage = double.Parse(setting.Replace(globalCoveragePrefix, string.Empty), System.Globalization.NumberStyles.Number);
+                            serverConfig.Planet.GlobeCoverage = double.Parse(setting.Replace(globalCoveragePrefix, string.Empty), System.Globalization.NumberStyles.Number);
                         }
                         else if (setting.StartsWith(seedPrefix))
                         {
-                            serverConfig.World.Seed = setting.Replace(seedPrefix, string.Empty);
+                            serverConfig.Planet.Seed = setting.Replace(seedPrefix, string.Empty);
                         }
                         else if (setting.StartsWith(rainfallPrefix))
                         {
-                            serverConfig.World.OverallRainfall = byte.Parse(setting.Replace(rainfallPrefix, string.Empty));
+                            serverConfig.Planet.OverallRainfall = byte.Parse(setting.Replace(rainfallPrefix, string.Empty));
                         }
                         else if (setting.StartsWith(tempPrefix))
                         {
-                            serverConfig.World.OverallTemperature = byte.Parse(setting.Replace(tempPrefix, string.Empty));
+                            serverConfig.Planet.OverallTemperature = byte.Parse(setting.Replace(tempPrefix, string.Empty));
                         }
                         else if (setting.StartsWith(populationPrefix))
                         {
-                            serverConfig.World.OverallPopulation = byte.Parse(setting.Replace(populationPrefix, string.Empty));
+                            serverConfig.Planet.OverallPopulation = byte.Parse(setting.Replace(populationPrefix, string.Empty));
                         }
                     }
 

@@ -7,8 +7,16 @@
 
         Connect = 10,
         Disconnect = 11,
-        PlayerList = 12,
+        NewGame = 12,
+        LoadGame = 13,
 
-        SettlementBuilder = 20,
+        PlayerList = 20,
+        PlanetData = 21,
+        Variables = 22,
+
+        Settlements = 30,
+        SettlementBuilder = 31,
+
+
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace OpenWorldServer.Data.Configs
+namespace OpenWorld.Shared.Data
 {
-    public class WorldConfig
+    public class PlanetData
     {
         public double GlobeCoverage { get; set; } = 0.3;
 

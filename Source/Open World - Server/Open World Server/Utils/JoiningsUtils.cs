@@ -3,19 +3,6 @@
     public static class JoiningsUtils
     {
 
-        public static string GetPlanetToSend()
-        {
-            string dataToSend = "Planet│";
-
-            double mmGC = StaticProxy.serverConfig.World.GlobeCoverage;
-            string mmS = StaticProxy.serverConfig.World.Seed;
-            int mmOR = StaticProxy.serverConfig.World.OverallRainfall;
-            int mmOT = StaticProxy.serverConfig.World.OverallTemperature;
-            int mmOP = StaticProxy.serverConfig.World.OverallPopulation;
-
-            return dataToSend + mmGC + "│" + mmS + "│" + mmOR + "│" + mmOT + "│" + mmOP;
-        }
-
         public static string GetSettlementsToSend(PlayerClient client)
         {
             string dataToSend = "Settlements│";

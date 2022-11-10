@@ -1,4 +1,5 @@
-﻿using OpenWorldServer.Data.Configs;
+﻿using OpenWorld.Shared.Data;
+using OpenWorldServer.Data.Configs;
 
 namespace OpenWorldServer.Data
 {
@@ -30,6 +31,6 @@ namespace OpenWorldServer.Data
 
         public RoadConfig RoadSystem { get; set; } = new RoadConfig();
 
-        public WorldConfig World { get; set; } = new WorldConfig();
+        public PlanetData Planet { get; set; } = new PlanetData();
     }
 }

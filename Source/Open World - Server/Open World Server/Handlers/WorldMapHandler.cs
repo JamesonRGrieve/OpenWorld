@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenWorld.Shared.Data;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 
@@ -12,6 +13,11 @@ namespace OpenWorldServer.Handlers
         private readonly PlayerHandler playerHandler;
 
         public IReadOnlyCollection<PlayerData> GetAccountsWithSettlements => this.playerHandler.AccountsHandler.Accounts.Where(a => a.HasSettlement).ToList();
+
+        public IReadOnlyCollection<SettlementInfo> GetSettlements
+            => this.playerHandler.AccountsHandler.Accounts
+            .Where(a => a.HasSettlement)
+            .Select(a => new SettlementInfo(a.HomeTileId, a.Username, a.Faction?.name)).ToList();
 
         public WorldMapHandler(PlayerHandler playerHandler)
         {

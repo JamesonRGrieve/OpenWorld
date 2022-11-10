@@ -1,6 +1,5 @@
 ﻿using System;
 using OpenWorld.Shared.Enums;
-using OpenWorldServer.Enums;
 
 namespace OpenWorld.Shared.Networking.Packets
 {
