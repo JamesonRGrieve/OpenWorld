@@ -31,6 +31,6 @@ namespace OpenWorldServer.Data
 
         public RoadConfig RoadSystem { get; set; } = new RoadConfig();
 
-        public PlanetData Planet { get; set; } = new PlanetData();
+        public PlanetConfig Planet { get; set; } = new PlanetConfig();
     }
 }

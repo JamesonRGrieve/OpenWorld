@@ -7,13 +7,13 @@ namespace OpenWorld.Shared.Networking.Packets
     {
         public override PacketType Type => PacketType.PlanetData;
 
-        public PlanetData PlanetData { get; private set; }
+        public PlanetConfig PlanetData { get; private set; }
 
         public PlanetPacket()
         {
         }
 
-        public PlanetPacket(PlanetData planetData)
+        public PlanetPacket(PlanetConfig planetData)
         {
             this.PlanetData = planetData;
         }

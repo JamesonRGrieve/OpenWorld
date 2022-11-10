@@ -229,6 +229,33 @@ namespace OpenWorldServer.Handlers
             return (flaggedMods, missingMods);
         }
 
+        private VariablesPacket GetVariablePacket(PlayerClient client)
+        {
+            var devModeAllowed = client.Account.IsAdmin || this.serverConfig.AllowDevMode;
+            var roadSystem = RoadSystemType.Deactivated;
+            if (this.serverConfig.RoadSystem.IsActive)
+            {
+                if (this.serverConfig.RoadSystem.AggressiveRoadMode)
+                {
+                    roadSystem = RoadSystemType.ActiveAggressive;
+                }
+                else
+                {
+                    roadSystem = RoadSystemType.Activated;
+                }
+            }
+
+            return new VariablesPacket(
+                devModeAllowed,
+                client.Account.ToWipe,
+                roadSystem,
+                this.serverConfig.ServerName,
+                this.serverConfig.ChatSystem.IsActive,
+                this.serverConfig.ChatSystem.UseProfanityFilter,
+                this.serverConfig.ModsSystem.ForceModVerification,
+                this.serverConfig.ForceDifficulty);
+        }
+
         private void JoinPlayer(PlayerClient client, JoinMode joinMode)
         {
             if (joinMode == JoinMode.NewGame)
@@ -249,8 +276,8 @@ namespace OpenWorldServer.Handlers
         {
             var settlements = this.worldMapHandler.GetSettlements.Where(s => s.Owner != client.Account.Username);
             client.SendData(new SettlementsPacket(settlements, client.Account.Faction?.name));
-            //Networking.SendData(client, JoiningsUtils.GetSettlementsToSend(client));
-            Networking.SendData(client, JoiningsUtils.GetVariablesToSend(client));
+
+            client.SendData(this.GetVariablePacket(client));
 
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
             Networking.SendData(client, FactionBuildingHandler.GetAllFactionStructures(client));

@@ -2,7 +2,7 @@
 
 namespace OpenWorld.Shared.Data
 {
-    public class PlanetData
+    public class PlanetConfig
     {
         public double GlobeCoverage { get; set; } = 0.3;
 
