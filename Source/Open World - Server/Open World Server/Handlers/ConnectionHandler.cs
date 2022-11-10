@@ -251,9 +251,6 @@ namespace OpenWorldServer.Handlers
             Networking.SendData(client, JoiningsUtils.GetSettlementsToSend(client));
             Networking.SendData(client, JoiningsUtils.GetVariablesToSend(client));
 
-            //var playerlistPacket = this.playerHandler.GetPlayerListPacket(client).Packet;
-            //client.SendData(playerlistPacket);
-
             Networking.SendData(client, FactionHandler.GetFactionDetails(client));
             Networking.SendData(client, FactionBuildingHandler.GetAllFactionStructures(client));
         }
