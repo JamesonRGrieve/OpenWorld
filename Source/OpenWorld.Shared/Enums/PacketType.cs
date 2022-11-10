@@ -4,6 +4,7 @@
     {
         Unkown = 0,
         Ping = 1,
+        ChatMessage = 2,
 
         Connect = 10,
         Disconnect = 11,

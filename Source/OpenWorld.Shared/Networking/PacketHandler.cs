@@ -34,6 +34,7 @@ namespace OpenWorld.Shared.Networking
                 case "SettlementBuilder":
                     return SetupPacket<SettlementBuilderPacket>(data);
                 case "ChatMessage":
+                    return SetupPacket<ChatMessagePacket>(data);
                 case "UserSettlement":
                 case "ForceEvent":
                 case "SendGiftTo":

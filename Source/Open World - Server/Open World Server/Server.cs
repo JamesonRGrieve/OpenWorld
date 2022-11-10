@@ -36,7 +36,6 @@ namespace OpenWorldServer
 
         //Server Lists
         public static List<string> adminList = new List<string>();
-        public static List<string> chatCache = new List<string>();
         public static List<Faction> savedFactions = new List<Faction>();
 
         public static string latestClientVersion;
@@ -272,13 +271,6 @@ namespace OpenWorldServer
                 Description = "Displays a list of events to be used with 'invoke' and 'plague'.",
                 Category = Command.CommandCategory.Information,
                 SimpleCommand = SimpleCommands.EventListCommand
-            },
-            new Command()
-            {
-                Word = "chat",
-                Description = "Recalls the cache of chat messages from the server.",
-                Category = Command.CommandCategory.Player_Interaction,
-                SimpleCommand = SimpleCommands.ChatCommand
             },
             new Command()
             {

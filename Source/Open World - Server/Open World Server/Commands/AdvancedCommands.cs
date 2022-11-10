@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace OpenWorldServer
 {
@@ -7,9 +6,7 @@ namespace OpenWorldServer
     {
         public static void SayCommand(string[] arguments)
         {
-            ConsoleUtils.LogToConsole($"Chat - [Console] {arguments[0]}");
-            Server.chatCache.Add($"[{DateTime.Now}] │ {arguments[0]}");
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients) Networking.SendData(sc, $"ChatMessage│SERVER│{arguments[0]}");
+            StaticProxy.playerHandler.SendChatMessageToAll("SERVER", arguments[0]);
         }
         public static void BroadcastCommand(string[] arguments)
         {

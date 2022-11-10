@@ -13,8 +13,6 @@ namespace OpenWorldServer.Handlers
         private readonly ServerConfig serverConfig;
 
         // This Props should be private so only the playerhandler handles those lists
-
-
         public AccountsHandler AccountsHandler { get; }
 
         public WhitelistHandler WhitelistHandler { get; }
@@ -69,10 +67,41 @@ namespace OpenWorldServer.Handlers
             var clients = this.ConnectedClients;
             var usernames = clients.Select(c => c.Account?.Username).ToArray();
             var packet = new PlayerListPacket(usernames, clients.Count);
-            Parallel.ForEach(clients, targetClient =>
+            this.SendPacketToAll(clients, packet);
+        }
+
+        internal void SendChatMessageToAll(ChatMessagePacket packet)
+        {
+            string messageForConsole = $"[Chat] {packet.Sender}: {packet.Message}";
+            ConsoleUtils.LogToConsole(messageForConsole);
+            this.SendPacketToAll(packet);
+        }
+
+        public void SendChatMessageToAll(string sender, string message)
+            => this.SendChatMessageToAll(new ChatMessagePacket(sender, message));
+
+        internal void SendPacketToAll(IPacket packet) => this.SendPacketToAll(this.ConnectedClients, packet, null);
+
+        internal void SendPacketToAll(ReadOnlyCollection<PlayerClient> clients, IPacket packet) => this.SendPacketToAll(clients, packet, null);
+
+        internal void SendPacketToAll(IPacket packet, PlayerClient clientToSkip) => this.SendPacketToAll(this.ConnectedClients, packet, clientToSkip);
+
+        internal void SendPacketToAll(ReadOnlyCollection<PlayerClient> clients, IPacket packet, PlayerClient clientToSkip)
+        {
+            if (clientToSkip == null)
             {
-                targetClient.SendData(packet);
-            });
+                Parallel.ForEach(clients, target => target.SendData(packet));
+            }
+            else
+            {
+                Parallel.ForEach(clients, target =>
+                {
+                    if (clientToSkip?.Account?.Username != target.Account?.Username)
+                    {
+                        target.SendData(packet);
+                    }
+                });
+            }
         }
     }
 }

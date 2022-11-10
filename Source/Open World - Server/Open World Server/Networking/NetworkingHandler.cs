@@ -1,19 +1,9 @@
-﻿using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Handlers.Old;
+﻿using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {
     public static class NetworkingHandler
     {
-        internal static void ConnectHandle(PlayerClient client, ConnectPacket packet)
-        {
-        }
-
-        public static void ChatMessageHandle(PlayerClient client, string data)
-        {
-            ServerUtils.SendChatMessage(client, data);
-        }
-
         public static void UserSettlementHandle(PlayerClient client, string data)
         {
             if (data.StartsWith("UserSettlement│NewSettlementID│"))

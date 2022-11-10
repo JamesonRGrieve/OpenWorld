@@ -45,7 +45,7 @@ namespace OpenWorldServer.Handlers
             }
             else if (data.StartsWith("ChatMessage│"))
             {
-                NetworkingHandler.ChatMessageHandle(client, data);
+                this.HandleChatMessage(client, PacketHandler.GetPacket<ChatMessagePacket>(data));
             }
             else if (data.StartsWith("UserSettlement│"))
             {
@@ -83,6 +83,17 @@ namespace OpenWorldServer.Handlers
             {
                 NetworkingHandler.FactionManagementHandle(client, data);
             }
+        }
+
+        private void HandleChatMessage(PlayerClient sender, ChatMessagePacket packet)
+        {
+            if (sender.Account?.Username != packet.Sender)
+            {
+                ConsoleUtils.LogToConsole($"Player [{sender.Account?.Username ?? ""}] tried to send a Chat Message with a different Username [{packet.Sender ?? ""}]");
+                return;
+            }
+
+            this.playerHandler.SendChatMessageToAll(packet);
         }
 
         // Check order wich made most sense

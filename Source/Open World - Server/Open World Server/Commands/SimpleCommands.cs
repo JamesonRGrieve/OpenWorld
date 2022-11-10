@@ -227,17 +227,12 @@ namespace OpenWorldServer
                 }
             }
             ConsoleUtils.LogToConsole("Saved Factions: " + Server.savedFactions.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Factions Saved" : string.Join('\n', Server.savedFactions.Select(x => x.name)));
+            ConsoleUtils.LogToConsole(Server.savedFactions.Count == 0 ? "No Factions Saved" : string.Join('\n', Server.savedFactions.Select(x => x.name)));
         }
         public static void SettlementsCommand()
         {
             ConsoleUtils.LogToConsole("Server Settlements: " + StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Settlements Saved" : string.Join('\n', StaticProxy.worldMapHandler.GetAccountsWithSettlements.Select(x => $"[{x.Username}] @ [{x.HomeTileId}]")));
-        }
-        public static void ChatCommand()
-        {
-            ConsoleUtils.LogToConsole("Server Chat", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(Server.chatCache.Count == 0 ? "No Chat Messages in History" : string.Join('\n', Server.chatCache));
+            ConsoleUtils.LogToConsole(StaticProxy.worldMapHandler.GetAccountsWithSettlements.Count == 0 ? "No Settlements Saved" : string.Join('\n', StaticProxy.worldMapHandler.GetAccountsWithSettlements.Select(x => $"[{x.Username}] @ [{x.HomeTileId}]")));
         }
         public static readonly string[] EventList = new string[] { "Raid", "Infestation", "MechCluster", "ToxicFallout", "Manhunter", "Wanderer", "FarmAnimals", "ShipChunk", "GiveQuest", "TraderCaravan" };
         public static void EventListCommand()

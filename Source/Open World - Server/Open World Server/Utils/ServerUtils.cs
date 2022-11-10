@@ -57,22 +57,5 @@ namespace OpenWorldServer
             else ConsoleUtils.LogToConsole("Running Outdated Or Unstable version. Please Update From Github At Earliest Convenience To Prevent Errors");
             Console.ForegroundColor = ConsoleColor.White;
         }
-
-        public static void SendChatMessage(PlayerClient client, string data)
-        {
-            string message = data.Split('│')[2];
-
-            string messageForConsole = "Chat - [" + client.Account.Username + "] " + message;
-
-            ConsoleUtils.LogToConsole(messageForConsole);
-
-            Server.chatCache.Add("[" + DateTime.Now + "]" + " │ " + messageForConsole);
-
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
-            {
-                if (sc == client) continue;
-                else Networking.SendData(sc, data);
-            }
-        }
     }
 }

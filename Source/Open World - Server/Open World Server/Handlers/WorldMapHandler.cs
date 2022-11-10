@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using OpenWorld.Shared.Data;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
@@ -108,14 +107,6 @@ namespace OpenWorldServer.Handlers
         }
 
         private void NotifySettlementChange(SettlementBuilderPacket packet, PlayerClient executer = null)
-        {
-            Parallel.ForEach(this.playerHandler.ConnectedClients, target =>
-            {
-                if (executer?.Account?.Username != target.Account?.Username)
-                {
-                    target.SendData(packet);
-                }
-            });
-        }
+            => this.playerHandler.SendPacketToAll(packet, executer);
     }
 }
