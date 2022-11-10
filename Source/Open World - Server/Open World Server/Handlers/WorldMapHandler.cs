@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OpenWorld.Shared.Data;
+using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 
@@ -46,7 +47,6 @@ namespace OpenWorldServer.Handlers
             client.Account.HomeTileId = tileId;
             StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
 
-            int factionValue = 0;
             foreach (var connectedClient in this.playerHandler.ConnectedClients)
             {
                 if (connectedClient.Account.Username == connectedClient.Account.Username)
@@ -54,34 +54,27 @@ namespace OpenWorldServer.Handlers
                     continue;
                 }
 
-                if (client.Account.Faction == null ||
-                    connectedClient.Account.Faction == null)
+                var factionType = SettlementFactionType.NoFaction;
+                if (!string.IsNullOrEmpty(client.Account.Faction?.name) && client.Account.Faction.name == connectedClient.Account?.Faction?.name)
                 {
-                    factionValue = 0;
+                    factionType = SettlementFactionType.SameFaction;
                 }
-                else if (client.Account.Faction != null && connectedClient.Account.Faction != null)
+                if (!string.IsNullOrEmpty(connectedClient.Account?.Faction?.name))
                 {
-                    if (client.Account.Faction.name == connectedClient.Account.Faction.name)
-                    {
-                        factionValue = 1;
-                    }
-                    else
-                    {
-                        factionValue = 2;
-                    }
+                    factionType = SettlementFactionType.OtherFaciton;
                 }
 
-                var packet = new SettlementBuilderPacket(tileId, client.Account.Username, factionValue);
+                var packet = new SettlementBuilderPacket(tileId, client.Account.Username, factionType);
                 connectedClient.SendData(packet);
             }
 
-            ConsoleUtils.LogToConsole("Settlement with ID [" + tileId + "] and Owner [" + client.Account.Username + "] has been Added");
+            ConsoleUtils.LogToConsole("Settlement with ID [" + tileId + "] and Owner [" + client.Account.Username + "] has been added");
         }
 
-        public void NotifySettlementAdded(PlayerClient client, int factionValue)
-            => this.NotifySettlementAdded(client.Account?.HomeTileId, client.Account?.Username, factionValue);
+        public void NotifySettlementAdded(PlayerClient client, SettlementFactionType factionType)
+            => this.NotifySettlementAdded(client.Account?.HomeTileId, client.Account?.Username, factionType);
 
-        public void NotifySettlementAdded(string tileId, string username, int factionValue, PlayerClient executer = null)
+        public void NotifySettlementAdded(string tileId, string username, SettlementFactionType factionType, PlayerClient executer = null)
         {
             if (string.IsNullOrEmpty(tileId))
             {
@@ -89,7 +82,7 @@ namespace OpenWorldServer.Handlers
             }
 
             ConsoleUtils.LogToConsole($"Notifying addition of Settlement TileId [{username}]@[{tileId}]");
-            this.NotifySettlementChange(new SettlementBuilderPacket(tileId, username, factionValue), executer);
+            this.NotifySettlementChange(new SettlementBuilderPacket(tileId, username, factionType), executer);
         }
 
         public void NotifySettlementRemoved(PlayerClient client)

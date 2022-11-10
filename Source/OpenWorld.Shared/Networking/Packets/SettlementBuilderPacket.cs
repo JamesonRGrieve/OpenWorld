@@ -14,7 +14,7 @@ namespace OpenWorld.Shared.Networking.Packets
 
         public string Username { get; private set; }
 
-        public int FactionValue { get; private set; }
+        public SettlementFactionType FactionType { get; private set; }
 
         public SettlementBuilderPacket()
         {
@@ -36,12 +36,12 @@ namespace OpenWorld.Shared.Networking.Packets
         /// <param name="tileId"></param>
         /// <param name="username"></param>
         /// <param name="factionValue"></param>
-        public SettlementBuilderPacket(string tileId, string username, int factionValue)
+        public SettlementBuilderPacket(string tileId, string username, SettlementFactionType factionType)
         {
             this.Action = SettlementBuilderAction.Add;
             this.TileId = tileId;
             this.Username = username;
-            this.FactionValue = factionValue;
+            this.FactionType = factionType;
         }
 
         public override string GetData()
@@ -50,7 +50,7 @@ namespace OpenWorld.Shared.Networking.Packets
             if (this.Action == SettlementBuilderAction.Add)
             {
                 splits.Add(this.Username);
-                splits.Add(this.FactionValue.ToString());
+                splits.Add(((int)this.FactionType).ToString());
             }
 
             return this.BuildData(splits);
@@ -82,7 +82,7 @@ namespace OpenWorld.Shared.Networking.Packets
             }
 
             this.Username = splits[3];
-            this.FactionValue = int.Parse(splits[4]);
+            this.FactionType = (SettlementFactionType)int.Parse(splits[4]);
         }
 
         private SettlementBuilderAction GetSettlementBuilderAction(string action)
