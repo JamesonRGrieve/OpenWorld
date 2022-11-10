@@ -34,7 +34,7 @@ namespace OpenWorldServer.Handlers
             if (playerDataFromTile != null &&
                 playerDataFromTile.Username != client.Account.Username)
             {
-                Networking.SendData(client, "Disconnect│Corrupted");
+                client.Disconnect(OpenWorld.Shared.Enums.DisconnectReason.Corrupted);
                 ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleUtils.ConsoleLogMode.Error);
                 return;
             }

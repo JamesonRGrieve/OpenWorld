@@ -84,12 +84,14 @@ namespace OpenWorldServer
 
             this.StartReadingDataFromClients();
             this.StartKeepAliveChecks();
+
+            Networking.ReadyServer();
+            ConsoleUtils.UpdateTitle();
+
             this.StartAcceptingConnections();
 
             FactionHandler.CheckFactions();
             PlayerUtils.CheckAllAvailablePlayers();
-
-            Threading.GenerateThreads(0);
 
             while (!exit) ListenForCommands();
         }
