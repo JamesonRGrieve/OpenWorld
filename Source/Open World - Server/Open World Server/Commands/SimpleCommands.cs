@@ -69,7 +69,7 @@ namespace OpenWorldServer
         }
         public static void ExitCommand()
         {
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
+            foreach (PlayerClient sc in StaticProxy.playerManager.ConnectedClients)
             {
                 Networking.SendData(sc, "Disconnect│Closing");
                 sc.IsDisconnecting = true;
@@ -84,7 +84,7 @@ namespace OpenWorldServer
         public static void ReloadCommand()
         {
             StaticProxy.modHandler.ReloadModFolders();
-            StaticProxy.playerHandler.AccountsHandler.ReloadAccounts();
+            StaticProxy.playerManager.AccountsHandler.ReloadAccounts();
             FactionHandler.CheckFactions();
             PlayerUtils.CheckAllAvailablePlayers();
         }
@@ -162,8 +162,8 @@ namespace OpenWorldServer
         }
         public static void WhiteListCommand()
         {
-            ConsoleUtils.LogToConsole("Whitelisted Players: " + StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(StaticProxy.playerHandler.WhitelistHandler.Whitelist.Count == 0 ? "No Whitelisted Players Found" : string.Join('\n', StaticProxy.playerHandler.WhitelistHandler.Whitelist.ToArray()));
+            ConsoleUtils.LogToConsole("Whitelisted Players: " + StaticProxy.playerManager.WhitelistHandler.Whitelist.Count, ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(StaticProxy.playerManager.WhitelistHandler.Whitelist.Count == 0 ? "No Whitelisted Players Found" : string.Join('\n', StaticProxy.playerManager.WhitelistHandler.Whitelist.ToArray()));
         }
         public static void AdminListCommand()
         {
@@ -173,20 +173,20 @@ namespace OpenWorldServer
         }
         public static void BanListCommand()
         {
-            ConsoleUtils.LogToConsole($"Banned players: {StaticProxy.playerHandler.BanlistHandler.Banlist.Count}", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(StaticProxy.playerHandler.BanlistHandler.Banlist.Count == 0 ? "No Banned Players" : string.Join('\n', StaticProxy.playerHandler.BanlistHandler.Banlist.Select(x => $"[{x.Username}] - [{x.IPAddress}]")));
+            ConsoleUtils.LogToConsole($"Banned players: {StaticProxy.playerManager.BanlistHandler.Banlist.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            ConsoleUtils.LogToConsole(StaticProxy.playerManager.BanlistHandler.Banlist.Count == 0 ? "No Banned Players" : string.Join('\n', StaticProxy.playerManager.BanlistHandler.Banlist.Select(x => $"[{x.Username}] - [{x.IPAddress}]")));
         }
         public static void WipeCommand()
         {
             ConsoleUtils.LogToConsole("WARNING! THIS ACTION WILL DELETE ALL PLAYER DATA. DO YOU WANT TO PROCEED? (Y/N)", ConsoleUtils.ConsoleLogMode.Warning);
             if (string.Equals(Console.ReadLine().Trim(), "Y", StringComparison.OrdinalIgnoreCase))
             {
-                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients) client.IsDisconnecting = true;
+                foreach (PlayerClient client in StaticProxy.playerManager.ConnectedClients) client.IsDisconnecting = true;
                 foreach (PlayerClient client in Server.savedClients)
                 {
                     client.Account.Wealth = 0;
                     client.Account.PawnCount = 0;
-                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                    StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
                 }
                 ConsoleUtils.LogToConsole("All Player Files Have Been Set To Wipe", ConsoleUtils.ConsoleLogMode.Info);
             }
@@ -194,11 +194,11 @@ namespace OpenWorldServer
         }
         public static void ListCommand()
         {
-            ConsoleUtils.LogToConsole($"Connected Players: {StaticProxy.playerHandler.ConnectedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
-            if (StaticProxy.playerHandler.ConnectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
+            ConsoleUtils.LogToConsole($"Connected Players: {StaticProxy.playerManager.ConnectedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            if (StaticProxy.playerManager.ConnectedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Connected");
             else
             {
-                foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients)
+                foreach (PlayerClient client in StaticProxy.playerManager.ConnectedClients)
                 {
                     try
                     {

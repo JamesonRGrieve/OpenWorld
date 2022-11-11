@@ -13,7 +13,7 @@ namespace OpenWorldServer
         }
         public static readonly Dictionary<Rule, Func<string, bool>> Validation = new Dictionary<Rule, Func<string, bool>>()
         {
-            {Rule.PlayerOnline, (arg) => StaticProxy.playerHandler.ConnectedClients.Any(x => x.Account.Username == arg) },
+            {Rule.PlayerOnline, (arg) => StaticProxy.playerManager.ConnectedClients.Any(x => x.Account.Username == arg) },
             {Rule.ValidEvent, (arg) => SimpleCommands.EventList.Contains(arg) }
             // TODO: ValidFaction, ValidItem, ValidItemQuantity, ValidItemQuality, PlayerBanned, PlayerAdmin
         };

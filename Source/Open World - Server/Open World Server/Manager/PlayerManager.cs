@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
-
-namespace OpenWorldServer.Handlers
+﻿namespace OpenWorldServer.Manager
 {
     public class PlayerHandler
     {
@@ -22,28 +14,28 @@ namespace OpenWorldServer.Handlers
         /// <summary>
         /// Copy of connected clients as ReadOnlyCollection
         /// </summary>
-        public ReadOnlyCollection<PlayerClient> ConnectedClients => this.players.ToList().AsReadOnly();
+        public ReadOnlyCollection<PlayerClient> ConnectedClients => players.ToList().AsReadOnly();
 
         private List<PlayerClient> players = new List<PlayerClient>();
 
         public PlayerHandler(ServerConfig serverConfig)
         {
             this.serverConfig = serverConfig;
-            this.AccountsHandler = new AccountsHandler(this.serverConfig);
-            this.WhitelistHandler = new WhitelistHandler(this.serverConfig);
-            this.BanlistHandler = new BanlistHandler(this.serverConfig);
+            AccountsHandler = new AccountsHandler(this.serverConfig);
+            WhitelistHandler = new WhitelistHandler(this.serverConfig);
+            BanlistHandler = new BanlistHandler(this.serverConfig);
         }
 
         internal void AddPlayer(TcpClient newClient)
-            => this.players.Add(new PlayerClient(newClient));
+            => players.Add(new PlayerClient(newClient));
 
         internal void RemovePlayer(PlayerClient client)
         {
-            if (this.players.Contains(client))
+            if (players.Contains(client))
             {
                 if (client.IsLoggedIn)
                 {
-                    this.AccountsHandler.SaveAccount(client);
+                    AccountsHandler.SaveAccount(client);
                     ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] has Disconnected");
                 }
                 else
@@ -54,7 +46,7 @@ namespace OpenWorldServer.Handlers
                 try
                 {
                     client.Dispose();
-                    this.players.Remove(client);
+                    players.Remove(client);
                 }
                 catch
                 {
@@ -64,27 +56,27 @@ namespace OpenWorldServer.Handlers
 
         internal void NotifyPlayerListChanged(PlayerClient newClient)
         {
-            var clients = this.ConnectedClients;
+            var clients = ConnectedClients;
             var usernames = clients.Select(c => c.Account?.Username).ToArray();
             var packet = new PlayerListPacket(usernames, clients.Count);
-            this.SendPacketToAll(clients, packet);
+            SendPacketToAll(clients, packet);
         }
 
         internal void SendChatMessageToAll(ChatMessagePacket packet)
         {
             string messageForConsole = $"[Chat] {packet.Sender}: {packet.Message}";
             ConsoleUtils.LogToConsole(messageForConsole);
-            this.SendPacketToAll(packet);
+            SendPacketToAll(packet);
         }
 
         public void SendChatMessageToAll(string sender, string message)
-            => this.SendChatMessageToAll(new ChatMessagePacket(sender, message));
+            => SendChatMessageToAll(new ChatMessagePacket(sender, message));
 
-        internal void SendPacketToAll(IPacket packet) => this.SendPacketToAll(this.ConnectedClients, packet, null);
+        internal void SendPacketToAll(IPacket packet) => SendPacketToAll(ConnectedClients, packet, null);
 
-        internal void SendPacketToAll(ReadOnlyCollection<PlayerClient> clients, IPacket packet) => this.SendPacketToAll(clients, packet, null);
+        internal void SendPacketToAll(ReadOnlyCollection<PlayerClient> clients, IPacket packet) => SendPacketToAll(clients, packet, null);
 
-        internal void SendPacketToAll(IPacket packet, PlayerClient clientToSkip) => this.SendPacketToAll(this.ConnectedClients, packet, clientToSkip);
+        internal void SendPacketToAll(IPacket packet, PlayerClient clientToSkip) => SendPacketToAll(ConnectedClients, packet, clientToSkip);
 
         internal void SendPacketToAll(ReadOnlyCollection<PlayerClient> clients, IPacket packet, PlayerClient clientToSkip)
         {

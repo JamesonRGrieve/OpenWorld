@@ -8,7 +8,7 @@ namespace OpenWorldServer
 {
     public static class ConsoleUtils
     {
-        public static void UpdateTitle() => Console.Title = $"OpenWorld {Server.serverVersion} - {StaticProxy.serverConfig.ServerName} | {StaticProxy.playerHandler.ConnectedClients.Count} / {StaticProxy.serverConfig.MaxPlayers} Players";
+        public static void UpdateTitle() => Console.Title = $"OpenWorld {Server.serverVersion} - {StaticProxy.serverConfig.ServerName} | {StaticProxy.playerManager.ConnectedClients.Count} / {StaticProxy.serverConfig.MaxPlayers} Players";
 
         public enum ConsoleLogMode
         {

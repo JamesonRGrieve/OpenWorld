@@ -9,13 +9,14 @@ using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
 using OpenWorldServer.Handlers.Old;
+using OpenWorldServer.Manager;
 
 namespace OpenWorldServer
 {
     public class Server
     {
         private readonly ServerConfig serverConfig;
-        private readonly PlayerHandler playerHandler;
+        private readonly PlayerManager playerManager;
         private readonly ModHandler modHandler;
         private readonly WorldMapHandler worldMapHandler;
         private readonly ConnectionHandler connectionHandler;
@@ -46,10 +47,10 @@ namespace OpenWorldServer
             this.serverConfig = serverConfig;
 
             // Setting up Server
+            this.playerManager = new PlayerManager(serverConfig);
             this.modHandler = new ModHandler(serverConfig);
-            this.playerHandler = new PlayerHandler(serverConfig);
-            this.worldMapHandler = new WorldMapHandler(this.playerHandler);
-            this.connectionHandler = new ConnectionHandler(this.serverConfig, this.playerHandler, this.modHandler, this.worldMapHandler);
+            this.worldMapHandler = new WorldMapHandler(this.playerManager);
+            this.connectionHandler = new ConnectionHandler(this.serverConfig, this.playerManager, this.modHandler, this.worldMapHandler);
 
             this.SetupStaticProxy();
 
@@ -107,7 +108,7 @@ namespace OpenWorldServer
                     try
                     {
                         var newClient = this.listener.AcceptTcpClient();
-                        this.playerHandler.AddPlayer(newClient);
+                        this.playerManager.AddPlayer(newClient);
 
                         // We actually dont need to delay the Thread here, since AcceptTcpClient is blocking
                         // But we dont want to rush through many clients on a mass reconnect.
@@ -133,11 +134,11 @@ namespace OpenWorldServer
                 var needUpdate = false;
                 while (this.IsRunning)
                 {
-                    foreach (var client in this.playerHandler.ConnectedClients)
+                    foreach (var client in this.playerManager.ConnectedClients)
                     {
                         if (!client.IsConnected || client.IsDisconnecting)
                         {
-                            this.playerHandler.RemovePlayer(client);
+                            this.playerManager.RemovePlayer(client);
                             needUpdate = true;
                             continue;
                         }
@@ -151,7 +152,7 @@ namespace OpenWorldServer
                     if (needUpdate)
                     {
                         ConsoleUtils.UpdateTitle();
-                        this.playerHandler.NotifyPlayerListChanged(null);
+                        this.playerManager.NotifyPlayerListChanged(null);
                         needUpdate = false;
                     }
 
@@ -167,7 +168,7 @@ namespace OpenWorldServer
                 var pingPacketData = new PingPacket().GetData();
                 while (this.IsRunning)
                 {
-                    var clients = this.playerHandler.ConnectedClients;
+                    var clients = this.playerManager.ConnectedClients;
                     if (clients.Count == 0)
                     {
                         Thread.Sleep(500);
@@ -178,7 +179,7 @@ namespace OpenWorldServer
                     {
                         if (!client.IsConnected || client.IsDisconnecting)
                         {
-                            this.playerHandler.RemovePlayer(client);
+                            this.playerManager.RemovePlayer(client);
                         }
 
                         Task.Run(() => client.SendData(pingPacketData));
@@ -193,7 +194,7 @@ namespace OpenWorldServer
         {
             StaticProxy.serverConfig = this.serverConfig;
             StaticProxy.modHandler = this.modHandler;
-            StaticProxy.playerHandler = this.playerHandler;
+            StaticProxy.playerManager = this.playerManager;
             StaticProxy.worldMapHandler = this.worldMapHandler;
         }
 

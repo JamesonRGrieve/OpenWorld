@@ -1,5 +1,6 @@
 ﻿using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
+using OpenWorldServer.Manager;
 
 namespace OpenWorldServer
 {
@@ -7,7 +8,7 @@ namespace OpenWorldServer
     public static class StaticProxy
     {
         public static ServerConfig serverConfig;
-        public static PlayerHandler playerHandler;
+        public static PlayerManager playerManager;
         public static ModHandler modHandler;
         public static WorldMapHandler worldMapHandler;
     }

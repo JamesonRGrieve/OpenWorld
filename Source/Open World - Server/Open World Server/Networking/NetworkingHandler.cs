@@ -95,7 +95,7 @@ namespace OpenWorldServer
             string username = data.Split('│')[2];
             PlayerClient target = null;
 
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
+            foreach (PlayerClient sc in StaticProxy.playerManager.ConnectedClients)
             {
                 if (sc.Account.Username == username)
                 {
@@ -124,7 +124,7 @@ namespace OpenWorldServer
             string user = data.Split('│')[2];
             PlayerClient target = null;
 
-            foreach (PlayerClient sc in StaticProxy.playerHandler.ConnectedClients)
+            foreach (PlayerClient sc in StaticProxy.playerManager.ConnectedClients)
             {
                 if (sc.Account.Username == user)
                 {

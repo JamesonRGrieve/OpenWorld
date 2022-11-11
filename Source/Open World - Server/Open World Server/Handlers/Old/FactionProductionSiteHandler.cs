@@ -30,7 +30,7 @@ namespace OpenWorldServer.Handlers.Old
             int productionSitesInFaction = faction.factionStructures.FindAll(fetch => fetch is FactionProductionSite).Count();
             foreach (var dummy in dummyfactionMembers)
             {
-                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, "FactionManagement│ProductionSite│Tick" + "│" + productionSitesInFaction);

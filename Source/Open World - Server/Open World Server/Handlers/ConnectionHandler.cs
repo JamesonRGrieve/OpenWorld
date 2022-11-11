@@ -7,20 +7,21 @@ using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers.Old;
+using OpenWorldServer.Manager;
 
 namespace OpenWorldServer.Handlers
 {
     internal class ConnectionHandler
     {
         private readonly ServerConfig serverConfig;
-        private readonly PlayerHandler playerHandler;
+        private readonly PlayerManager playerManager;
         private readonly ModHandler modHandler;
         private readonly WorldMapHandler worldMapHandler;
 
-        public ConnectionHandler(ServerConfig serverConfig, PlayerHandler playerHandler, ModHandler modHandler, WorldMapHandler worldMapHandler)
+        public ConnectionHandler(ServerConfig serverConfig, PlayerManager playerHandler, ModHandler modHandler, WorldMapHandler worldMapHandler)
         {
             this.serverConfig = serverConfig;
-            this.playerHandler = playerHandler;
+            this.playerManager = playerHandler;
             this.modHandler = modHandler;
             this.worldMapHandler = worldMapHandler;
         }
@@ -93,7 +94,7 @@ namespace OpenWorldServer.Handlers
                 return;
             }
 
-            this.playerHandler.SendChatMessageToAll(packet);
+            this.playerManager.SendChatMessageToAll(packet);
         }
 
         // Check order wich made most sense
@@ -137,7 +138,7 @@ namespace OpenWorldServer.Handlers
                 return;
             }
 
-            var account = this.playerHandler.AccountsHandler.GetAccount(packet.Username);
+            var account = this.playerManager.AccountsHandler.GetAccount(packet.Username);
             if (account != null)
             {
                 if (account.Password != packet.Password)
@@ -154,7 +155,7 @@ namespace OpenWorldServer.Handlers
             {
                 client.Account.Username = packet.Username;
                 client.Account.Password = packet.Password;
-                this.playerHandler.AccountsHandler.SaveAccount(client);
+                this.playerManager.AccountsHandler.SaveAccount(client);
                 ConsoleUtils.LogToConsole("New Player [" + client.Account.Username + "] has logged in");
             }
 
@@ -168,7 +169,7 @@ namespace OpenWorldServer.Handlers
                 return;
             }
 
-            if (!this.playerHandler.WhitelistHandler.IsWhitelisted(client.Account.Username))
+            if (!this.playerManager.WhitelistHandler.IsWhitelisted(client.Account.Username))
             {
                 client.Disconnect(DisconnectReason.NotOnWhitelist);
                 ConsoleUtils.LogToConsole($"Player [{client.Account.Username}] tried to Join but is not Whitelisted");
@@ -193,7 +194,7 @@ namespace OpenWorldServer.Handlers
         }
 
         private bool IsServerFull()
-            => this.playerHandler.ConnectedClients.Count >= StaticProxy.serverConfig.MaxPlayers;
+            => this.playerManager.ConnectedClients.Count >= StaticProxy.serverConfig.MaxPlayers;
 
         private bool IsClientVersionValid(string clientVersion)
             => string.IsNullOrWhiteSpace(Server.latestClientVersion) || clientVersion == Server.latestClientVersion;
@@ -201,12 +202,12 @@ namespace OpenWorldServer.Handlers
         private bool IsValidUsername(string username)
             => !string.IsNullOrWhiteSpace(username) && username.All(character => char.IsLetterOrDigit(character) || character == '_' || character == '-');
 
-        private bool IsBanned(string username) => this.playerHandler.BanlistHandler.GetBanInfo(username) != null;
+        private bool IsBanned(string username) => this.playerManager.BanlistHandler.GetBanInfo(username) != null;
 
-        private bool IsBanned(IPAddress ip) => (this.playerHandler.BanlistHandler.GetBanInfo(ip)?.Length ?? 0) != 0;
+        private bool IsBanned(IPAddress ip) => (this.playerManager.BanlistHandler.GetBanInfo(ip)?.Length ?? 0) != 0;
 
         private bool IsUserAlreadyConnected(string username)
-            => this.playerHandler.ConnectedClients.Any(c => username == c.Account.Username);
+            => this.playerManager.ConnectedClients.Any(c => username == c.Account.Username);
 
         private (List<string> InvalidMods, List<string> MissingMods) AreClientModsValid(string[] mods)
         {
@@ -279,7 +280,7 @@ namespace OpenWorldServer.Handlers
                 this.SendLoadGameData(client);
             }
 
-            this.playerHandler.NotifyPlayerListChanged(client);
+            this.playerManager.NotifyPlayerListChanged(client);
             ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] joined");
         }
 
@@ -297,7 +298,7 @@ namespace OpenWorldServer.Handlers
         private void SendNewGameData(PlayerClient client)
         {
             this.worldMapHandler.NotifySettlementRemoved(client);
-            this.playerHandler.AccountsHandler.ResetAccount(client, true);
+            this.playerManager.AccountsHandler.ResetAccount(client, true);
 
             client.SendData(new PlanetPacket(this.serverConfig.Planet));
             this.SendWorldData(client);
@@ -326,7 +327,7 @@ namespace OpenWorldServer.Handlers
 
             if (wasModified)
             {
-                this.playerHandler.AccountsHandler.SaveAccount(client);
+                this.playerManager.AccountsHandler.SaveAccount(client);
             }
 
             client.SendData(new LoadGamePacket());

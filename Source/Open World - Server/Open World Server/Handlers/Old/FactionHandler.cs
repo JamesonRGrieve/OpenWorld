@@ -50,7 +50,7 @@ namespace OpenWorldServer.Handlers.Old
 
             PlayerClient clientToSave = Server.savedClients.Find(fetch => fetch.Account.Username == factionLeader.Account.Username);
             clientToSave.Account.Faction = newFaction;
-            StaticProxy.playerHandler.AccountsHandler.SaveAccount(clientToSave);
+            StaticProxy.playerManager.AccountsHandler.SaveAccount(clientToSave);
 
             Networking.SendData(factionLeader, "FactionManagement│Created");
 
@@ -156,7 +156,7 @@ namespace OpenWorldServer.Handlers.Old
             faction.members.Add(memberToAdd, MemberRank.Member);
             SaveFaction(faction);
 
-            PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToAdd.Account.Username);
+            PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToAdd.Account.Username);
             if (connected != null)
             {
                 connected.Account.Faction = faction;
@@ -168,7 +168,7 @@ namespace OpenWorldServer.Handlers.Old
             if (saved != null)
             {
                 saved.Account.Faction = faction;
-                StaticProxy.playerHandler.AccountsHandler.SaveAccount(saved);
+                StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
             }
 
             UpdateAllPlayerDetailsInFaction(faction);
@@ -185,7 +185,7 @@ namespace OpenWorldServer.Handlers.Old
                 }
             }
 
-            PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToRemove.Account.Username);
+            PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == memberToRemove.Account.Username);
             if (connected != null)
             {
                 connected.Account.Faction = null;
@@ -196,7 +196,7 @@ namespace OpenWorldServer.Handlers.Old
             if (saved != null)
             {
                 saved.Account.Faction = null;
-                StaticProxy.playerHandler.AccountsHandler.SaveAccount(saved);
+                StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
             }
 
             if (faction.members.Count > 0)
@@ -213,7 +213,7 @@ namespace OpenWorldServer.Handlers.Old
 
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     connected.Account.Faction = null;
@@ -224,7 +224,7 @@ namespace OpenWorldServer.Handlers.Old
                 if (saved != null)
                 {
                     saved.Account.Faction = null;
-                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(saved);
+                    StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
                 }
             }
 
@@ -287,7 +287,7 @@ namespace OpenWorldServer.Handlers.Old
 
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetFactionDetails(connected));

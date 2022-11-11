@@ -87,7 +87,7 @@ namespace OpenWorldServer.Handlers.Old
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetSiloContents(faction, siloTileID));
@@ -140,7 +140,7 @@ namespace OpenWorldServer.Handlers.Old
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
             foreach (PlayerClient dummy in dummyfactionMembers)
             {
-                PlayerClient connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                PlayerClient connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, GetSiloContents(faction, siloTileID));

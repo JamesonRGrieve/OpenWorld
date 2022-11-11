@@ -4,24 +4,25 @@ using OpenWorld.Shared.Data;
 using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
+using OpenWorldServer.Manager;
 
 namespace OpenWorldServer.Handlers
 {
     public class WorldMapHandler
     {
         //private readonly AccountsHandler accountsHandler;
-        private readonly PlayerHandler playerHandler;
+        private readonly PlayerManager playerManager;
 
-        public IReadOnlyCollection<Account> GetAccountsWithSettlements => this.playerHandler.AccountsHandler.Accounts.Where(a => a.HasSettlement).ToList();
+        public IReadOnlyCollection<Account> GetAccountsWithSettlements => this.playerManager.AccountsHandler.Accounts.Where(a => a.HasSettlement).ToList();
 
         public IReadOnlyCollection<SettlementInfo> GetSettlements
-            => this.playerHandler.AccountsHandler.Accounts
+            => this.playerManager.AccountsHandler.Accounts
             .Where(a => a.HasSettlement)
             .Select(a => new SettlementInfo(a.Id, a.Username, a.HomeTileId, a.Faction?.name)).ToList();
 
-        public WorldMapHandler(PlayerHandler playerHandler)
+        public WorldMapHandler(PlayerManager playerHandler)
         {
-            this.playerHandler = playerHandler;
+            this.playerManager = playerHandler;
         }
 
         public bool IsTileAvailable(string tileID) => this.GetAccountFromTile(tileID) != null;
@@ -45,9 +46,9 @@ namespace OpenWorldServer.Handlers
         private void AddSettlement(PlayerClient client, string tileId)
         {
             client.Account.HomeTileId = tileId;
-            StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+            StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
 
-            foreach (var connectedClient in this.playerHandler.ConnectedClients)
+            foreach (var connectedClient in this.playerManager.ConnectedClients)
             {
                 if (connectedClient.Account.Id == connectedClient.Account.Id)
                 {
@@ -100,6 +101,6 @@ namespace OpenWorldServer.Handlers
         }
 
         private void NotifySettlementChange(SettlementBuilderPacket packet, PlayerClient executer = null)
-            => this.playerHandler.SendPacketToAll(packet, executer);
+            => this.playerManager.SendPacketToAll(packet, executer);
     }
 }

@@ -66,7 +66,7 @@ namespace OpenWorldServer.Handlers.Old
             var dummyFactionMembers = faction.members.Keys.ToArray();
             foreach (var dummy in dummyFactionMembers)
             {
-                var connected = StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
+                var connected = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == dummy.Account.Username);
                 if (connected != null)
                 {
                     Networking.SendData(connected, "FactionManagement│Bank│Refresh│" + bankToFind.depositedSilver);

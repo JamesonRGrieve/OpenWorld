@@ -22,7 +22,7 @@ namespace OpenWorldServer
 
 
 
-                var account = StaticProxy.playerHandler.AccountsHandler.GetAccount(Path.GetFileNameWithoutExtension(path));
+                var account = StaticProxy.playerManager.AccountsHandler.GetAccount(Path.GetFileNameWithoutExtension(path));
                 if (account == null)
                     return;
 
@@ -37,7 +37,7 @@ namespace OpenWorldServer
                     catch
                     {
                         playerToLoad.Account.HomeTileId = null;
-                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(playerToLoad.Account);
+                        StaticProxy.playerManager.AccountsHandler.SaveAccount(playerToLoad.Account);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.Account.Username + " Is Using A Cloned Entry! Fixing");
@@ -51,7 +51,7 @@ namespace OpenWorldServer
                     if (factionToFech == null)
                     {
                         playerToLoad.Account.Faction = null;
-                        StaticProxy.playerHandler.AccountsHandler.SaveAccount(playerToLoad.Account);
+                        StaticProxy.playerManager.AccountsHandler.SaveAccount(playerToLoad.Account);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         ConsoleUtils.LogToConsole("Error! Player " + playerToLoad.Account.Username + " Is Using A Missing Faction! Fixing");
@@ -113,7 +113,7 @@ namespace OpenWorldServer
 
             if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0)
             {
-                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
 
@@ -121,11 +121,11 @@ namespace OpenWorldServer
                 ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Alarm [" + wealthToCompare + " > " + (int)client.Account.Wealth + "], Banning");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                StaticProxy.playerHandler.BanlistHandler.BanPlayer(client, "Wealth Check triggered");
+                StaticProxy.playerManager.BanlistHandler.BanPlayer(client, "Wealth Check triggered");
             }
             else if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0)
             {
-                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
 
@@ -135,7 +135,7 @@ namespace OpenWorldServer
             }
             else
             {
-                StaticProxy.playerHandler.AccountsHandler.SaveAccount(client);
+                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
                 Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
             }
@@ -143,7 +143,7 @@ namespace OpenWorldServer
 
         public static bool CheckForConnectedPlayers(string tileID)
         {
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID) return true;
@@ -154,12 +154,12 @@ namespace OpenWorldServer
 
         public static PlayerClient GetPlayerFromTile(string tileID)
         {
-            return StaticProxy.playerHandler.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
+            return StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
         }
 
         public static bool CheckForPlayerShield(string tileID)
         {
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID && !client.IsEventProtected && !client.Account.IsImmunized)
@@ -174,7 +174,7 @@ namespace OpenWorldServer
 
         public static bool CheckForPvpAvailability(string tileID)
         {
-            foreach (PlayerClient client in StaticProxy.playerHandler.ConnectedClients)
+            foreach (PlayerClient client in StaticProxy.playerManager.ConnectedClients)
             {
                 if (client.Account.HomeTileId == tileID && !client.InRTSE && !client.Account.IsImmunized)
                 {
@@ -188,7 +188,7 @@ namespace OpenWorldServer
 
         public static string GetSpyData(string tileID, PlayerClient origin)
         {
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient client in clients)
             {
                 if (client.Account.HomeTileId == tileID)
@@ -218,7 +218,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "ForcedEvent│" + data.Split('│')[1];
 
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[2])
@@ -235,7 +235,7 @@ namespace OpenWorldServer
             string tileToSend = data.Split('│')[1];
             string dataToSend = "GiftedItems│" + data.Split('│')[2];
 
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == tileToSend)
@@ -254,7 +254,7 @@ namespace OpenWorldServer
                 if (sc.Account.HomeTileId == tileToSend)
                 {
                     sc.Account.GiftString.Add(dataToSend);
-                    StaticProxy.playerHandler.AccountsHandler.SaveAccount(sc);
+                    StaticProxy.playerManager.AccountsHandler.SaveAccount(sc);
                     ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.Account.Username + "] And [" + sc.Account.Username + "] But Was Offline. Saving");
                     return;
                 }
@@ -265,7 +265,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "TradeRequest│" + invoker.Account.Username + "│" + data.Split('│')[2] + "│" + data.Split('│')[3];
 
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[1])
@@ -280,7 +280,7 @@ namespace OpenWorldServer
         {
             string dataToSend = "BarterRequest│" + invoker.Account.HomeTileId + "│" + data.Split('│')[2];
 
-            var clients = StaticProxy.playerHandler.ConnectedClients;
+            var clients = StaticProxy.playerManager.ConnectedClients;
             foreach (PlayerClient sc in clients)
             {
                 if (sc.Account.HomeTileId == data.Split('│')[1])
