@@ -38,7 +38,7 @@ namespace OpenWorldServer.Handlers.Old
 
         public static void CreateFaction(string factionName, PlayerClient factionLeader)
         {
-            Faction newFaction = new Faction()
+            FactionOld newFaction = new FactionOld()
             {
                 name = factionName,
                 wealth = 0,
@@ -57,7 +57,7 @@ namespace OpenWorldServer.Handlers.Old
             Networking.SendData(factionLeader, GetFactionDetails(factionLeader));
         }
 
-        public static void SaveFaction(Faction factionToSave)
+        public static void SaveFaction(FactionOld factionToSave)
         {
             string factionSavePath = PathProvider.FactionsFolderPath + Path.DirectorySeparatorChar + factionToSave.name + ".bin";
 
@@ -89,7 +89,7 @@ namespace OpenWorldServer.Handlers.Old
                     BinaryFormatter formatter = new BinaryFormatter();
                     FileStream s = File.Open(faction, FileMode.Open);
                     object obj = formatter.Deserialize(s);
-                    Faction factionToLoad = (Faction)obj;
+                    FactionOld factionToLoad = (FactionOld)obj;
 
                     s.Flush();
                     s.Close();
@@ -105,7 +105,7 @@ namespace OpenWorldServer.Handlers.Old
                         continue;
                     }
 
-                    Faction factionToFetch = Server.savedFactions.Find(fetch => fetch.name == factionToLoad.name);
+                    FactionOld factionToFetch = Server.savedFactions.Find(fetch => fetch.name == factionToLoad.name);
                     if (factionToFetch == null) Server.savedFactions.Add(factionToLoad);
                 }
                 catch { failedToLoadFactions++; }
@@ -121,7 +121,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void DisbandFaction(Faction factionToDisband)
+        public static void DisbandFaction(FactionOld factionToDisband)
         {
             Server.savedFactions.Remove(factionToDisband);
 
@@ -137,7 +137,7 @@ namespace OpenWorldServer.Handlers.Old
 
             else
             {
-                Faction factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
+                FactionOld factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
 
                 dataToSend += factionToCheck.name + "│";
 
@@ -151,7 +151,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void AddMember(Faction faction, PlayerClient memberToAdd)
+        public static void AddMember(FactionOld faction, PlayerClient memberToAdd)
         {
             faction.members.Add(memberToAdd, MemberRank.Member);
             SaveFaction(faction);
@@ -174,7 +174,7 @@ namespace OpenWorldServer.Handlers.Old
             UpdateAllPlayerDetailsInFaction(faction);
         }
 
-        public static void RemoveMember(Faction faction, PlayerClient memberToRemove)
+        public static void RemoveMember(FactionOld faction, PlayerClient memberToRemove)
         {
             foreach (KeyValuePair<PlayerClient, MemberRank> pair in faction.members)
             {
@@ -207,7 +207,7 @@ namespace OpenWorldServer.Handlers.Old
             else DisbandFaction(faction);
         }
 
-        public static void PurgeFaction(Faction faction)
+        public static void PurgeFaction(FactionOld faction)
         {
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
 
@@ -231,7 +231,7 @@ namespace OpenWorldServer.Handlers.Old
             DisbandFaction(faction);
         }
 
-        public static void PromoteMember(Faction faction, PlayerClient memberToPromote)
+        public static void PromoteMember(FactionOld faction, PlayerClient memberToPromote)
         {
             PlayerClient toPromote = null;
             MemberRank previousRank = 0;
@@ -256,7 +256,7 @@ namespace OpenWorldServer.Handlers.Old
             UpdateAllPlayerDetailsInFaction(faction);
         }
 
-        public static void DemoteMember(Faction faction, PlayerClient memberToPromote)
+        public static void DemoteMember(FactionOld faction, PlayerClient memberToPromote)
         {
             PlayerClient toDemote = null;
             MemberRank previousRank = 0;
@@ -281,7 +281,7 @@ namespace OpenWorldServer.Handlers.Old
             UpdateAllPlayerDetailsInFaction(faction);
         }
 
-        public static void UpdateAllPlayerDetailsInFaction(Faction faction)
+        public static void UpdateAllPlayerDetailsInFaction(FactionOld faction)
         {
             PlayerClient[] dummyfactionMembers = faction.members.Keys.ToArray();
 
@@ -295,7 +295,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static MemberRank GetMemberPowers(Faction faction, PlayerClient memberToCheck)
+        public static MemberRank GetMemberPowers(FactionOld faction, PlayerClient memberToCheck)
         {
             Dictionary<PlayerClient, MemberRank> members = faction.members;
             foreach (KeyValuePair<PlayerClient, MemberRank> pair in members)

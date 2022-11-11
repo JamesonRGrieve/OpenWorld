@@ -7,7 +7,7 @@ namespace OpenWorldServer
     [System.Serializable]
     public class FactionSilo : FactionStructure
     {
-        public override Faction holdingFaction => base.holdingFaction;
+        public override FactionOld holdingFaction => base.holdingFaction;
 
         public override string structureName => "Silo";
 
@@ -17,7 +17,7 @@ namespace OpenWorldServer
 
         public Dictionary<int, List<string>> holdingItems = new Dictionary<int, List<string>>();
 
-        public FactionSilo(Faction holdingFaction, int structureTile)
+        public FactionSilo(FactionOld holdingFaction, int structureTile)
         {
             this.holdingFaction = holdingFaction;
             this.structureTile = structureTile;

@@ -10,8 +10,8 @@ namespace OpenWorldServer.Handlers.Old
 
             int factionValue = 0;
 
-            Faction[] factions = Server.savedFactions.ToArray();
-            foreach (Faction faction in factions)
+            FactionOld[] factions = Server.savedFactions.ToArray();
+            foreach (FactionOld faction in factions)
             {
                 if (client.Account.Faction == null) factionValue = 0;
                 if (client.Account.Faction != null)
@@ -32,7 +32,7 @@ namespace OpenWorldServer.Handlers.Old
             return dataToSend;
         }
 
-        public static void BuildStructure(Faction faction, string tileID, string structureID)
+        public static void BuildStructure(FactionOld faction, string tileID, string structureID)
         {
             int newStructureTile = int.Parse(tileID);
             int newStructureIntValue = int.Parse(structureID);
@@ -74,7 +74,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void DestroyStructure(Faction faction, string tileID)
+        public static void DestroyStructure(FactionOld faction, string tileID)
         {
             int structureTile = int.Parse(tileID);
 
@@ -93,10 +93,10 @@ namespace OpenWorldServer.Handlers.Old
 
         public static bool CheckForGlobalStructureCap(int structureType)
         {
-            Faction[] serverFactions = Server.savedFactions.ToArray();
+            FactionOld[] serverFactions = Server.savedFactions.ToArray();
 
             if (structureType != 3) return true;
-            else foreach (Faction serverFaction in serverFactions)
+            else foreach (FactionOld serverFaction in serverFactions)
                 {
                     foreach (FactionStructure structure in serverFaction.factionStructures)
                     {
@@ -107,7 +107,7 @@ namespace OpenWorldServer.Handlers.Old
             return true;
         }
 
-        public static bool CheckForStructureCap(Faction faction, int structureType)
+        public static bool CheckForStructureCap(FactionOld faction, int structureType)
         {
             FactionStructure structureOfSameType = faction.factionStructures.Find(fetch => fetch.structureType == structureType);
             if (structureOfSameType != null)
@@ -123,7 +123,7 @@ namespace OpenWorldServer.Handlers.Old
             else return true;
         }
 
-        public static bool CheckIfTileIsAvailableForStructure(Faction faction, int structureTile)
+        public static bool CheckIfTileIsAvailableForStructure(FactionOld faction, int structureTile)
         {
             FactionStructure presentStructure = faction.factionStructures.Find(fetch => fetch.structureTile == structureTile);
             if (presentStructure != null) return false;

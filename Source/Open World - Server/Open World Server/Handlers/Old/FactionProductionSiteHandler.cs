@@ -11,8 +11,8 @@ namespace OpenWorldServer.Handlers.Old
             {
                 Thread.Sleep(600000);
 
-                Faction[] allFactions = Server.savedFactions.ToArray();
-                foreach (Faction faction in allFactions)
+                FactionOld[] allFactions = Server.savedFactions.ToArray();
+                foreach (FactionOld faction in allFactions)
                 {
                     FactionStructure productionSiteToFind = faction.factionStructures.Find(fetch => fetch is FactionProductionSite);
 
@@ -24,7 +24,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void SendProductionToMembers(Faction faction)
+        public static void SendProductionToMembers(FactionOld faction)
         {
             var dummyfactionMembers = faction.members.Keys.ToArray();
             int productionSitesInFaction = faction.factionStructures.FindAll(fetch => fetch is FactionProductionSite).Count();

@@ -7,7 +7,7 @@ namespace OpenWorldServer
     [System.Serializable]
     public class FactionBank : FactionStructure
     {
-        public override Faction holdingFaction => base.holdingFaction;
+        public override FactionOld holdingFaction => base.holdingFaction;
 
         public override string structureName => "Bank";
 
@@ -17,7 +17,7 @@ namespace OpenWorldServer
 
         public int depositedSilver;
 
-        public FactionBank(Faction holdingFaction, int structureTile)
+        public FactionBank(FactionOld holdingFaction, int structureTile)
         {
             this.holdingFaction = holdingFaction;
             this.structureTile = structureTile;

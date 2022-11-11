@@ -9,7 +9,7 @@ namespace OpenWorldServer
     {
         public enum StructureType { Silo, Marketplace, ProductionSite, Wonder, Bank, Stable, Courier }
 
-        public virtual Faction holdingFaction { get; set; }
+        public virtual FactionOld holdingFaction { get; set; }
 
         public virtual string structureName { get; set; }
 

@@ -71,7 +71,7 @@ namespace OpenWorldServer.Handlers
 
         public Account GetAccount(Guid id)
         {
-            var account = this.accounts.Find(a => a.Id == id);
+            var account = this.Accounts.FirstOrDefault(a => a.Id == id);
             this.SetFaction(account);
 
             return account;
@@ -79,7 +79,7 @@ namespace OpenWorldServer.Handlers
 
         public Account GetAccount(string username)
         {
-            var account = this.accounts.Find(a => a.Username == username);
+            var account = this.Accounts.FirstOrDefault(a => a.Username == username);
             this.SetFaction(account);
 
             return account;
@@ -108,21 +108,21 @@ namespace OpenWorldServer.Handlers
 
         public bool SaveAccount(Account account, bool saveOnly = false)
         {
-            var playerFile = this.GetAccountFilePath(account.Username);
             try
             {
-                ConsoleUtils.LogToConsole($"Saving [{account.Username}]", ConsoleUtils.ConsoleLogMode.Done);
-                JsonDataHelper.Save(account, playerFile);
+                ConsoleUtils.LogToConsole($"Saving Account [{account.Username}]", ConsoleUtils.ConsoleLogMode.Done);
+                JsonDataHelper.Save(account, this.GetAccountFilePath(account.Username));
                 if (!saveOnly && !this.Accounts.Contains(account))
                 {
                     this.accounts.Add(account);
-                    Server.savedClients.Add(new PlayerClient(null) { Account = account });
                 }
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                ConsoleUtils.LogToConsole($"Error saving Account [{account.Username}]", ConsoleUtils.ConsoleLogMode.Error);
+                ConsoleUtils.LogToConsole(ex.Message, ConsoleUtils.ConsoleLogMode.Error);
                 return false;
             }
         }
@@ -181,7 +181,7 @@ namespace OpenWorldServer.Handlers
             if (File.Exists(playerFile))
             {
                 var data = JsonDataHelper.Load<Account>(playerFile);
-                var oldData = this.GetAccount(username);
+                var oldData = this.GetAccount(data.Id);
                 if (oldData != null)
                 {
                     this.accounts.Remove(oldData);
@@ -194,6 +194,8 @@ namespace OpenWorldServer.Handlers
             return null;
         }
 
-        private string GetAccountFilePath(string username) => Path.Combine(PathProvider.PlayersFolderPath, $"{username}.json");
+        private string SanitizedName(string name) => name.Replace(' ', '-');
+
+        private string GetAccountFilePath(string username) => Path.Combine(PathProvider.PlayersFolderPath, $"{this.SanitizedName(username)}.json");
     }
 }

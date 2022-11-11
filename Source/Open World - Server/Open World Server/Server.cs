@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using OpenWorld.Shared.Networking.Packets;
 using OpenWorldServer.Data;
 using OpenWorldServer.Handlers;
-using OpenWorldServer.Handlers.Old;
 using OpenWorldServer.Manager;
 
 namespace OpenWorldServer
@@ -19,6 +18,7 @@ namespace OpenWorldServer
         private readonly PlayerManager playerManager;
         private readonly ModHandler modHandler;
         private readonly WorldMapHandler worldMapHandler;
+        private readonly FactionHandler factionHandler;
         private readonly ConnectionHandler connectionHandler;
 
         public bool IsRunning { get; set; } = false;
@@ -37,7 +37,7 @@ namespace OpenWorldServer
 
         //Server Lists
         public static List<string> adminList = new List<string>();
-        public static List<Faction> savedFactions = new List<Faction>();
+        public static List<FactionOld> savedFactions = new List<FactionOld>();
 
         public static string latestClientVersion;
 
@@ -50,7 +50,8 @@ namespace OpenWorldServer
             this.playerManager = new PlayerManager(serverConfig);
             this.modHandler = new ModHandler(serverConfig);
             this.worldMapHandler = new WorldMapHandler(this.playerManager);
-            this.connectionHandler = new ConnectionHandler(this.serverConfig, this.playerManager, this.modHandler, this.worldMapHandler);
+            this.factionHandler = new FactionHandler(this.serverConfig, this.playerManager);
+            this.connectionHandler = new ConnectionHandler(this.serverConfig, this.playerManager, this.modHandler, this.worldMapHandler, this.factionHandler);
 
             this.SetupStaticProxy();
 
@@ -92,7 +93,6 @@ namespace OpenWorldServer
 
             this.StartAcceptingConnections();
 
-            FactionHandler.CheckFactions();
             PlayerUtils.CheckAllAvailablePlayers();
 
             while (!exit) ListenForCommands();

@@ -20,6 +20,6 @@
         Settlements = 30,
         SettlementBuilder = 31,
 
-
+        FactionManagement = 40,
     }
 }

@@ -47,7 +47,7 @@ namespace OpenWorldServer
 
                 if (playerToLoad.Account.Faction != null)
                 {
-                    Faction factionToFech = Server.savedFactions.Find(fetch => fetch.name == playerToLoad.Account.Faction.name);
+                    FactionOld factionToFech = Server.savedFactions.Find(fetch => fetch.name == playerToLoad.Account.Faction.name);
                     if (factionToFech == null)
                     {
                         playerToLoad.Account.Faction = null;

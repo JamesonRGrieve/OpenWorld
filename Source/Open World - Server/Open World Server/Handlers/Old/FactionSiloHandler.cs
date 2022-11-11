@@ -5,7 +5,7 @@ namespace OpenWorldServer.Handlers.Old
 {
     public static class FactionSiloHandler
     {
-        public static string GetSiloContents(Faction faction, string siloTileID)
+        public static string GetSiloContents(FactionOld faction, string siloTileID)
         {
             int structureTile = int.Parse(siloTileID);
 
@@ -30,7 +30,7 @@ namespace OpenWorldServer.Handlers.Old
             return dataToSend;
         }
 
-        public static void DepositIntoSilo(Faction faction, string siloTileID, string items)
+        public static void DepositIntoSilo(FactionOld faction, string siloTileID, string items)
         {
             int structureTile = int.Parse(siloTileID);
 
@@ -95,7 +95,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void WithdrawFromSilo(Faction faction, string siloTileID, string siloItemID, PlayerClient client)
+        public static void WithdrawFromSilo(FactionOld faction, string siloTileID, string siloItemID, PlayerClient client)
         {
             int structureTile = int.Parse(siloTileID);
 

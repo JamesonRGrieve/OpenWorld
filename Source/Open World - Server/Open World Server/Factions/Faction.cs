@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {
     [System.Serializable]
-    public class Faction
+    public class FactionOld
     {
         public string name = "";
         public int wealth = 0;

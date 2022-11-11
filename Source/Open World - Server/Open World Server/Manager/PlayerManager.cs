@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Sockets;
@@ -34,6 +35,9 @@ namespace OpenWorldServer.Manager
             WhitelistHandler = new WhitelistHandler(this.serverConfig);
             BanlistHandler = new BanlistHandler(this.serverConfig);
         }
+
+        internal PlayerClient GetClient(Guid accountId)
+            => this.ConnectedClients.FirstOrDefault(c => c.Account?.Id == accountId);
 
         internal void AddPlayer(TcpClient newClient)
             => players.Add(new PlayerClient(newClient));

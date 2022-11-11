@@ -11,8 +11,8 @@ namespace OpenWorldServer.Handlers.Old
             {
                 Thread.Sleep(600000);
 
-                Faction[] allFactions = Server.savedFactions.ToArray();
-                foreach (Faction faction in allFactions)
+                FactionOld[] allFactions = Server.savedFactions.ToArray();
+                foreach (FactionOld faction in allFactions)
                 {
                     FactionBank bankToFind = faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
 
@@ -28,7 +28,7 @@ namespace OpenWorldServer.Handlers.Old
             }
         }
 
-        public static void DepositMoney(Faction faction, int quantity)
+        public static void DepositMoney(FactionOld faction, int quantity)
         {
             FactionBank bankToFind = faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
 
@@ -41,7 +41,7 @@ namespace OpenWorldServer.Handlers.Old
             RefreshMembersBankDetails(faction);
         }
 
-        public static void WithdrawMoney(Faction faction, int quantity, PlayerClient client)
+        public static void WithdrawMoney(FactionOld faction, int quantity, PlayerClient client)
         {
             FactionBank bankToFind = faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
 
@@ -57,7 +57,7 @@ namespace OpenWorldServer.Handlers.Old
             RefreshMembersBankDetails(faction);
         }
 
-        public static void RefreshMembersBankDetails(Faction faction)
+        public static void RefreshMembersBankDetails(FactionOld faction)
         {
             FactionBank bankToFind = faction.factionStructures.Find(fetch => fetch is FactionBank) as FactionBank;
 

@@ -17,13 +17,15 @@ namespace OpenWorldServer.Handlers
         private readonly PlayerManager playerManager;
         private readonly ModHandler modHandler;
         private readonly WorldMapHandler worldMapHandler;
+        private readonly FactionHandler factionHandler;
 
-        public ConnectionHandler(ServerConfig serverConfig, PlayerManager playerHandler, ModHandler modHandler, WorldMapHandler worldMapHandler)
+        public ConnectionHandler(ServerConfig serverConfig, PlayerManager playerHandler, ModHandler modHandler, WorldMapHandler worldMapHandler, FactionHandler factionHandler)
         {
             this.serverConfig = serverConfig;
             this.playerManager = playerHandler;
             this.modHandler = modHandler;
             this.worldMapHandler = worldMapHandler;
+            this.factionHandler = factionHandler;
         }
 
         public void ReadDataFromClient(PlayerClient client)
@@ -291,7 +293,7 @@ namespace OpenWorldServer.Handlers
 
             client.SendData(this.GetVariablePacket(client));
 
-            Networking.SendData(client, FactionHandler.GetFactionDetails(client));
+            client.SendData(this.factionHandler.GetFactionDetailsPacket(client.Account.FactionId));
             Networking.SendData(client, FactionBuildingHandler.GetAllFactionStructures(client));
         }
 

@@ -117,7 +117,7 @@ namespace OpenWorldServer
         }
         public static void FactionDetailsCommand(string[] arguments)
         {
-            Faction factionToSearch = Server.savedFactions.Find(fetch => fetch.name == arguments[0]);
+            FactionOld factionToSearch = Server.savedFactions.Find(fetch => fetch.name == arguments[0]);
             if (factionToSearch == null) ConsoleUtils.LogToConsole($"Faction {arguments[0]} Was Not Found", ConsoleUtils.ConsoleLogMode.Info);
             else
             {

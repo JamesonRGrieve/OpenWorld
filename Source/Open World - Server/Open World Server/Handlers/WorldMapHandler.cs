@@ -31,7 +31,7 @@ namespace OpenWorldServer.Handlers
 
         public void TryToClaimTile(PlayerClient client, string tileID)
         {
-            var accountFromTile = StaticProxy.worldMapHandler.GetAccountFromTile(tileID);
+            var accountFromTile = this.GetAccountFromTile(tileID);
             if (accountFromTile != null &&
                 accountFromTile.Id != client.Account.Id)
             {
@@ -46,7 +46,7 @@ namespace OpenWorldServer.Handlers
         private void AddSettlement(PlayerClient client, string tileId)
         {
             client.Account.HomeTileId = tileId;
-            StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
+            this.playerManager.AccountsHandler.SaveAccount(client);
 
             foreach (var connectedClient in this.playerManager.ConnectedClients)
             {

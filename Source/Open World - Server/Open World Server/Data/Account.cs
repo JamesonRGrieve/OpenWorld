@@ -29,7 +29,9 @@ namespace OpenWorldServer.Data
 
         public List<string> TradeString { get; set; } = new List<string>();
 
-        public Faction Faction { get; set; }
+        public FactionOld Faction { get; set; }
+
+        public Guid? FactionId { get; set; } = null;
 
         public int PawnCount { get; set; } = 0;
 

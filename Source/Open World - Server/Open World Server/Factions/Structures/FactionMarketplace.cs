@@ -7,7 +7,7 @@ namespace OpenWorldServer
     [System.Serializable]
     public class FactionMarketplace : FactionStructure
     {
-        public override Faction holdingFaction => base.holdingFaction;
+        public override FactionOld holdingFaction => base.holdingFaction;
 
         public override string structureName => "Marketplace";
 
@@ -15,7 +15,7 @@ namespace OpenWorldServer
 
         public override int structureTile => base.structureTile;
 
-        public FactionMarketplace(Faction holdingFaction, int structureTile)
+        public FactionMarketplace(FactionOld holdingFaction, int structureTile)
         {
             this.holdingFaction = holdingFaction;
             this.structureTile = structureTile;
