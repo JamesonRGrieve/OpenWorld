@@ -22,7 +22,7 @@ namespace OpenWorldServer
 
         public bool IsDisconnecting { get; set; } = false;
 
-        public PlayerData Account { get; set; }
+        public Account Account { get; set; }
 
         public bool IsEventProtected { get; set; } = false;
 
@@ -35,7 +35,7 @@ namespace OpenWorldServer
         public PlayerClient(TcpClient userSocket)
         {
             this.tcpClient = userSocket;
-            this.Account = new PlayerData();
+            this.Account = new Account();
         }
 
         public void SendData(IPacket packet) => this.SendData(packet.GetData());

@@ -22,11 +22,11 @@ namespace OpenWorldServer
 
 
 
-                var playerData = StaticProxy.playerHandler.AccountsHandler.GetAccount(Path.GetFileNameWithoutExtension(path));
-                if (playerData == null)
+                var account = StaticProxy.playerHandler.AccountsHandler.GetAccount(Path.GetFileNameWithoutExtension(path));
+                if (account == null)
                     return;
 
-                PlayerClient playerToLoad = new PlayerClient(null) { Account = playerData };
+                PlayerClient playerToLoad = new PlayerClient(null) { Account = account };
 
                 if (!string.IsNullOrWhiteSpace(playerToLoad.Account.HomeTileId))
                 {

@@ -16,9 +16,9 @@ namespace OpenWorldServer.Handlers
         /// <summary>
         /// Copy of Accounts as ReadOnlyCollection
         /// </summary>
-        public ReadOnlyCollection<PlayerData> Accounts => this.accounts.ToList().AsReadOnly();
+        public ReadOnlyCollection<Account> Accounts => this.accounts.ToList().AsReadOnly();
 
-        private List<PlayerData> accounts = new List<PlayerData>();
+        private List<Account> accounts = new List<Account>();
 
         public AccountsHandler(ServerConfig serverConfig)
         {
@@ -41,7 +41,7 @@ namespace OpenWorldServer.Handlers
         {
             try
             {
-                var account = JsonDataHelper.Load<PlayerData>(playerFile);
+                var account = JsonDataHelper.Load<Account>(playerFile);
 
                 if (this.serverConfig.IdleSystem.IsActive)
                 {
@@ -69,7 +69,7 @@ namespace OpenWorldServer.Handlers
             }
         }
 
-        public PlayerData GetAccount(Guid id)
+        public Account GetAccount(Guid id)
         {
             var account = this.accounts.Find(a => a.Id == id);
             this.SetFaction(account);
@@ -77,7 +77,7 @@ namespace OpenWorldServer.Handlers
             return account;
         }
 
-        public PlayerData GetAccount(string username)
+        public Account GetAccount(string username)
         {
             var account = this.accounts.Find(a => a.Username == username);
             this.SetFaction(account);
@@ -85,7 +85,7 @@ namespace OpenWorldServer.Handlers
             return account;
         }
 
-        private void SetFaction(PlayerData account)
+        private void SetFaction(Account account)
         {
             if (account == null || account.Faction == null)
             {
@@ -106,7 +106,7 @@ namespace OpenWorldServer.Handlers
         public bool SaveAccount(PlayerClient client)
             => this.SaveAccount(client.Account);
 
-        public bool SaveAccount(PlayerData account, bool saveOnly = false)
+        public bool SaveAccount(Account account, bool saveOnly = false)
         {
             var playerFile = this.GetAccountFilePath(account.Username);
             try
@@ -130,9 +130,9 @@ namespace OpenWorldServer.Handlers
         public void ResetAccount(PlayerClient client, bool saveGiftsAndTrades)
             => client.Account = this.ResetAccount(client.Account, saveGiftsAndTrades);
 
-        public PlayerData ResetAccount(PlayerData account, bool saveGiftsAndTrades)
+        public Account ResetAccount(Account account, bool saveGiftsAndTrades)
         {
-            var newPlayerData = new PlayerData()
+            var newAccount = new Account()
             {
                 Id = account.Id,
                 Username = account.Username,
@@ -141,19 +141,19 @@ namespace OpenWorldServer.Handlers
 
             if (saveGiftsAndTrades)
             {
-                newPlayerData.TradeString = account.TradeString;
-                newPlayerData.GiftString = account.GiftString;
+                newAccount.TradeString = account.TradeString;
+                newAccount.GiftString = account.GiftString;
             }
 
             this.RemoveAccount(account);
-            this.SaveAccount(newPlayerData);
+            this.SaveAccount(newAccount);
 
-            return newPlayerData;
+            return newAccount;
         }
 
-        public void RemoveAccount(PlayerData account)
+        public void RemoveAccount(Account account)
         {
-            // We dont use the playerData directly since it could already
+            // We dont use the Account directly since it could already
             // be a new reference and wouldn't be find in the list by Contains
 
             var oldData = this.GetAccount(account.Id);
@@ -175,12 +175,12 @@ namespace OpenWorldServer.Handlers
             this.LoadAccounts();
         }
 
-        public PlayerData ReloadAccount(string username)
+        public Account ReloadAccount(string username)
         {
             var playerFile = this.GetAccountFilePath(username);
             if (File.Exists(playerFile))
             {
-                var data = JsonDataHelper.Load<PlayerData>(playerFile);
+                var data = JsonDataHelper.Load<Account>(playerFile);
                 var oldData = this.GetAccount(username);
                 if (oldData != null)
                 {

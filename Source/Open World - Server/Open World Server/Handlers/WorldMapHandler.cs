@@ -12,7 +12,7 @@ namespace OpenWorldServer.Handlers
         //private readonly AccountsHandler accountsHandler;
         private readonly PlayerHandler playerHandler;
 
-        public IReadOnlyCollection<PlayerData> GetAccountsWithSettlements => this.playerHandler.AccountsHandler.Accounts.Where(a => a.HasSettlement).ToList();
+        public IReadOnlyCollection<Account> GetAccountsWithSettlements => this.playerHandler.AccountsHandler.Accounts.Where(a => a.HasSettlement).ToList();
 
         public IReadOnlyCollection<SettlementInfo> GetSettlements
             => this.playerHandler.AccountsHandler.Accounts
@@ -26,13 +26,13 @@ namespace OpenWorldServer.Handlers
 
         public bool IsTileAvailable(string tileID) => this.GetAccountFromTile(tileID) != null;
 
-        public PlayerData GetAccountFromTile(string tileID) => this.GetAccountsWithSettlements.FirstOrDefault(a => a.HomeTileId == tileID);
+        public Account GetAccountFromTile(string tileID) => this.GetAccountsWithSettlements.FirstOrDefault(a => a.HomeTileId == tileID);
 
         public void TryToClaimTile(PlayerClient client, string tileID)
         {
-            var playerDataFromTile = StaticProxy.worldMapHandler.GetAccountFromTile(tileID);
-            if (playerDataFromTile != null &&
-                playerDataFromTile.Id != client.Account.Id)
+            var accountFromTile = StaticProxy.worldMapHandler.GetAccountFromTile(tileID);
+            if (accountFromTile != null &&
+                accountFromTile.Id != client.Account.Id)
             {
                 client.Disconnect(OpenWorld.Shared.Enums.DisconnectReason.Corrupted);
                 ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleUtils.ConsoleLogMode.Error);

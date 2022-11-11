@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace OpenWorldServer.Data
 {
     [DebuggerDisplay("{Username,nq} ({Id,nq})")]
-    public class PlayerData
+    public class Account
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
