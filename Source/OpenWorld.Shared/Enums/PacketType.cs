@@ -14,6 +14,8 @@
         PlayerList = 20,
         PlanetData = 21,
         Variables = 22,
+        GiftedItems = 23,
+        TradedItems = 24,
 
         Settlements = 30,
         SettlementBuilder = 31,

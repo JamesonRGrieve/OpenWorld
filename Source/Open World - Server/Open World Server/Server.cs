@@ -53,28 +53,30 @@ namespace OpenWorldServer
 
             this.SetupStaticProxy();
 
-            this.SetupListener();
-
-            this.Run();
+            if (this.SetupListener())
+            {
+                this.Run();
+            }
         }
 
-        private void SetupListener()
+        private bool SetupListener()
         {
             IPAddress ipAddress;
             if (!IPAddress.TryParse(this.serverConfig.HostIP, out ipAddress))
             {
                 ConsoleUtils.LogToConsole($"The IP [{this.serverConfig.HostIP}] is not a valid IP", ConsoleUtils.ConsoleLogMode.Error);
-                return;
+                return false;
             }
 
             if (this.serverConfig.Port >= 65535 || this.serverConfig.Port <= 0)
             {
                 ConsoleUtils.LogToConsole($"The Port [{this.serverConfig.Port}] needs to be between 0 and 65535", ConsoleUtils.ConsoleLogMode.Error);
-                return;
+                return false;
             }
 
             this.listener = new TcpListener(ipAddress, this.serverConfig.Port);
             this.listener.Start();
+            return true;
         }
 
         public void Run()

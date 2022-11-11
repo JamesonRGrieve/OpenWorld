@@ -309,8 +309,26 @@ namespace OpenWorldServer.Handlers
         {
             this.SendWorldData(client);
 
-            Networking.SendData(client, JoiningsUtils.GetGiftsToSend(client));
-            Networking.SendData(client, JoiningsUtils.GetTradesToSend(client));
+            var wasModified = false;
+            if (client.Account.GiftString.Count > 0)
+            {
+                client.SendData(new GiftedItemsPacket(client.Account.GiftString));
+                client.Account.GiftString.Clear();
+                wasModified = true;
+            }
+
+            if (client.Account.TradeString.Count > 0)
+            {
+                client.SendData(new TradedItemsPacket(client.Account.TradeString));
+                client.Account.TradeString.Clear();
+                wasModified = true;
+            }
+
+            if (wasModified)
+            {
+                this.playerHandler.AccountsHandler.SaveAccount(client);
+            }
+
             client.SendData(new LoadGamePacket());
         }
     }
