@@ -1,6 +1,15 @@
-﻿namespace OpenWorldServer.Manager
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+using OpenWorld.Shared.Networking.Packets;
+using OpenWorldServer.Data;
+using OpenWorldServer.Handlers;
+
+namespace OpenWorldServer.Manager
 {
-    public class PlayerHandler
+    public class PlayerManager
     {
         private readonly ServerConfig serverConfig;
 
@@ -18,7 +27,7 @@
 
         private List<PlayerClient> players = new List<PlayerClient>();
 
-        public PlayerHandler(ServerConfig serverConfig)
+        public PlayerManager(ServerConfig serverConfig)
         {
             this.serverConfig = serverConfig;
             AccountsHandler = new AccountsHandler(this.serverConfig);
