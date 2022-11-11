@@ -69,34 +69,38 @@ namespace OpenWorldServer.Handlers
             }
         }
 
-        public PlayerData GetAccount(PlayerClient client, bool ignoreLoggedIn = false)
+        public PlayerData GetAccount(Guid id)
         {
-            if (!ignoreLoggedIn && client.IsLoggedIn)
-            {
-                // No need to access list. If player is already logged in, we mapped the PlayerData object to the Client
-                return client.Account;
-            }
+            var account = this.accounts.Find(a => a.Id == id);
+            this.SetFaction(account);
 
-            return this.GetAccount(client.Account.Username);
+            return account;
         }
 
         public PlayerData GetAccount(string username)
         {
-            var account = this.accounts.Find(pd => pd.Username == username);
-            if (account != null && account.Faction != null)
-            {
-                var factionToGive = Server.savedFactions.Find(fetch => fetch.name == account.Faction.name);
-                if (factionToGive != null)
-                {
-                    account.Faction = factionToGive;
-                }
-                else
-                {
-                    account.Faction = null;
-                }
-            }
+            var account = this.accounts.Find(a => a.Username == username);
+            this.SetFaction(account);
 
             return account;
+        }
+
+        private void SetFaction(PlayerData account)
+        {
+            if (account == null || account.Faction == null)
+            {
+                return;
+            }
+
+            var factionToGive = Server.savedFactions.Find(fetch => fetch.name == account.Faction.name);
+            if (factionToGive != null)
+            {
+                account.Faction = factionToGive;
+            }
+            else
+            {
+                account.Faction = null;
+            }
         }
 
         public bool SaveAccount(PlayerClient client)
@@ -130,6 +134,7 @@ namespace OpenWorldServer.Handlers
         {
             var newPlayerData = new PlayerData()
             {
+                Id = account.Id,
                 Username = account.Username,
                 Password = account.Password,
             };
@@ -151,7 +156,7 @@ namespace OpenWorldServer.Handlers
             // We dont use the playerData directly since it could already
             // be a new reference and wouldn't be find in the list by Contains
 
-            var oldData = this.GetAccount(account.Username);
+            var oldData = this.GetAccount(account.Id);
             if (oldData != null)
             {
                 this.accounts.Remove(oldData);

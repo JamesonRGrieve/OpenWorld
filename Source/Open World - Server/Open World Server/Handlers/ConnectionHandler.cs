@@ -285,7 +285,7 @@ namespace OpenWorldServer.Handlers
 
         private void SendWorldData(PlayerClient client)
         {
-            var settlements = this.worldMapHandler.GetSettlements.Where(s => s.Owner != client.Account.Username);
+            var settlements = this.worldMapHandler.GetSettlements.Where(s => s.OwnerId != client.Account.Id);
             client.SendData(new SettlementsPacket(settlements, client.Account.Faction?.name));
 
             client.SendData(this.GetVariablePacket(client));

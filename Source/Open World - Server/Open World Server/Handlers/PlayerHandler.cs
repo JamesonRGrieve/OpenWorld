@@ -96,7 +96,7 @@ namespace OpenWorldServer.Handlers
             {
                 Parallel.ForEach(clients, target =>
                 {
-                    if (clientToSkip?.Account?.Username != target.Account?.Username)
+                    if (clientToSkip != null && clientToSkip.Account?.Id != target.Account?.Id)
                     {
                         target.SendData(packet);
                     }

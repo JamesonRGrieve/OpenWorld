@@ -1,17 +1,22 @@
-﻿namespace OpenWorld.Shared.Data
+﻿using System;
+
+namespace OpenWorld.Shared.Data
 {
     public class SettlementInfo
     {
-        public string HomeTileId { get; }
+        public Guid OwnerId { get; }
 
         public string Owner { get; }
 
+        public string HomeTileId { get; }
+
         public string FactionName { get; }
 
-        public SettlementInfo(string homeTileId, string owner, string factionName)
+        public SettlementInfo(Guid ownerId, string owner, string homeTileId, string factionName)
         {
-            this.HomeTileId = homeTileId;
+            this.OwnerId = ownerId;
             this.Owner = owner;
+            this.HomeTileId = homeTileId;
             this.FactionName = factionName;
         }
     }

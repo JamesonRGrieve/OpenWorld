@@ -17,7 +17,7 @@ namespace OpenWorldServer.Handlers
         public IReadOnlyCollection<SettlementInfo> GetSettlements
             => this.playerHandler.AccountsHandler.Accounts
             .Where(a => a.HasSettlement)
-            .Select(a => new SettlementInfo(a.HomeTileId, a.Username, a.Faction?.name)).ToList();
+            .Select(a => new SettlementInfo(a.Id, a.Username, a.HomeTileId, a.Faction?.name)).ToList();
 
         public WorldMapHandler(PlayerHandler playerHandler)
         {
@@ -32,7 +32,7 @@ namespace OpenWorldServer.Handlers
         {
             var playerDataFromTile = StaticProxy.worldMapHandler.GetAccountFromTile(tileID);
             if (playerDataFromTile != null &&
-                playerDataFromTile.Username != client.Account.Username)
+                playerDataFromTile.Id != client.Account.Id)
             {
                 client.Disconnect(OpenWorld.Shared.Enums.DisconnectReason.Corrupted);
                 ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "] tried to claim used Tile! [" + tileID + "]", ConsoleUtils.ConsoleLogMode.Error);
@@ -49,7 +49,7 @@ namespace OpenWorldServer.Handlers
 
             foreach (var connectedClient in this.playerHandler.ConnectedClients)
             {
-                if (connectedClient.Account.Username == connectedClient.Account.Username)
+                if (connectedClient.Account.Id == connectedClient.Account.Id)
                 {
                     continue;
                 }

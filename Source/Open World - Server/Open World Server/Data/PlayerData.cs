@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace OpenWorldServer.Data
 {
-    [DebuggerDisplay("{Username,nq}")]
+    [DebuggerDisplay("{Username,nq} ({Id,nq})")]
     public class PlayerData
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public string Username { get; set; }
 
         public string Password { get; set; }
@@ -17,6 +20,7 @@ namespace OpenWorldServer.Data
 
         public DateTime? LastLogin { get; set; }
 
+        [JsonIgnore]
         public bool HasSettlement => !string.IsNullOrEmpty(this.HomeTileId);
 
         public string HomeTileId { get; set; }
