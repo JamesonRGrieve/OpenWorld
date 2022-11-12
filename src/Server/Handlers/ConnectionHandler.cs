@@ -5,11 +5,11 @@ using System.Net;
 using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking;
 using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
-using OpenWorldServer.Handlers.Old;
-using OpenWorldServer.Manager;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Handlers.Old;
+using OpenWorld.Server.Manager;
 
-namespace OpenWorldServer.Handlers
+namespace OpenWorld.Server.Handlers
 {
     internal class ConnectionHandler
     {

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RuntimeIdentifiers>linux-arm64</RuntimeIdentifiers>
@@ -16,6 +16,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Shared\Shared.csproj" />
+	  <ProjectReference Include="..\Shared\OpenWorld.Shared.csproj" />
 	</ItemGroup>
 </Project>

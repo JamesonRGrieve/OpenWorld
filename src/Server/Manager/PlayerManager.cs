@@ -5,10 +5,10 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
-using OpenWorldServer.Handlers;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Handlers;
 
-namespace OpenWorldServer.Manager
+namespace OpenWorld.Server.Manager
 {
     public class PlayerManager
     {

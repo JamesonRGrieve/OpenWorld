@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using OpenWorldServer.Data;
-using OpenWorldServer.Services;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Services;
 
-namespace OpenWorldServer.Handlers
+namespace OpenWorld.Server.Handlers
 {
     public class ModHandler
     {

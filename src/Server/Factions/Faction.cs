@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using OpenWorldServer.Handlers.Old;
+using OpenWorld.Server.Handlers.Old;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     [System.Serializable]
     public class FactionOld

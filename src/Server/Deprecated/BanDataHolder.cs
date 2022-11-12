@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenWorldServer.Deprecated
+namespace OpenWorld.Server.Deprecated
 {
     [System.Serializable]
     public class BanDataHolder

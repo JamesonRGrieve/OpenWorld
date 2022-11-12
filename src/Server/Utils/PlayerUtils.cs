@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     public static class PlayerUtils
     {

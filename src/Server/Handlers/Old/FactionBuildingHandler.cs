@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace OpenWorldServer.Handlers.Old
+namespace OpenWorld.Server.Handlers.Old
 {
     public static class FactionBuildingHandler
     {

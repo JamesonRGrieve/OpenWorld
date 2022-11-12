@@ -1,4 +1,4 @@
-﻿namespace OpenWorldServer.Enums
+﻿namespace OpenWorld.Server.Enums
 {
     public enum KickMode
     {

@@ -3,10 +3,10 @@ using System.Linq;
 using OpenWorld.Shared.Data;
 using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
-using OpenWorldServer.Manager;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Manager;
 
-namespace OpenWorldServer.Handlers
+namespace OpenWorld.Server.Handlers
 {
     public class WorldMapHandler
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
-namespace OpenWorldServer.Data
+namespace OpenWorld.Server.Data
 {
     [DebuggerDisplay("{Username,nq} ({Id,nq})")]
     public class Account

@@ -158,9 +158,9 @@
     <Compile Include="Threading.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj">
+    <ProjectReference Include="..\Shared\OpenWorld.Shared.csproj">
       <Project>{6541e85d-eba1-4a8b-8e20-d14cdfbc21aa}</Project>
-      <Name>Shared</Name>
+      <Name>OpenWorld.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

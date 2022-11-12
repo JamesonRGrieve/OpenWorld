@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace OpenWorldServer.Services
+namespace OpenWorld.Server.Services
 {
     internal static class PathProvider
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace OpenWorldServer.Utils
+namespace OpenWorld.Server.Utils
 {
     public static class JsonDataHelper
     {

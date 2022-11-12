@@ -1,6 +1,6 @@
 ﻿using OpenWorld.Shared.Enums;
 
-namespace OpenWorldServer.Data.Factions.Structures
+namespace OpenWorld.Server.Data.Factions.Structures
 {
     internal class Marketplace : FactionStructureBase
     {

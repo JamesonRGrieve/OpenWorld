@@ -6,11 +6,11 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
-using OpenWorldServer.Handlers;
-using OpenWorldServer.Manager;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Handlers;
+using OpenWorld.Server.Manager;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     public class Server
     {

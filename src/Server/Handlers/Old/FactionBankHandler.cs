@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 
-namespace OpenWorldServer.Handlers.Old
+namespace OpenWorld.Server.Handlers.Old
 {
     public static class FactionBankHandler
     {

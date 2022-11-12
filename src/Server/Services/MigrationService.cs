@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using OpenWorldServer.Data;
-using OpenWorldServer.Deprecated;
-using OpenWorldServer.Utils;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Deprecated;
+using OpenWorld.Server.Utils;
 
-namespace OpenWorldServer.Services
+namespace OpenWorld.Server.Services
 {
     internal class MigrationService
     {

@@ -2,11 +2,11 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using OpenWorld.Server.Data;
 using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets;
-using OpenWorldServer.Data;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     public class PlayerClient
     {

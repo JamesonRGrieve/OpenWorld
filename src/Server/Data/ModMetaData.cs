@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace OpenWorldServer.Data
+namespace OpenWorld.Server.Data
 {
     public class ModMetaData
     {

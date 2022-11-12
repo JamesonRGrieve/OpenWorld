@@ -1,4 +1,4 @@
-﻿namespace OpenWorldServer.Data.Configs
+﻿namespace OpenWorld.Server.Data.Configs
 {
     public class RoadConfig
     {

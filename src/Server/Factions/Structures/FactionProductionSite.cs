@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     [System.Serializable]
     public class FactionProductionSite : FactionStructure

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using OpenWorldServer.Data;
-using OpenWorldServer.Services;
-using OpenWorldServer.Utils;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Services;
+using OpenWorld.Server.Utils;
 
-namespace OpenWorldServer.Handlers
+namespace OpenWorld.Server.Handlers
 {
     public class WhitelistHandler
     {

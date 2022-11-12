@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenWorld.Shared.Enums;
 
-namespace OpenWorldServer.Converter
+namespace OpenWorld.Server.Converter
 {
     internal class FactionMemberJsonConverter : JsonConverter<Dictionary<Guid, FactionRank>>
     {

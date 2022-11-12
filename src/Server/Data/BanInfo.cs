@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenWorldServer.Data
+namespace OpenWorld.Server.Data
 {
     public class BanInfo
     {

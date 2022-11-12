@@ -1,8 +1,8 @@
-﻿using OpenWorldServer.Data;
-using OpenWorldServer.Handlers;
-using OpenWorldServer.Manager;
+﻿using OpenWorld.Server.Data;
+using OpenWorld.Server.Handlers;
+using OpenWorld.Server.Manager;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     // THIS CLASS IS TEMPORARY
     public static class StaticProxy

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using OpenWorldServer.Data;
-using OpenWorldServer.Handlers.Old;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Handlers.Old;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     public static class SimpleCommands
     {

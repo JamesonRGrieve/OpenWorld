@@ -1,7 +1,7 @@
-﻿using OpenWorld.Shared.Data;
-using OpenWorldServer.Data.Configs;
+﻿using OpenWorld.Server.Data.Configs;
+using OpenWorld.Shared.Data;
 
-namespace OpenWorldServer.Data
+namespace OpenWorld.Server.Data
 {
     public class ServerConfig
     {

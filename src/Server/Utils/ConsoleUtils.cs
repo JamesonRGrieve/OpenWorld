@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OpenWorldServer.Services;
+using OpenWorld.Server.Services;
 
-namespace OpenWorldServer
+namespace OpenWorld.Server
 {
     public static class ConsoleUtils
     {

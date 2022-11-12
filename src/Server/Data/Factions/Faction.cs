@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using OpenWorld.Shared.Enums;
-using OpenWorldServer.Converter;
+using OpenWorld.Server.Converter;
 
-namespace OpenWorldServer.Data.Factions
+namespace OpenWorld.Server.Data.Factions
 {
     public class Faction
     {

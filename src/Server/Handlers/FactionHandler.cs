@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using OpenWorld.Shared.Enums;
 using OpenWorld.Shared.Networking.Packets.Faction;
-using OpenWorldServer.Data;
-using OpenWorldServer.Data.Factions;
-using OpenWorldServer.Manager;
-using OpenWorldServer.Services;
-using OpenWorldServer.Utils;
+using OpenWorld.Server.Data;
+using OpenWorld.Server.Data.Factions;
+using OpenWorld.Server.Manager;
+using OpenWorld.Server.Services;
+using OpenWorld.Server.Utils;
 
-namespace OpenWorldServer.Handlers
+namespace OpenWorld.Server.Handlers
 {
     public class FactionHandler
     {

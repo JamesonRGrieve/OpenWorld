@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using OpenWorldServer.Services;
+using OpenWorld.Server.Services;
 
-namespace OpenWorldServer.Handlers.Old
+namespace OpenWorld.Server.Handlers.Old
 {
     public static class FactionHandler
     {
