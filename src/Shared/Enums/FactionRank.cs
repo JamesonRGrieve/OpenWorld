@@ -4,8 +4,6 @@
     {
         Member = 0,
         Moderator = 1,
-        Leader = 2,
-
-        NotMember = 100,
+        Leader = 2
     }
 }

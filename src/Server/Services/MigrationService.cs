@@ -6,6 +6,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using OpenWorld.Server.Data;
 using OpenWorld.Server.Deprecated;
 using OpenWorld.Server.Utils;
+using OpenWorld.Server.Data.Factions;
+using static OpenWorld.Server.Handlers.Old.FactionHandler;
+using OpenWorld.Server.Handlers.Old;
 
 namespace OpenWorld.Server.Services
 {
@@ -22,6 +25,102 @@ namespace OpenWorld.Server.Services
             this.MigrateWhitelist();
             this.MigrateBanlist();
             this.MigrateModsFolder();
+            MigrateFactions(MigratePlayers());
+        }
+
+        private List<Account> MigratePlayers()
+        {
+            List<Account> migratedPlayers = new List<Account>();
+            var oldPath = Path.Combine(PathProvider.MainFolderPath, "Players");
+            if (!Directory.Exists(oldPath)) ConsoleUtils.LogToConsole($"No old players folder detected, skipping.");
+            else
+            {
+                string[] playerFiles = Directory.GetFiles(oldPath);
+                int failedToLoadPlayers = 0;
+                
+
+                foreach (string player in playerFiles)
+                {
+                    try
+                    {
+                        BinaryFormatter formatter = new BinaryFormatter();
+                        FileStream s = File.Open(player, FileMode.Open);
+                        object obj = formatter.Deserialize(s);
+                        ServerClient loaded = (ServerClient)obj;
+                        
+
+                        s.Flush();
+                        s.Close();
+                        s.Dispose();
+
+                        Account imported = new Account()
+                        { 
+                            Username = loaded.username,
+                            Password = loaded.password,
+                            IsAdmin =  loaded.isAdmin,
+                            ToWipe = loaded.toWipe,
+                            HomeTileId = loaded.homeTileID,
+                            GiftString = loaded.giftString,
+                            TradeString = loaded.tradeString,
+                            Faction = loaded.faction,
+                            PawnCount = loaded.pawnCount,
+                            Wealth = loaded.wealth,
+                            IsImmunized = loaded.isImmunized
+                        };
+                        migratedPlayers.Add(imported);
+                        JsonDataHelper.Save(imported, Path.Combine(PathProvider.PlayersFolderPath, $"{imported.Username}.json"));
+                    }
+                    catch { failedToLoadPlayers++; }
+                }
+                
+
+                ConsoleUtils.LogToConsole($"Imported {migratedPlayers.Count} Old Factions");
+
+                if (failedToLoadPlayers > 0) ConsoleUtils.LogToConsole($"Failed to load {failedToLoadPlayers} Players", ConsoleUtils.ConsoleLogMode.Error);
+                
+            }
+            return migratedPlayers;
+        }
+        private void MigrateFactions(List<Account> migratedPlayers)
+        {
+            var oldPath = Path.Combine(PathProvider.MainFolderPath, "Factions");
+            if (!Directory.Exists(oldPath)) ConsoleUtils.LogToConsole($"No old factions folder detected, skipping.");
+            else
+            {
+                string[] factionFiles = Directory.GetFiles(oldPath);
+                int failedToLoadFactions = 0, importedFactions = 0;
+
+                foreach (string faction in factionFiles)
+                {
+                    try
+                    {
+                        BinaryFormatter formatter = new BinaryFormatter();
+                        FileStream s = File.Open(faction, FileMode.Open);
+                        object obj = formatter.Deserialize(s);
+                        FactionOld factionToLoad = (FactionOld)obj;
+
+                        s.Flush();
+                        s.Close();
+                        s.Dispose();
+
+                        Faction imported = new Faction()
+                        {
+                            Name = factionToLoad.name,
+                            Wealth = factionToLoad.wealth,
+                            Structures = new List<object>(factionToLoad.factionStructures)
+                        };
+                        // TODO: Patch out the necessity to reference MemberRank here.
+                        foreach (KeyValuePair<PlayerClient, MemberRank> oldFactionMember in factionToLoad.members) imported.Members.Add(migratedPlayers.Find(x => x.Username==oldFactionMember.Key.Account.Username).Id, (Shared.Enums.FactionRank)(byte)oldFactionMember.Value);
+
+                        JsonDataHelper.Save(imported, Path.Combine(PathProvider.FactionsFolderPath, $"{imported.Name}.json"));
+                    }
+                    catch { failedToLoadFactions++; }
+                }
+
+                ConsoleUtils.LogToConsole($"Imported {importedFactions} Old Factions");
+
+                if (failedToLoadFactions > 0) ConsoleUtils.LogToConsole($"Failed to load {failedToLoadFactions} Factions", ConsoleUtils.ConsoleLogMode.Error);
+            }
         }
 
         public static MigrationService CreateAndMigrateAll(ServerConfig serverConfig)
