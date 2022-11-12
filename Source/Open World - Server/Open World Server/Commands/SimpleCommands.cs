@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using OpenWorldServer.Data;
 using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
@@ -86,7 +87,6 @@ namespace OpenWorldServer
             StaticProxy.modHandler.ReloadModFolders();
             StaticProxy.playerManager.AccountsHandler.ReloadAccounts();
             FactionHandler.CheckFactions();
-            PlayerUtils.CheckAllAvailablePlayers();
         }
 
         private static readonly Dictionary<string, Dictionary<string, string>> STATUSES_1 = new Dictionary<string, Dictionary<string, string>>()
@@ -167,9 +167,9 @@ namespace OpenWorldServer
         }
         public static void AdminListCommand()
         {
-            List<PlayerClient> admins = Server.savedClients.Where(x => x.Account.IsAdmin).ToList();
+            List<Account> admins = StaticProxy.playerManager.AccountsHandler.Accounts.Where(x => x.IsAdmin).ToList();
             ConsoleUtils.LogToConsole("Server Administrators: " + admins.Count, ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole(admins.Count == 0 ? "No Admins Found" : string.Join('\n', admins.Select(x => x.Account.Username)));
+            ConsoleUtils.LogToConsole(admins.Count == 0 ? "No Admins Found" : string.Join('\n', admins.Select(x => x.Username)));
         }
         public static void BanListCommand()
         {
@@ -182,11 +182,11 @@ namespace OpenWorldServer
             if (string.Equals(Console.ReadLine().Trim(), "Y", StringComparison.OrdinalIgnoreCase))
             {
                 foreach (PlayerClient client in StaticProxy.playerManager.ConnectedClients) client.IsDisconnecting = true;
-                foreach (PlayerClient client in Server.savedClients)
+                foreach (var acc in StaticProxy.playerManager.AccountsHandler.Accounts)
                 {
-                    client.Account.Wealth = 0;
-                    client.Account.PawnCount = 0;
-                    StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
+                    acc.Wealth = 0;
+                    acc.PawnCount = 0;
+                    StaticProxy.playerManager.AccountsHandler.SaveAccount(acc);
                 }
                 ConsoleUtils.LogToConsole("All Player Files Have Been Set To Wipe", ConsoleUtils.ConsoleLogMode.Info);
             }
@@ -210,20 +210,13 @@ namespace OpenWorldServer
                     }
                 }
             }
-            ConsoleUtils.LogToConsole($"Saved Players: {Server.savedClients.Count}", ConsoleUtils.ConsoleLogMode.Heading);
-            if (Server.savedClients.Count == 0) ConsoleUtils.LogToConsole("No Players Saved");
+            ConsoleUtils.LogToConsole($"Saved Players: {StaticProxy.playerManager.AccountsHandler.Accounts.Count}", ConsoleUtils.ConsoleLogMode.Heading);
+            if (StaticProxy.playerManager.AccountsHandler.Accounts.Count == 0) ConsoleUtils.LogToConsole("No Players Saved");
             else
             {
-                foreach (PlayerClient savedClient in Server.savedClients)
+                foreach (var account in StaticProxy.playerManager.AccountsHandler.Accounts)
                 {
-                    try
-                    {
-                        ConsoleUtils.LogToConsole(savedClient.Account.Username);
-                    }
-                    catch
-                    {
-                        ConsoleUtils.LogToConsole($"Error Processing Player With IP {savedClient.IPAddress}", ConsoleUtils.ConsoleLogMode.Error);
-                    }
+                    ConsoleUtils.LogToConsole(account.Username);
                 }
             }
             ConsoleUtils.LogToConsole("Saved Factions: " + Server.savedFactions.Count, ConsoleUtils.ConsoleLogMode.Heading);

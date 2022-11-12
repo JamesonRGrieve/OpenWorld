@@ -48,7 +48,7 @@ namespace OpenWorldServer.Handlers.Old
 
             factionLeader.Account.Faction = newFaction;
 
-            PlayerClient clientToSave = Server.savedClients.Find(fetch => fetch.Account.Username == factionLeader.Account.Username);
+            PlayerClient clientToSave = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Id == factionLeader.Account.Id);
             clientToSave.Account.Faction = newFaction;
             StaticProxy.playerManager.AccountsHandler.SaveAccount(clientToSave);
 
@@ -164,10 +164,10 @@ namespace OpenWorldServer.Handlers.Old
                 //Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            PlayerClient saved = Server.savedClients.Find(fetch => fetch.Account.Username == memberToAdd.Account.Username);
+            var saved = StaticProxy.playerManager.AccountsHandler.Accounts.FirstOrDefault(fetch => fetch.Id == memberToAdd.Account.Id);
             if (saved != null)
             {
-                saved.Account.Faction = faction;
+                saved.Faction = faction;
                 StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
             }
 
@@ -192,10 +192,10 @@ namespace OpenWorldServer.Handlers.Old
                 Networking.SendData(connected, GetFactionDetails(connected));
             }
 
-            PlayerClient saved = Server.savedClients.Find(fetch => fetch.Account.Username == memberToRemove.Account.Username);
+            var saved = StaticProxy.playerManager.AccountsHandler.Accounts.FirstOrDefault(fetch => fetch.Id == memberToRemove.Account.Id);
             if (saved != null)
             {
-                saved.Account.Faction = null;
+                saved.Faction = null;
                 StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
             }
 
@@ -220,10 +220,10 @@ namespace OpenWorldServer.Handlers.Old
                     Networking.SendData(connected, GetFactionDetails(connected));
                 }
 
-                PlayerClient saved = Server.savedClients.Find(fetch => fetch.Account.Username == dummy.Account.Username);
+                var saved = StaticProxy.playerManager.AccountsHandler.Accounts.FirstOrDefault(fetch => fetch.Id == dummy.Account.Id);
                 if (saved != null)
                 {
-                    saved.Account.Faction = null;
+                    saved.Faction = null;
                     StaticProxy.playerManager.AccountsHandler.SaveAccount(saved);
                 }
             }

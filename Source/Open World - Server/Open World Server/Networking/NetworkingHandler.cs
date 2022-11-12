@@ -1,4 +1,5 @@
-﻿using OpenWorldServer.Handlers.Old;
+﻿using System.Linq;
+using OpenWorldServer.Handlers.Old;
 
 namespace OpenWorldServer
 {
@@ -10,10 +11,12 @@ namespace OpenWorldServer
             {
                 try
                 {
+                    var oldWealth = client.Account.Wealth;
+                    var oldPawnCount = client.Account.PawnCount;
                     client.Account.Wealth = float.Parse(data.Split('│')[3]);
                     client.Account.PawnCount = int.Parse(data.Split('│')[4]);
 
-                    PlayerUtils.CheckForPlayerWealth(client);
+                    PlayerUtils.CheckForPlayerWealth(client, oldWealth);
                 }
                 catch { }
 
@@ -264,7 +267,7 @@ namespace OpenWorldServer
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     FactionOld factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
-                    PlayerClient memberToRemove = Server.savedClients.Find(fetch => fetch.Account.HomeTileId == tileID);
+                    PlayerClient memberToRemove = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
 
                     if (memberToRemove.Account.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToRemove.Account.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -298,7 +301,7 @@ namespace OpenWorldServer
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     FactionOld factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
-                    PlayerClient memberToPromote = Server.savedClients.Find(fetch => fetch.Account.HomeTileId == tileID);
+                    PlayerClient memberToPromote = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
 
                     if (memberToPromote.Account.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToPromote.Account.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");
@@ -332,7 +335,7 @@ namespace OpenWorldServer
                 if (!PlayerUtils.CheckForConnectedPlayers(tileID))
                 {
                     FactionOld factionToCheck = Server.savedFactions.Find(fetch => fetch.name == client.Account.Faction.name);
-                    PlayerClient memberToDemote = Server.savedClients.Find(fetch => fetch.Account.HomeTileId == tileID);
+                    PlayerClient memberToDemote = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.HomeTileId == tileID);
 
                     if (memberToDemote.Account.Faction == null) Networking.SendData(client, "FactionManagement│NotInFaction");
                     else if (memberToDemote.Account.Faction.name != factionToCheck.name) Networking.SendData(client, "FactionManagement│NotInFaction");

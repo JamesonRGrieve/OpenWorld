@@ -29,9 +29,6 @@ namespace OpenWorldServer
 
         public static bool exit = false;
 
-        //Player Parameters
-        public static List<PlayerClient> savedClients = new List<PlayerClient>();
-
         //Server Details
         public static string serverVersion = "v1.4.2";
 
@@ -92,8 +89,6 @@ namespace OpenWorldServer
             ConsoleUtils.UpdateTitle();
 
             this.StartAcceptingConnections();
-
-            PlayerUtils.CheckAllAvailablePlayers();
 
             while (!exit) ListenForCommands();
         }

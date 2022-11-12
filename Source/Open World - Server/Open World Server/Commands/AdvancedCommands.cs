@@ -34,7 +34,6 @@ namespace OpenWorldServer
         {
             PlayerClient targetClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]);
             targetClient.Account.IsImmunized = true;
-            Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsImmunized = true;
             StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
             ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Immunized", ConsoleUtils.ConsoleLogMode.Info);
         }
@@ -42,7 +41,6 @@ namespace OpenWorldServer
         {
             PlayerClient targetClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]);
             targetClient.Account.IsImmunized = false;
-            Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsImmunized = false;
             StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
             ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Deimmunized", ConsoleUtils.ConsoleLogMode.Info);
         }
@@ -50,7 +48,6 @@ namespace OpenWorldServer
         {
             PlayerClient targetClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]);
             targetClient.IsEventProtected = true;
-            Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).IsEventProtected = true;
             StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
             ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Protected", ConsoleUtils.ConsoleLogMode.Info);
         }
@@ -58,7 +55,6 @@ namespace OpenWorldServer
         {
             PlayerClient targetClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]);
             targetClient.IsEventProtected = false;
-            Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).IsEventProtected = false;
             StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
             ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Protected", ConsoleUtils.ConsoleLogMode.Info);
         }
@@ -80,7 +76,6 @@ namespace OpenWorldServer
             else
             {
                 targetClient.Account.IsAdmin = true;
-                Server.savedClients.Find(fetch => fetch.Account.Username == arguments[0]).Account.IsAdmin = true;
                 StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
                 Networking.SendData(targetClient, "Admin│Promote");
                 ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Promoted", ConsoleUtils.ConsoleLogMode.Info);
@@ -93,7 +88,6 @@ namespace OpenWorldServer
             else
             {
                 targetClient.Account.IsAdmin = false;
-                Server.savedClients.Find(fetch => fetch.Account.Username == targetClient.Account.Username).Account.IsAdmin = false;
                 StaticProxy.playerManager.AccountsHandler.SaveAccount(targetClient);
                 Networking.SendData(targetClient, "Admin│Demote");
                 ConsoleUtils.LogToConsole($"Player {targetClient.Account.Username} Has Been Demoted", ConsoleUtils.ConsoleLogMode.Info);
@@ -101,19 +95,20 @@ namespace OpenWorldServer
         }
         public static void PlayerDetailsCommand(string[] arguments)
         {
-            PlayerClient liveClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]), savedClient = Server.savedClients.Find(fetch => fetch.Account.Username == arguments[0]);
+            var liveClient = StaticProxy.playerManager.ConnectedClients.FirstOrDefault(fetch => fetch.Account.Username == arguments[0]);
+            var savedClient = StaticProxy.playerManager.AccountsHandler.Accounts.FirstOrDefault(fetch => fetch.Username == arguments[0]);
             bool isConnected = liveClient != null;
             string ip = liveClient == null ? "N/A - Offline" : liveClient.IPAddress.ToString();
             ConsoleUtils.LogToConsole("Player Details", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole($"Username: {savedClient.Account.Username}\nPassword: {savedClient.Account.Password}\n");
+            ConsoleUtils.LogToConsole($"Username: {savedClient.Username}\nPassword: {savedClient.Password}\n");
             ConsoleUtils.LogToConsole("Role", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole($"Admin: {savedClient.Account.IsAdmin}");
+            ConsoleUtils.LogToConsole($"Admin: {savedClient.IsAdmin}");
             ConsoleUtils.LogToConsole("Status", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole($"Online: {isConnected}\nConnection IP: {ip}\nImmunized: {savedClient.Account.IsImmunized}\nEvent Shielded: {savedClient.IsEventProtected}\nIn RTSE: {savedClient.InRTSE}");
+            ConsoleUtils.LogToConsole($"Online: {isConnected}\nConnection IP: {ip}\nImmunized: {savedClient.IsImmunized}\nEvent Shielded: {liveClient?.IsEventProtected}\nIn RTSE: {liveClient?.InRTSE}");
             ConsoleUtils.LogToConsole("Wealth", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole($"Stored Gifts: {savedClient.Account.GiftString.Count}\nStored Trades: {savedClient.Account.TradeString.Count}\nWealth Value: {savedClient.Account.Wealth}\nPawn Count: {savedClient.Account.PawnCount}");
+            ConsoleUtils.LogToConsole($"Stored Gifts: {savedClient.GiftString.Count}\nStored Trades: {savedClient.TradeString.Count}\nWealth Value: {savedClient.Wealth}\nPawn Count: {savedClient.PawnCount}");
             ConsoleUtils.LogToConsole("Details", ConsoleUtils.ConsoleLogMode.Heading);
-            ConsoleUtils.LogToConsole($"Home Tile ID: {savedClient.Account.HomeTileId}\nFaction: {(savedClient.Account.Faction == null ? "None" : savedClient.Account.Faction.name)}");
+            ConsoleUtils.LogToConsole($"Home Tile ID: {savedClient.HomeTileId}\nFaction: {(savedClient.Faction == null ? "None" : savedClient.Faction.name)}");
         }
         public static void FactionDetailsCommand(string[] arguments)
         {

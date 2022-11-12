@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using OpenWorldServer.Services;
 
 namespace OpenWorldServer
 {
@@ -59,85 +58,48 @@ namespace OpenWorldServer
                     }
                 }
 
-                Server.savedClients.Add(playerToLoad);
+                //Server.savedClients.Add(playerToLoad);
             }
 
             catch { }
         }
 
-        public static void CheckAllAvailablePlayers()
+
+        public static void CheckForPlayerWealth(PlayerClient client, float oldWealth)
         {
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            ConsoleUtils.LogToConsole("Players Check", ConsoleUtils.ConsoleLogMode.Heading);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            CheckSavedPlayers();
-        }
-
-        private static void CheckSavedPlayers()
-        {
-            //Server.savedClients.Clear();
-            //Server.savedSettlements.Clear();
-
-            if (!Directory.Exists(PathProvider.PlayersFolderPath))
+            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive == false)
             {
-                Directory.CreateDirectory(PathProvider.PlayersFolderPath);
-                ConsoleUtils.LogToConsole("No Players Folder Found, Generating");
-                // TODO: This is unstructured.
                 return;
             }
 
-            else
+            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold == 0 &&
+                StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold == 0)
             {
-                string[] playerFiles = Directory.GetFiles(PathProvider.PlayersFolderPath);
-
-                foreach (string file in playerFiles)
-                {
-
-                    LoadPlayer(file);
-                }
-
-                if (Server.savedClients.Count == 0) ConsoleUtils.LogToConsole("No Saved Players Found, Ignoring");
-                else ConsoleUtils.LogToConsole("Loaded [" + Server.savedClients.Count + "] Player Files");
+                return;
             }
-        }
 
-        public static void CheckForPlayerWealth(PlayerClient client)
-        {
-            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.IsActive == false) return;
-            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold == 0 && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold == 0) return;
-            if (client.Account.IsAdmin) return;
-
-            int wealthToCompare = (int)Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth;
-
-            if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0)
+            if (client.Account.IsAdmin)
             {
-                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
+                return;
+            }
 
+            var difInWelath = client.Account.Wealth - oldWealth;
+            if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold > 0 &&
+                difInWelath > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.BanThreshold)
+            {
                 Console.ForegroundColor = ConsoleColor.Red;
-                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Alarm [" + wealthToCompare + " > " + (int)client.Account.Wealth + "], Banning");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Alarm [" + oldWealth + " > " + (int)client.Account.Wealth + "], Banning");
                 Console.ForegroundColor = ConsoleColor.White;
 
                 StaticProxy.playerManager.BanlistHandler.BanPlayer(client, "Wealth Check triggered");
             }
-            else if (client.Account.Wealth - wealthToCompare > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold && StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0)
+            else if (StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold > 0 &&
+                difInWelath > StaticProxy.serverConfig.AntiCheat.WealthCheckSystem.WarningThreshold)
             {
-                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Warning [" + wealthToCompare + " > " + (int)client.Account.Wealth + "]");
+                ConsoleUtils.LogToConsole("Player [" + client.Account.Username + "]'s Wealth Triggered Warning [" + oldWealth + " > " + (int)client.Account.Wealth + "]");
                 Console.ForegroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                StaticProxy.playerManager.AccountsHandler.SaveAccount(client);
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.Wealth = client.Account.Wealth;
-                Server.savedClients.Find(fetch => fetch.Account.Username == client.Account.Username).Account.PawnCount = client.Account.PawnCount;
             }
         }
 
@@ -248,14 +210,14 @@ namespace OpenWorldServer
 
             dataToSend = dataToSend.Replace("GiftedItems│", "");
 
-            var savedClients = Server.savedClients.ToArray();
-            foreach (PlayerClient sc in savedClients)
+            var savedClients = StaticProxy.playerManager.AccountsHandler.Accounts;
+            foreach (var sc in savedClients)
             {
-                if (sc.Account.HomeTileId == tileToSend)
+                if (sc.HomeTileId == tileToSend)
                 {
-                    sc.Account.GiftString.Add(dataToSend);
+                    sc.GiftString.Add(dataToSend);
                     StaticProxy.playerManager.AccountsHandler.SaveAccount(sc);
-                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.Account.Username + "] And [" + sc.Account.Username + "] But Was Offline. Saving");
+                    ConsoleUtils.LogToConsole("Gift Done Between [" + invoker.Account.Username + "] And [" + sc.Username + "] But Was Offline. Saving");
                     return;
                 }
             }

@@ -4,8 +4,8 @@
     {
         public bool IsActive { get; set; } = false;
 
-        public int WarningThreshold { get; set; } = 10000;
+        public int WarningThreshold { get; set; } = 50000;
 
-        public int BanThreshold { get; set; } = 100000;
+        public int BanThreshold { get; set; } = 250000;
     }
 }
