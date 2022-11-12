@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Ideology</name>
+  <packageId>Ludeon.RimWorld.Ideology</packageId>
+  <author>Ludeon Studios</author>
+  <steamAppId>1392840</steamAppId>
+  <supportedVersions>
+  	<li>1.3</li>
+  </supportedVersions>
+  <loadAfter>
+    <li>Ludeon.RimWorld</li>
+  </loadAfter>
+  <forceLoadAfter>
+    <li>Ludeon.RimWorld.Royalty</li>
+  </forceLoadAfter>
+</ModMetaData>
