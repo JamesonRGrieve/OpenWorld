@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using OpenWorld.Shared.Enums;
-using OpenWorldServer.Data.Factions.Structures;
+using OpenWorldServer.Converter;
 
 namespace OpenWorldServer.Data.Factions
 {
@@ -13,8 +14,10 @@ namespace OpenWorldServer.Data.Factions
 
         public int Wealth { get; set; } = 0;
 
-        public Dictionary<Guid, FactionRank> Members = new Dictionary<Guid, FactionRank>();
+        [JsonConverter(typeof(FactionMemberJsonConverter))] // Fix for Json Serializer in Net Core 3.1
+        public Dictionary<Guid, FactionRank> Members { get; set; } = new Dictionary<Guid, FactionRank>();
 
-        public List<FactionStructureBase> Structures { get; set; } = new List<FactionStructureBase>();
+        // We use object here so we dont need an extra Converter. Not a long term solution
+        public List<object> Structures { get; set; } = new List<object>();
     }
 }

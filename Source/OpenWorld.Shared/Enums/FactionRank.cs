@@ -1,6 +1,6 @@
 ﻿namespace OpenWorld.Shared.Enums
 {
-    public enum FactionRank
+    public enum FactionRank : byte
     {
         Member = 0,
         Moderator = 1,

@@ -112,7 +112,8 @@ namespace OpenWorldServer.Handlers
             {
                 ConsoleUtils.LogToConsole($"Saving Account [{account.Username}]", ConsoleUtils.ConsoleLogMode.Done);
                 JsonDataHelper.Save(account, this.GetAccountFilePath(account.Username));
-                if (!saveOnly && !this.Accounts.Contains(account))
+                var knownAccount = this.Accounts.FirstOrDefault(a => a.Id == account.Id);
+                if (!saveOnly && knownAccount == null)
                 {
                     this.accounts.Add(account);
                 }

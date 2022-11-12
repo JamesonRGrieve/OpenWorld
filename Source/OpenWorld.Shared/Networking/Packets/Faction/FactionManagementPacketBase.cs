@@ -29,6 +29,16 @@ namespace OpenWorld.Shared.Networking.Packets.Faction
             {
                 case FactionManagementType.Details:
                     return "Details";
+                case FactionManagementType.Created:
+                    return "Created";
+                case FactionManagementType.NameInUse:
+                    return "NameInUse";
+                case FactionManagementType.Disband:
+                    return "Disband";
+                case FactionManagementType.NoPowers:
+                    return "NoPowers";
+                case FactionManagementType.Leave:
+                    return "Leave";
             }
 
             throw new ArgumentException($"{nameof(managementType)} '{managementType}' could not be prased");

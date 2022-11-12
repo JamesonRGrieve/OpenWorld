@@ -69,7 +69,8 @@ namespace OpenWorldServer.Handlers
             {
                 ConsoleUtils.LogToConsole($"Saving Faction [{faction.Name}]", ConsoleUtils.ConsoleLogMode.Done);
                 JsonDataHelper.Save(faction, this.GetFactionFilePath(faction.Name));
-                if (!saveOnly && !this.Factions.Contains(faction))
+                var knownFacction = this.Factions.FirstOrDefault(a => a.Id == faction.Id);
+                if (!saveOnly && knownFacction == null)
                 {
                     this.factions.Add(faction);
                 }
@@ -84,20 +85,45 @@ namespace OpenWorldServer.Handlers
             }
         }
 
-        public void CreateFaction(string factionName, PlayerClient owner)
+        public Faction CreateFaction(string factionName, PlayerClient owner)
+            => this.CreateFaction(factionName, owner.Account.Id);
+
+        public Faction CreateFaction(string factionName, Guid memberId)
         {
             var faction = new Faction()
             {
                 Name = factionName,
             };
 
-            faction.Members.Add(owner.Account.Id, FactionRank.Leader);
-            owner.Account.FactionId = faction.Id;
+            faction.Members.Add(memberId, FactionRank.Leader);
+
+            var client = this.playerManager.GetClient(memberId);
+            var knownFaction = this.Factions.Any(f => f.Name == factionName);
+            if (knownFaction)
+            {
+                if (client != null)
+                {
+                    client.SendData(new FactionManagementPacket(FactionManagementType.NameInUse));
+                }
+
+                return null;
+            }
+
+            var member = client != null ? client.Account : this.playerManager.AccountsHandler.GetAccount(memberId);
+            if (member != null)
+            {
+                member.FactionId = faction.Id;
+                this.playerManager.AccountsHandler.SaveAccount(member);
+            }
 
             this.SaveFaction(faction);
-            this.playerManager.AccountsHandler.SaveAccount(owner);
-            owner.SendData(new FactionCreatedPacket());
-            owner.SendData(this.GetFactionDetailsPacket(faction));
+            if (client != null)
+            {
+                client.SendData(new FactionManagementPacket(FactionManagementType.Created));
+                client.SendData(this.GetFactionDetailsPacket(faction));
+            }
+
+            return faction;
         }
 
         public void PurgeFaction(Faction faction)
@@ -139,7 +165,7 @@ namespace OpenWorldServer.Handlers
         {
             if (faction != null && faction.Members.ContainsKey(memberId))
             {
-                return faction.Members[memberId];
+                return (FactionRank)faction.Members[memberId];
             }
 
             return FactionRank.NotMember;
