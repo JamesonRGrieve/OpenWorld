@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenWorld.Shared.Enums;
+using OpenWorldServer.Data.Factions.Structures;
 
 namespace OpenWorldServer.Data.Factions
 {
@@ -14,6 +15,6 @@ namespace OpenWorldServer.Data.Factions
 
         public Dictionary<Guid, FactionRank> Members = new Dictionary<Guid, FactionRank>();
 
-        public List<FactionStructure> Structures { get; set; } = new List<FactionStructure>();
+        public List<FactionStructureBase> Structures { get; set; } = new List<FactionStructureBase>();
     }
 }
