@@ -1,0 +1,1 @@
+The following files DO NOT contain the contents of the original Rimworld DLCs. These go inside the server as custom mods to enable DLC usage
